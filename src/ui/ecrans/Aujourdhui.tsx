@@ -9,11 +9,11 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { cumulParSubstance, jourLocal } from '../../domain/cumul.js';
-import { ajouterJours, fenetreGlissante, heureLocale } from '../../domain/temps.js';
+import { ajouterJours, fenetreVivante, heureLocale } from '../../domain/temps.js';
 import type { GroupeAtc, Substance } from '../../domain/types.js';
 import { baseDeDonnees } from '../../db/client.js';
 import { maintenant } from '../App.js';
-import { useMedco } from '../etat.js';
+import { FUSEAU, useMedco } from '../etat.js';
 import type { EtatMedco } from '../etat.js';
 import { couleurSubstance } from '../tokens.js';
 import { faitDuSignal, formaterQuantite } from '../textes.js';
@@ -43,7 +43,12 @@ export function Aujourdhui(): ReactNode {
   }, [codes]);
 
   const cumul = useMemo(
-    () => cumulParSubstance(prises, fenetreGlissante(instant, 'PT24H')),
+    // `fenetreVivante`, et non `fenetreGlissante` : la prise que l'utilisateur
+    // vient d'enregistrer porte la seconde en cours, donc exactement la borne
+    // de fin — que `fenetreGlissante` exclut (§7.3). Le chiffre-clé restait à
+    // zéro, et l'écran affichait « Aucune prise enregistrée » alors que la
+    // prise figurait dans la liste du jour juste en dessous.
+    () => cumulParSubstance(prises, fenetreVivante(instant, 'PT24H', FUSEAU())),
     [prises, instant],
   );
 

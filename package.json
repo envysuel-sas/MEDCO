@@ -14,6 +14,7 @@
     "marque": "node scripts/extraire-marque.mjs && node scripts/generer-icones.mjs",
     "icones": "node scripts/generer-icones.mjs",
     "verifier:ui": "node scripts/verifier-ui.mjs",
+    "verifier:prise": "node scripts/verifier-prise.mjs",
     "pipeline": "python3 pipeline/build.py",
     "test:couverture": "vitest run --coverage"
   },

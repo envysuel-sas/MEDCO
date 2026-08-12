@@ -27,6 +27,7 @@ import {
   ecartEnJours,
   epoch,
   fenetreGlissante,
+  fenetreVivante,
   heureLocale,
   instantDepuisEpoch,
   instantLocal,
@@ -706,5 +707,56 @@ describe('borne de fenêtre et format d’horodatage', () => {
     const instant = '2026-08-12T17:30:00+00:00';
     const borne = instantDepuisEpoch(epoch(instant) + 1000, 'UTC');
     expect(borne > instant).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Régression : une prise enregistrée « maintenant » entre dans son cumul
+// ---------------------------------------------------------------------------
+
+describe('fenetreVivante', () => {
+  const PRISE: PriseAvecSubstances = {
+    id: 'p1',
+    profilId: 'a',
+    produitId: 'x',
+    horodatage: '2026-08-12T19:48:32+02:00',
+    fuseau: PARIS,
+    dose: 1,
+    statut: 'prise',
+    substances: [{ code: 'PARA', quantiteMg: 1000, fiabilite: 2, classe: 'ANTALGIQUE_SIMPLE' }],
+  };
+
+  // Un instant s'écrit à la seconde. Une prise enregistrée dans la seconde en
+  // cours porte donc exactement la borne de fin — que `fenetreGlissante`
+  // exclut (§7.3). Le chiffre-clé restait à zéro et l'écran annonçait
+  // « Aucune prise enregistrée » sous une liste qui, elle, la montrait.
+  it('compte la prise enregistrée dans la seconde en cours', () => {
+    const maintenant = PRISE.horodatage;
+    expect(cumulParSubstance([PRISE], fenetreGlissante(maintenant, 'PT24H')).size).toBe(0);
+    expect(cumulParSubstance([PRISE], fenetreVivante(maintenant, 'PT24H', PARIS)).get('PARA')?.mg).toBe(
+      1000,
+    );
+  });
+
+  it('rend ses deux bornes dans l’offset local, comparables à un horodatage', () => {
+    const fenetre = fenetreVivante('2026-08-12T19:48:32+02:00', 'PT24H', PARIS);
+    expect(fenetre.fin).toBe('2026-08-12T19:48:33+02:00');
+    expect(fenetre.debut).toBe('2026-08-11T19:48:33+02:00');
+    // C'est cette comparaison-là que fait SQL.
+    expect(fenetre.debut <= PRISE.horodatage && PRISE.horodatage < fenetre.fin).toBe(true);
+  });
+
+  // La borne de fin reste exclusive : elle ne fait qu'englober la seconde en
+  // cours. Une prise postérieure — un décalage d'horloge — reste dehors.
+  it('n’avale pas une prise postérieure à la seconde en cours', () => {
+    const maintenant = '2026-08-12T19:48:32+02:00';
+    const future = { ...PRISE, horodatage: '2026-08-12T19:48:34+02:00' };
+    expect(cumulParSubstance([future], fenetreVivante(maintenant, 'PT24H', PARIS)).size).toBe(0);
+  });
+
+  it('exclut toujours la prise vieille de vingt-quatre heures pile', () => {
+    const maintenant = '2026-08-12T19:48:32+02:00';
+    const veille = { ...PRISE, horodatage: '2026-08-11T19:48:32+02:00' };
+    expect(cumulParSubstance([veille], fenetreVivante(maintenant, 'PT24H', PARIS)).size).toBe(0);
   });
 });

@@ -10,7 +10,7 @@ import { create } from 'zustand';
 import { cumulParSubstance } from '../domain/cumul.js';
 import { evaluer, validerBundle } from '../domain/regles.js';
 import type { Regle, Signal } from '../domain/regles.js';
-import { epoch, fenetreGlissante, instantDepuisEpoch } from '../domain/temps.js';
+import { fenetreVivante } from '../domain/temps.js';
 import type { Instant, PriseAvecSubstances, Produit } from '../domain/types.js';
 import { BaseDejaOuverte, baseDeDonnees } from '../db/client.js';
 import { regenererTout } from '../services/pilulier.js';
@@ -105,22 +105,13 @@ export const useMedco = create<EtatMedco>((set, get) => ({
     const { profilId, regles } = get();
     if (!profilId) return;
 
-    const fenetre = fenetreGlissante(maintenant, FENETRE_TRAVAIL);
-    // La borne de fin des fenêtres du domaine est **exclue** (§7.3). Le jeu de
-    // travail, lui, doit contenir la prise qui vient d'être enregistrée : sa
-    // borne dépasse donc l'instant courant d'une seconde.
-    //
-    // ⚠ Elle doit être écrite dans le **même format** que `prise.horodatage` :
-    // la requête compare des chaînes, pas des instants. `toISOString()` produit
-    // du UTC suffixé `Z` ; une prise enregistrée à Paris en été porte
-    // `+02:00`, et « 19:30:00+02:00 » est **textuellement supérieur** à
-    // « 17:30:01Z ». La prise sortait donc de sa propre fenêtre et
-    // n'apparaissait pas — invisible en France, invisible nulle part en UTC,
-    // donc jamais vue en test.
-    const fin = instantDepuisEpoch(epoch(maintenant) + 1000, FUSEAU());
+    // Le jeu de travail doit contenir la prise qui vient d'être enregistrée :
+    // c'est ce que `fenetreVivante` garantit, bornes comprises et écrites dans
+    // le même format que `prise.horodatage` — la requête compare des chaînes.
+    const fenetre = fenetreVivante(maintenant, FENETRE_TRAVAIL, FUSEAU());
     const [produits, prises, acquittements] = await Promise.all([
       baseDeDonnees.produitsActifs(profilId),
-      baseDeDonnees.prisesAvecSubstances(profilId, fenetre.debut, fin),
+      baseDeDonnees.prisesAvecSubstances(profilId, fenetre.debut, fenetre.fin),
       baseDeDonnees.acquittements(profilId),
     ]);
 
@@ -152,6 +143,6 @@ export function cumulDuJour(
   code: string,
   maintenant: Instant,
 ): { mg: number; fiabiliteMin: 0 | 1 | 2; nbPrises: number } {
-  const cumul = cumulParSubstance(prises, fenetreGlissante(maintenant, 'PT24H'));
+  const cumul = cumulParSubstance(prises, fenetreVivante(maintenant, 'PT24H', FUSEAU()));
   return cumul.get(code) ?? { mg: 0, fiabiliteMin: 2, nbPrises: 0 };
 }
