@@ -1,0 +1,50 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
+import { fileURLToPath, URL } from 'node:url';
+
+// base : '/<nom-du-depot>/' sur GitHub Pages, '/' avec un domaine personnalisé.
+const BASE = process.env.VITE_BASE ?? '/';
+
+export default defineConfig({
+  base: BASE,
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+
+  // @sqlite.org/sqlite-wasm ne doit pas être pré-bundlé : il charge son .wasm à côté.
+  optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
+
+  worker: { format: 'es' },
+
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'prompt',
+      injectRegister: 'auto',
+      includeAssets: ['apple-touch-icon.png', 'favicon.svg'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,wasm}'],
+        // Le bundle catalogue est téléchargé et importé par l'app (spec §5.5),
+        // pas mis en cache par Workbox : trop gros et géré par version.
+        globIgnores: ['**/bundles/**'],
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+      },
+      manifest: {
+        name: 'Medco',
+        short_name: 'Medco',
+        description: 'Suivi de consommation médicamenteuse',
+        lang: 'fr',
+        start_url: BASE,
+        scope: BASE,
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#12100E',
+        theme_color: '#12100E',
+        icons: [
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+    }),
+  ],
+});
