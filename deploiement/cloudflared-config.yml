@@ -6,7 +6,8 @@
 # route de Worker (§10.3). Sans cela, l'application et le Worker ne pourraient
 # pas partager le même nom d'hôte.
 #
-# Créé par :
+# Guide pas à pas, étape 5 : docs/deploiement.md
+#
 #   cloudflared tunnel login
 #   cloudflared tunnel create medco
 #   cloudflared tunnel route dns medco medco.boes-home.com
@@ -26,9 +27,8 @@ ingress:
       # Le certificat présenté par GitHub couvre *.github.io : la validation TLS
       # doit se faire sur ce nom-là, pas sur le domaine personnalisé.
       originServerName: envysuel-sas.github.io
-      connectTimeout: 30s
       # Le premier lancement télécharge ~3 Mo de catalogue.
-      noHappyEyeballs: false
+      connectTimeout: 30s
 
   # Règle terminale obligatoire.
   - service: http_status:404

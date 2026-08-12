@@ -15,7 +15,7 @@ Le comptage se fait **par substance active, pas par boîte** : Doliprane 1000 + 
 | Ce que la maquette ne tranche pas | [`docs/maquette/manques.md`](docs/maquette/manques.md) |
 | Pipeline BDPM | [`pipeline/README.md`](pipeline/README.md) |
 | Worker de rappel | [`worker/README.md`](worker/README.md) |
-| Déploiement et DNS | [`docs/deploiement.md`](docs/deploiement.md) |
+| Mise en ligne, pas à pas | [`docs/deploiement.md`](docs/deploiement.md) |
 
 ## Démarrage
 
@@ -50,8 +50,9 @@ pnpm pipeline         # ingestion BDPM (nécessite Python 3.12)
 permet de monter le Worker de rappel sur la **même origine**, sous
 `/rappels/*` : pas de CORS, un seul nom, et plus de certificat à faire émettre.
 
-Le détail — dont les deux lignes de `originRequest` sans lesquelles GitHub sert
-la mauvaise page — est dans [`docs/deploiement.md`](docs/deploiement.md).
+[`docs/deploiement.md`](docs/deploiement.md) est un guide pas à pas qui part de
+zéro : chaque étape indique ce que vous tapez, ce que vous devez voir, et quoi
+faire si ça ne marche pas. Comptez une heure.
 
 ## Vérification visuelle
 
