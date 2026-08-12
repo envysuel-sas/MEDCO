@@ -59,12 +59,19 @@ export function rechercherSpecialites(terme: string, limite = 30): ResultatReche
     .join(' ');
   if (!requete) return [];
 
+  // ⚠ L'opérande gauche de `MATCH` doit être le **nom nu** de la table FTS :
+  // ni `cat.specialite_fts` (« no such column »), ni un alias (idem). La
+  // sous-requête isole cette contrainte et laisse la requête externe lisible.
   return lire(
-    `SELECT s.cis, s.nom, s.forme, s.substances, s.prescription, s.commercialisee
-     FROM cat.specialite_fts f
-     JOIN cat.specialite s ON s.rowid = f.rowid
-     WHERE cat.specialite_fts MATCH ?1
-     ORDER BY s.commercialisee DESC, rank
+    `SELECT s.cis, s.nom, s.forme, s.substances, s.prescription, s.commercialisee,
+            f.rang
+     FROM cat.specialite s
+     JOIN (
+       SELECT rowid AS ligne, rank AS rang
+       FROM cat.specialite_fts
+       WHERE specialite_fts MATCH ?1
+     ) f ON f.ligne = s.rowid
+     ORDER BY s.commercialisee DESC, f.rang
      LIMIT ?2`,
     [requete, limite],
   ).map((l) => ({
@@ -644,4 +651,196 @@ export function occurrencesDuPlan(planId: string): Occurrence[] {
      FROM occurrence WHERE plan_id = ?1 ORDER BY prevue_le`,
     [planId],
   ).map(versOccurrence);
+}
+
+// ---------------------------------------------------------------------------
+// Profils, moments et produits — création
+// ---------------------------------------------------------------------------
+
+export interface Profil {
+  readonly id: string;
+  readonly nom: string;
+  readonly couleur: string | null;
+  readonly creeLe: Instant;
+}
+
+export function profils(): Profil[] {
+  return lire('SELECT id, nom, couleur, cree_le FROM profil ORDER BY cree_le').map((l) => ({
+    id: texte(l, 'id'),
+    nom: texte(l, 'nom'),
+    couleur: texteOuNull(l, 'couleur'),
+    creeLe: texte(l, 'cree_le'),
+  }));
+}
+
+/**
+ * Moments par défaut d'un profil. Les libellés et les heures viennent de la
+ * maquette (composant du pilulier, écran 1f) : matin 08:00, midi 12:30,
+ * soir 20:00, coucher 22:30.
+ */
+const MOMENTS_PAR_DEFAUT = [
+  { code: 'matin', libelle: 'Matin', heure: '08:00', ordre: 1 },
+  { code: 'midi', libelle: 'Midi', heure: '12:30', ordre: 2 },
+  { code: 'soir', libelle: 'Soir', heure: '20:00', ordre: 3 },
+  { code: 'coucher', libelle: 'Coucher', heure: '22:30', ordre: 4 },
+] as const;
+
+export function creerProfil(profil: Profil): void {
+  const db = base();
+  db.exec('BEGIN;');
+  try {
+    db.exec({
+      sql: 'INSERT INTO profil (id, nom, couleur, cree_le) VALUES (?,?,?,?)',
+      bind: [profil.id, profil.nom, profil.couleur, profil.creeLe],
+    });
+    for (const moment of MOMENTS_PAR_DEFAUT) {
+      db.exec({
+        sql: 'INSERT INTO moment (id, profil_id, code, libelle, heure, ordre) VALUES (?,?,?,?,?,?)',
+        bind: [
+          `${profil.id}:${moment.code}`,
+          profil.id,
+          moment.code,
+          moment.libelle,
+          moment.heure,
+          moment.ordre,
+        ],
+      });
+    }
+    db.exec('COMMIT;');
+  } catch (cause) {
+    db.exec('ROLLBACK;');
+    throw cause;
+  }
+}
+
+export function definirHeureMoment(momentId: string, heure: string): void {
+  base().exec({ sql: 'UPDATE moment SET heure = ?2 WHERE id = ?1', bind: [momentId, heure] });
+}
+
+export interface NouveauProduit {
+  readonly id: string;
+  readonly profilId: string;
+  readonly cis: string | null;
+  readonly cip13: string | null;
+  readonly element: string | null;
+  readonly nomAffiche: string;
+  readonly mode: Mode;
+  readonly doseDefaut: number;
+  readonly unite: string | null;
+  readonly creeLe: Instant;
+  /** Composition saisie à la main, pour un produit hors catalogue. */
+  readonly compositionLibre?: readonly {
+    codeSubstance: string | null;
+    nomSubstance: string;
+    doseParUnite: number;
+    unite: string;
+  }[];
+}
+
+export function creerProduit(produit: NouveauProduit): void {
+  const db = base();
+  db.exec('BEGIN;');
+  try {
+    db.exec({
+      sql: `INSERT INTO produit (id, profil_id, cis, cip13, element, nom_affiche, mode,
+                                 dose_defaut, unite, actif, cree_le)
+            VALUES (?,?,?,?,?,?,?,?,?,1,?)`,
+      bind: [
+        produit.id,
+        produit.profilId,
+        produit.cis,
+        produit.cip13,
+        produit.element,
+        produit.nomAffiche,
+        produit.mode,
+        produit.doseDefaut,
+        produit.unite,
+        produit.creeLe,
+      ],
+    });
+    for (const ligne of produit.compositionLibre ?? []) {
+      db.exec({
+        sql: `INSERT INTO produit_compo_libre (produit_id, code_substance, nom_substance,
+                                               dose_par_unite, unite)
+              VALUES (?,?,?,?,?)`,
+        bind: [produit.id, ligne.codeSubstance, ligne.nomSubstance, ligne.doseParUnite, ligne.unite],
+      });
+    }
+    db.exec('COMMIT;');
+  } catch (cause) {
+    db.exec('ROLLBACK;');
+    throw cause;
+  }
+}
+
+export function produit(produitId: string): Produit | null {
+  const [ligne] = lire(
+    `SELECT p.id, p.profil_id, p.cis, p.element, p.nom_affiche, p.mode, p.unite,
+            COALESCE(s.classe, 'AUTRE') AS classe
+     FROM produit p LEFT JOIN cat.specialite s ON s.cis = p.cis
+     WHERE p.id = ?1`,
+    [produitId],
+  );
+  return ligne ? versProduit(ligne) : null;
+}
+
+export function definirModeProduit(produitId: string, mode: Mode): void {
+  // ⚠ R2 — bascule prescrit/libre : elle change l'application des règles de
+  // fréquence, jamais celle des règles de dose.
+  base().exec({ sql: 'UPDATE produit SET mode = ?2 WHERE id = ?1', bind: [produitId, mode] });
+}
+
+export function archiverProduit(produitId: string): void {
+  base().exec({ sql: 'UPDATE produit SET actif = 0 WHERE id = ?1', bind: [produitId] });
+}
+
+/** Une spécialité du catalogue, pour la fiche produit. */
+export function specialite(cis: string): (ResultatRecherche & { titulaire: string | null }) | null {
+  const [ligne] = lire(
+    `SELECT cis, nom, forme, voies, substances, prescription, commercialisee
+     FROM cat.specialite WHERE cis = ?1`,
+    [cis],
+  );
+  if (!ligne) return null;
+  return {
+    cis: texte(ligne, 'cis'),
+    nom: texte(ligne, 'nom'),
+    forme: texteOuNull(ligne, 'forme'),
+    substances: texte(ligne, 'substances'),
+    prescription: texteOuNull(ligne, 'prescription'),
+    commercialisee: nombre(ligne, 'commercialisee') === 1,
+    titulaire: null,
+  };
+}
+
+/** Spécialités contenant une substance donnée — écran « fiche substance ». */
+export function specialitesAvecSubstance(code: CodeSubstance, limite = 40): ResultatRecherche[] {
+  return lire(
+    `SELECT DISTINCT s.cis, s.nom, s.forme, s.substances, s.prescription, s.commercialisee
+     FROM cat.composition c JOIN cat.specialite s ON s.cis = c.cis
+     WHERE c.code_substance = ?1 AND c.comptee = 1
+     ORDER BY s.commercialisee DESC, s.nom
+     LIMIT ?2`,
+    [code, limite],
+  ).map((l) => ({
+    cis: texte(l, 'cis'),
+    nom: texte(l, 'nom'),
+    forme: texteOuNull(l, 'forme'),
+    substances: texte(l, 'substances'),
+    prescription: texteOuNull(l, 'prescription'),
+    commercialisee: nombre(l, 'commercialisee') === 1,
+  }));
+}
+
+export function substanceParCode(code: CodeSubstance): Substance | null {
+  return substancesDuCatalogue([code]).get(code) ?? null;
+}
+
+/** Toutes les prises d'un profil sur une période, pour le relevé PDF (§14.1). */
+export function prisesPourReleve(
+  profilId: string,
+  debut: Instant,
+  fin: Instant,
+): PriseAvecSubstances[] {
+  return prisesAvecSubstances(profilId, debut, fin);
 }

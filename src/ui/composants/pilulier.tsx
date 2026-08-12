@@ -148,7 +148,12 @@ export function PilulierSemaine({
   indexAujourdhui,
 }: {
   readonly moments: readonly Pick<Moment, 'id' | 'libelle' | 'heure'>[];
-  readonly jours: readonly string[];
+  /**
+   * `date` sert de clé, `libelle` d'affichage. Les deux sont distincts :
+   * confondre l'un et l'autre vide silencieusement la grille.
+   */
+  readonly jours: readonly { date: string; libelle: string }[];
+  /** Clé : `${momentId}#${date}`. */
   readonly cellules: ReadonlyMap<string, readonly CelluleSemaine[]>;
   readonly indexAujourdhui: number;
 }): ReactNode {
@@ -158,12 +163,12 @@ export function PilulierSemaine({
         <span />
         {jours.map((jour, index) => (
           <span
-            key={jour}
+            key={jour.date}
             className={[styles['plaquetteJour'], index === indexAujourdhui ? styles['ongletActif'] : '']
               .filter(Boolean)
               .join(' ')}
           >
-            {jour}
+            {jour.libelle}
           </span>
         ))}
       </div>
@@ -175,10 +180,10 @@ export function PilulierSemaine({
             <span className={styles['momentHeure']}> {moment.heure}</span>
           </span>
           {jours.map((jour, index) => {
-            const contenu = cellules.get(`${moment.id}#${jour}`) ?? [];
+            const contenu = cellules.get(`${moment.id}#${jour.date}`) ?? [];
             return (
               <span
-                key={`${moment.id}-${jour}`}
+                key={`${moment.id}-${jour.date}`}
                 className={[
                   styles['semaineCellule'],
                   index === indexAujourdhui ? styles['semaineAujourdhui'] : '',
@@ -201,7 +206,7 @@ export function PilulierSemaine({
                       ...(cellule.statut === 'validee' ? { background: COULEUR_ATC[cellule.groupe] } : {}),
                       ...(cellule.statut === 'expiree' ? { background: 'var(--surface-creux)' } : {}),
                     }}
-                    aria-label={`${moment.libelle} ${jour} : ${LIBELLE_STATUT[cellule.statut]}`}
+                    aria-label={`${moment.libelle} ${jour.libelle} : ${LIBELLE_STATUT[cellule.statut]}`}
                   />
                 ))}
               </span>

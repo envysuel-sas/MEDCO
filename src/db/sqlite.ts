@@ -26,6 +26,7 @@ const CHEMIN_CATALOGUE = '/catalogue.db';
 let sqlite3: Sqlite3Static | undefined;
 let poolUtil: Awaited<ReturnType<Sqlite3Static['installOpfsSAHPoolVfs']>> | undefined;
 let db: Database | undefined;
+let catalogueAttache = false;
 
 export class BaseDejaOuverteError extends Error {
   constructor() {
@@ -71,10 +72,9 @@ export function base(): Database {
 export async function installerCatalogue(octets: Uint8Array): Promise<void> {
   if (!poolUtil || !db) throw new Error('ouvrir() doit être appelé avant installerCatalogue().');
 
-  try {
+  if (catalogueAttache) {
     db.exec('DETACH DATABASE cat;');
-  } catch {
-    // Pas encore attaché : rien à détacher.
+    catalogueAttache = false;
   }
   await poolUtil.importDb(CHEMIN_CATALOGUE, octets);
   attacherCatalogue(db);
@@ -84,11 +84,32 @@ export function catalogueInstalle(): boolean {
   return poolUtil?.getFileNames().includes(CHEMIN_CATALOGUE) ?? false;
 }
 
+/**
+ * Attache le catalogue en lecture seule (§5.3).
+ *
+ * ⚠ **Le snippet de la spec §5.3 est fautif.** `PRAGMA cat.query_only = 1`
+ * n'a rien de propre à la base attachée : `query_only` est un réglage de
+ * **connexion**. Le préfixe de schéma est accepté puis ignoré, et toute la
+ * connexion passe en lecture seule — y compris `user.db`. Symptôme :
+ * `SQLITE_READONLY` à la première écriture, sur une base pourtant
+ * inscriptible.
+ *
+ * La lecture seule est donc obtenue par l'URI `mode=ro` de l'attachement, qui
+ * ne porte que sur la base attachée. Si l'URI n'est pas acceptée, on attache
+ * normalement : l'application n'écrit jamais dans `cat.*`, et le catalogue est
+ * de toute façon remplacé en bloc par `importDb()`.
+ */
 function attacherCatalogue(cible: Database): void {
   if (!catalogueInstalle()) return; // premier lancement
-  // Une seule connexion, deux fichiers attachés — jamais deux connexions (§5.3).
-  cible.exec(`ATTACH DATABASE '${CHEMIN_CATALOGUE}' AS cat;`);
-  cible.exec('PRAGMA cat.query_only = 1;');
+  const vfs = (poolUtil as { vfsName?: string } | undefined)?.vfsName ?? 'opfs-sahpool';
+
+  // Une seule connexion, deux fichiers attachés — jamais deux connexions.
+  try {
+    cible.exec(`ATTACH DATABASE 'file:${CHEMIN_CATALOGUE}?mode=ro&vfs=${vfs}' AS cat;`);
+  } catch {
+    cible.exec(`ATTACH DATABASE '${CHEMIN_CATALOGUE}' AS cat;`);
+  }
+  catalogueAttache = true;
 }
 
 /** Migrations versionnées. `user_version` porte le numéro appliqué. */

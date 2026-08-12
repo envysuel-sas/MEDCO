@@ -40,7 +40,9 @@ import {
 } from '../composants/donnees.js';
 import type { Alveole, LignePriseAffichee } from '../composants/donnees.js';
 import { BlocMoment, PilulierSemaine } from '../composants/pilulier.js';
+import { ActionsPrisePassee, SelecteurInstant } from '../composants/SelecteurInstant.js';
 import type { CelluleSemaine, OccurrenceAffichee } from '../composants/pilulier.js';
+import { faitDuSignal } from '../textes.js';
 import styles from '../composants/composants.module.css';
 
 const GROUPES: GroupeAtc[] = ['N', 'M', 'A', 'R', 'J', 'C', 'D', 'G', 'B', 'S', 'H', '_'];
@@ -175,9 +177,13 @@ export function KitchenSink(): ReactNode {
   const [dose, setDose] = useState(1);
   const [recherche, setRecherche] = useState('');
   const [filtre, setFiltre] = useState(true);
+  // Instant figé : la page doit être identique d'un rendu à l'autre pour
+  // pouvoir être comparée à la maquette.
+  const MAINTENANT = '2026-08-12T14:30:00+02:00';
+  const [instant, setInstant] = useState<string>(MAINTENANT);
 
   const cellules = new Map<string, readonly CelluleSemaine[]>();
-  const jours = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  const jours = ['2026-08-10', '2026-08-11', '2026-08-12', '2026-08-13', '2026-08-14', '2026-08-15', '2026-08-16'];
   for (const [index, jour] of jours.entries()) {
     cellules.set(`m-matin#${jour}`, [
       { statut: index < 2 ? 'validee' : index === 2 ? 'attendue' : 'attendue', groupe: 'H' },
@@ -305,18 +311,20 @@ export function KitchenSink(): ReactNode {
       <Bloc titre="Signal — trois blocs, jamais un quatrième">
         <CarteSignal
           signal={SIGNAL}
-          fait="18 jours avec prise d'antalgique sur les 30 derniers jours."
+          fait={faitDuSignal(SIGNAL)}
           onAcquitter={() => undefined}
           onDetail={() => undefined}
         />
-        <CarteSignal
-          signal={{ ...SIGNAL, niveau: 'information', regleId: 'IBU-DUREE' }}
-          fait="5 jours consécutifs avec prise d'ibuprofène."
-        />
-        <CarteSignal
-          signal={{ ...SIGNAL, niveau: 'attention', regleId: 'ASSOC-30J' }}
-          fait="12 jours avec prise d'antalgique en association sur les 30 derniers jours."
-        />
+        {(
+          [
+            { ...SIGNAL, niveau: 'information', regleId: 'PARA-24H', type: 'cumul_fenetre', valeur: 3000, seuil: 3000, unite: 'mg', libelleCible: 'paracétamol' },
+            { ...SIGNAL, niveau: 'information', regleId: 'IBU-DUREE', type: 'duree_consecutive', valeur: 5, seuil: 5, unite: 'jours', libelleCible: 'ibuprofène' },
+            { ...SIGNAL, niveau: 'attention', regleId: 'ASSOC-30J', valeur: 12, seuil: 10, libelleCible: "antalgique en association" },
+            { ...SIGNAL, niveau: 'information', regleId: 'PARA-INTERVALLE', type: 'intervalle_min', valeur: 2, seuil: 4, unite: 'h', libelleCible: 'paracétamol' },
+          ] as Signal[]
+        ).map((exemple) => (
+          <CarteSignal key={exemple.regleId} signal={exemple} fait={faitDuSignal(exemple)} />
+        ))}
         <Carte>
           <Citation texte="La dose maximale journalière est de 60 mg/kg/jour (avec un maximum de 3 g/j sans ordonnance)." />
         </Carte>
@@ -344,6 +352,22 @@ export function KitchenSink(): ReactNode {
           equivalent={`${(dose * 1000).toLocaleString('fr-FR')} mg de paracétamol`}
           onChanger={setDose}
         />
+      </Bloc>
+
+      <Bloc titre="Sélecteur d’instant — le futur est bloqué">
+        <Carte>
+          <SelecteurInstant valeur={instant} maximum={MAINTENANT} onChanger={setInstant} />
+        </Carte>
+        <Carte>
+          <Etiquette>Prise passée — corriger ou retirer</Etiquette>
+          <ActionsPrisePassee
+            horodatage="2026-08-11T21:30:00+02:00"
+            saisieLe="2026-08-12T08:40:00+02:00"
+            onChangerHeure={() => undefined}
+            onDupliquer={() => undefined}
+            onRetirer={() => undefined}
+          />
+        </Carte>
       </Bloc>
 
       <Bloc titre="Recherche">
@@ -409,7 +433,10 @@ export function KitchenSink(): ReactNode {
               { id: 'm-matin', libelle: 'Matin', heure: '08:00' },
               { id: 'm-soir', libelle: 'Soir', heure: '20:00' },
             ]}
-            jours={jours}
+            jours={jours.map((date, index) => ({
+              date,
+              libelle: ['L', 'M', 'M', 'J', 'V', 'S', 'D'][index]!,
+            }))}
             cellules={cellules}
             indexAujourdhui={2}
           />

@@ -37,7 +37,8 @@ Un composant absent de cette route est considéré comme non livré.
 | Chip produit récent (1e) | `ChipProduit` | `produit`, `groupe`, `dosage`, `selectionne` | sélectionné · non sélectionné |
 | Ligne de résultat de recherche (1l) | `LigneResultat` | `resultat`, `onChoisir` | commercialisée · non commercialisée · sur ordonnance |
 | Sélecteur de dose (1e) | `SelecteurDose` | `dose`, `unite`, `equivalent`, `onChange` | — |
-| Sélecteur d'instant (2c, 2d) | `SelecteurInstant` | `valeur`, `onChange`, `maximum` | maintenant · ce matin · hier · date libre · futur bloqué |
+| Sélecteur d'instant (2c, 2d) | `SelecteurInstant` | `valeur`, `onChanger`, `maximum` | maintenant · ce matin · hier soir · date libre · futur bloqué |
+| Prise passée (2e) | `ActionsPrisePassee` | `horodatage`, `saisieLe`, `onChangerHeure`, `onDupliquer`, `onRetirer` | saisie du jour · ajoutée après coup |
 
 ## Pilulier
 
@@ -70,7 +71,10 @@ Un composant absent de cette route est considéré comme non livré.
 | 1g Pilulier vue semaine | `/pilulier/semaine` | `EcranPilulierSemaine` |
 | 1m Repères | `/reperes` | `EcranReperes` |
 | 1n Réglages | `/reglages` | `EcranReglages` |
-| 1o Onboarding | `/bienvenue` | `EcranOnboarding` |
+| 1o Onboarding | (avant toute route) | `Onboarding` — installation sur l'écran d'accueil |
+| — (absent de la maquette) | (premier lancement) | `Bienvenue` — installation du catalogue puis création du profil |
+| — (absent de la maquette) | `/plans/:produitId` | `Plan` — création d'un plan de prise |
+| — (absent de la maquette) | `/scan` | `Scan` — lecture du Datamatrix |
 | — (absent de la maquette) | `/kitchen-sink` | `KitchenSink` |
 | — (absent de la maquette) | second onglet | `EcranSecondOnglet` |
 

@@ -5,16 +5,18 @@
  * prises du jour. Aucun quatrième bloc dans une carte de signal (§8.6).
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { cumulParSubstance, jourLocal } from '../../domain/cumul.js';
 import { ajouterJours, fenetreGlissante, heureLocale } from '../../domain/temps.js';
-import type { GroupeAtc } from '../../domain/types.js';
+import type { GroupeAtc, Substance } from '../../domain/types.js';
+import { baseDeDonnees } from '../../db/client.js';
 import { maintenant } from '../App.js';
 import { useMedco } from '../etat.js';
 import type { EtatMedco } from '../etat.js';
-import { COULEUR_ATC } from '../tokens.js';
+import { COULEUR_ATC, couleurSubstance } from '../tokens.js';
+import { faitDuSignal } from '../textes.js';
 import { Carte, Etiquette, EtatVide } from '../composants/primitives.js';
 import { EnTete } from '../composants/chrome.js';
 import { CarteSignal, CumulJour, ListePrises, Plaquette } from '../composants/donnees.js';
@@ -25,7 +27,20 @@ const JOURS_PLAQUETTE = 30;
 
 export function Aujourdhui(): ReactNode {
   const instant = maintenant();
-  const { prises, produits, signaux, acquitter } = useMedco();
+  const { prises, produits, signaux, regles, acquitter } = useMedco();
+  const [substances, setSubstances] = useState<Map<string, Substance>>(new Map());
+
+  const codes = useMemo(
+    () => [...new Set(prises.flatMap((prise) => prise.substances.map((s) => s.code)))],
+    [prises],
+  );
+
+  useEffect(() => {
+    if (codes.length === 0) return;
+    void baseDeDonnees
+      .substancesDuCatalogue(codes)
+      .then((table) => setSubstances(new Map(table as unknown as [string, Substance][])));
+  }, [codes]);
 
   const cumul = useMemo(
     () => cumulParSubstance(prises, fenetreGlissante(instant, 'PT24H')),
@@ -41,8 +56,22 @@ export function Aujourdhui(): ReactNode {
     return meilleur ?? ['', { mg: 0, fiabiliteMin: 2 as const, nbPrises: 0 }];
   }, [cumul]);
 
-  const alveoles = useMemo(() => plaquetteDesJours(prises, instant), [prises, instant]);
-  const lignes = useMemo(() => lignesDuJour(prises, produits, instant), [prises, produits, instant]);
+  const dominante = substances.get(codeDominant) ?? null;
+  // Le repère affiché est celui d'une règle de cumul ciblant cette substance,
+  // jamais une valeur choisie par l'app.
+  const repere =
+    regles.find(
+      (regle) => regle.type === 'cumul_fenetre' && regle.cible.substances?.includes(codeDominant),
+    )?.seuil ?? null;
+
+  const alveoles = useMemo(
+    () => plaquetteDesJours(prises, instant, substances),
+    [prises, instant, substances],
+  );
+  const lignes = useMemo(
+    () => lignesDuJour(prises, produits, instant, substances),
+    [prises, produits, instant, substances],
+  );
 
   return (
     <>
@@ -52,9 +81,9 @@ export function Aujourdhui(): ReactNode {
         {codeDominant ? (
           <CumulJour
             mg={dominant.mg}
-            repere={null}
-            substance={codeDominant}
-            groupe="_"
+            repere={repere}
+            substance={dominante?.nom.toLowerCase() ?? codeDominant}
+            groupe={dominante?.groupeAtc ?? '_'}
             codeSubstance={codeDominant}
             detailPrises={`${dominant.nbPrises} prise${dominant.nbPrises > 1 ? 's' : ''}`}
             fiabiliteMin={dominant.fiabiliteMin}
@@ -80,7 +109,7 @@ export function Aujourdhui(): ReactNode {
           <CarteSignal
             key={signal.regleId}
             signal={signal}
-            fait={`${signal.valeur} ${signal.unite} — ${signal.libelleCible}.`}
+            fait={faitDuSignal(signal)}
             onAcquitter={() => void acquitter(signal, instant)}
           />
         ))}
@@ -97,16 +126,26 @@ export function Aujourdhui(): ReactNode {
 function plaquetteDesJours(
   prises: EtatMedco['prises'],
   instant: string,
+  substances: ReadonlyMap<string, Substance>,
 ): Alveole[] {
   const aujourdhui = jourLocal(instant);
   const premier = ajouterJours(aujourdhui, -(JOURS_PLAQUETTE - 1));
 
-  const parJour = new Map<string, number>();
+  // La teinte porte le groupe ATC dominant du jour, l'intensité le nombre de
+  // prises : sur un mois, on voit quelle famille domine (§12.2).
+  const parJour = new Map<string, { nombre: number; groupe: GroupeAtc; code: string }>();
   for (const prise of prises) {
     if (prise.statut !== 'prise') continue;
     const jour = jourLocal(prise.horodatage);
     if (jour < premier) continue;
-    parJour.set(jour, (parJour.get(jour) ?? 0) + 1);
+    const premiere = prise.substances[0];
+    const substance = premiere ? substances.get(premiere.code) : undefined;
+    const existant = parJour.get(jour);
+    parJour.set(jour, {
+      nombre: (existant?.nombre ?? 0) + 1,
+      groupe: existant?.groupe ?? substance?.groupeAtc ?? '_',
+      code: existant?.code ?? premiere?.code ?? jour,
+    });
   }
 
   // Le premier jour de la grille est aligné sur le lundi (semaine française).
@@ -120,17 +159,18 @@ function plaquetteDesJours(
   const jours: Alveole[] = [];
   for (let index = 0; index < JOURS_PLAQUETTE; index += 1) {
     const jour = ajouterJours(premier, index);
-    const nombre = parJour.get(jour) ?? 0;
+    const entree = parJour.get(jour);
+    const nombre = entree?.nombre ?? 0;
     jours.push({
       jour,
       aujourdhui: jour === aujourdhui,
       bandes:
-        nombre === 0
+        entree === undefined
           ? []
           : [
               {
                 hauteur: '100%',
-                couleur: COULEUR_ATC._,
+                couleur: couleurSubstance(entree.groupe, entree.code),
                 opacite: nombre >= 3 ? 1 : nombre === 2 ? 0.7 : 0.4,
               },
             ],
@@ -145,6 +185,7 @@ function lignesDuJour(
   prises: EtatMedco['prises'],
   produits: EtatMedco['produits'],
   instant: string,
+  substances: ReadonlyMap<string, Substance>,
 ): LignePriseAffichee[] {
   const aujourdhui = jourLocal(instant);
   const parId = new Map(produits.map((produit) => [produit.id, produit]));
@@ -154,15 +195,18 @@ function lignesDuJour(
     .sort((a, b) => b.horodatage.localeCompare(a.horodatage))
     .map((prise) => {
       const produit = parId.get(prise.produitId);
-      const substance = prise.substances[0];
+      const premiere = prise.substances[0];
+      const substance = premiere ? substances.get(premiere.code) : undefined;
       return {
         id: prise.id,
         heure: heureLocale(prise.horodatage),
         nom: produit?.nomAffiche ?? '—',
-        detail: substance ? `${Math.round(substance.quantiteMg)} mg` : 'dosage non exploitable',
+        detail: premiere
+          ? `${substance?.nom.toLowerCase() ?? premiere.code} ${Math.round(premiere.quantiteMg)} mg`
+          : 'dosage non exploitable',
         appoint: `${prise.dose} ${produit?.unite ?? ''}`.trim(),
-        groupe: '_' as GroupeAtc,
-        codeSubstance: substance?.code ?? prise.produitId,
+        groupe: substance?.groupeAtc ?? ('_' as GroupeAtc),
+        codeSubstance: premiere?.code ?? prise.produitId,
         ...(prise.statut === 'annulee' ? { annulee: true } : {}),
         ...(prise.substances.length === 0 ? { exclueDuCumul: true } : {}),
       };

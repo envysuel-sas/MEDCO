@@ -1,12 +1,15 @@
 {
   "version": "2026-08-12",
   "fichier": "catalogue-2026-08-12.sqlite.br",
+  "fichier_gzip": "catalogue-2026-08-12.sqlite.gz",
   "date_bdpm": "2026-08-03",
   "date_build": "2026-08-12",
   "nb_specialites": 15857,
   "octets": 1923671,
+  "octets_gzip": 3041235,
   "octets_decompresses": 11309056,
   "sha256": "8bc72f90bbfe43a6ae2909737086d0088cf6f88590a83b8fce46e704a8f6043c",
+  "sha256_gzip": "481dd84f55d8574e544bfddc82d57af8e7d2b983d9e610095249624aed6e02fa",
   "sha256_sqlite": "e9c64de0860ac0f703da68bc05b1724395800849046c63e3344650031b459613",
   "version_regles": "2026.08.12",
   "source": {

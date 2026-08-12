@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 
 import { jourLocal } from '../../domain/cumul.js';
 import { ajouterJours } from '../../domain/temps.js';
-import type { GroupeAtc, Moment, Occurrence } from '../../domain/types.js';
+import type { GroupeAtc, Moment, Occurrence, Plan } from '../../domain/types.js';
 import { baseDeDonnees } from '../../db/client.js';
 import { maintenant } from '../App.js';
 import { useMedco } from '../etat.js';
@@ -25,11 +25,13 @@ const RAPPEL_NOTICE =
 function useDonneesPilulier(debut: string, fin: string): {
   moments: Moment[];
   occurrences: Occurrence[];
+  plans: Plan[];
   recharger: () => void;
 } {
   const { profilId, produits } = useMedco();
   const [moments, setMoments] = useState<Moment[]>([]);
   const [occurrences, setOccurrences] = useState<Occurrence[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [rang, setRang] = useState(0);
 
   useEffect(() => {
@@ -37,42 +39,56 @@ function useDonneesPilulier(debut: string, fin: string): {
     void Promise.all([
       baseDeDonnees.momentsDuProfil(profilId),
       baseDeDonnees.occurrencesEntre(profilId, debut, fin),
-    ]).then(([listeMoments, listeOccurrences]) => {
+      baseDeDonnees.plansDuProfil(profilId),
+    ]).then(([listeMoments, listeOccurrences, listePlans]) => {
       setMoments([...new Map(listeMoments as unknown as [string, Moment][]).values()]);
       setOccurrences(listeOccurrences);
+      setPlans(listePlans);
     });
   }, [profilId, debut, fin, rang, produits]);
 
-  return { moments, occurrences, recharger: () => setRang((valeur) => valeur + 1) };
+  return { moments, occurrences, plans, recharger: () => setRang((valeur) => valeur + 1) };
 }
 
 export function PilulierJourEcran(): ReactNode {
   const instant = maintenant();
   const jour = jourLocal(instant);
   const { profilId, produits, rafraichir } = useMedco();
-  const { moments, occurrences, recharger } = useDonneesPilulier(
+  const { moments, occurrences, plans, recharger } = useDonneesPilulier(
     `${jour}T00:00:00+00:00`,
     `${ajouterJours(jour, 1)}T00:00:00+00:00`,
   );
 
-  const blocs = useMemo(() => {
-    const parId = new Map(produits.map((produit) => [produit.id, produit]));
-    return moments.map((moment) => ({
-      moment,
-      occurrences: occurrences
-        .filter((occurrence) => occurrence.momentId === moment.id)
-        .map<OccurrenceAffichee>((occurrence) => ({
-          occurrence,
-          nomProduit: parId.get(occurrence.planId)?.nomAffiche ?? 'Traitement',
-          doseLibelle: `${occurrence.dose}`,
-          groupe: '_' as GroupeAtc,
-          codeSubstance: occurrence.planId,
-        })),
-    }));
-  }, [moments, occurrences, produits]);
+  // Une occurrence porte un `plan_id` ; c'est le plan qui porte le produit.
+  const produitDuPlan = useMemo(() => {
+    const parProduit = new Map(produits.map((produit) => [produit.id, produit]));
+    return new Map(plans.map((plan) => [plan.id, parProduit.get(plan.produitId) ?? null]));
+  }, [plans, produits]);
+
+  const blocs = useMemo(
+    () =>
+      moments.map((moment) => ({
+        moment,
+        occurrences: occurrences
+          .filter((occurrence) => occurrence.momentId === moment.id)
+          .map<OccurrenceAffichee>((occurrence) => {
+            const produit = produitDuPlan.get(occurrence.planId) ?? null;
+            return {
+              occurrence,
+              nomProduit: produit?.nomAffiche ?? 'Traitement',
+              doseLibelle: `${occurrence.dose} ${produit?.unite ?? ''}`.trim(),
+              groupe: '_' as GroupeAtc,
+              codeSubstance: produit?.id ?? occurrence.planId,
+            };
+          }),
+      })),
+    [moments, occurrences, produitDuPlan],
+  );
 
   async function valider(occurrence: Occurrence): Promise<void> {
     if (!profilId) return;
+    const produitId = produitDuPlan.get(occurrence.planId)?.id;
+    if (!produitId) return;
     const instantValidation = maintenant();
     await baseDeDonnees.validerOccurrences([
       {
@@ -80,7 +96,7 @@ export function PilulierJourEcran(): ReactNode {
         prise: {
           id: crypto.randomUUID(),
           profilId,
-          produitId: occurrence.planId,
+          produitId,
           occurrenceId: occurrence.id,
           horodatage: instantValidation,
           fuseau: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -90,6 +106,41 @@ export function PilulierJourEcran(): ReactNode {
         },
       },
     ]);
+    recharger();
+    await rafraichir(instantValidation);
+  }
+
+  /** « Tout valider » : une seule transaction sur toutes les occurrences (§9.3). */
+  async function toutValider(momentId: string): Promise<void> {
+    if (!profilId) return;
+    const instantValidation = maintenant();
+    const fuseau = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const lot = occurrences
+      .filter((occurrence) => occurrence.momentId === momentId && occurrence.statut === 'attendue')
+      .flatMap((occurrence) => {
+        const produitId = produitDuPlan.get(occurrence.planId)?.id;
+        if (!produitId) return [];
+        return [
+          {
+            occurrence,
+            prise: {
+              id: crypto.randomUUID(),
+              profilId,
+              produitId,
+              occurrenceId: occurrence.id,
+              horodatage: instantValidation,
+              fuseau,
+              dose: occurrence.dose,
+              saisieLe: instantValidation,
+              source: 'manuelle' as const,
+            },
+          },
+        ];
+      });
+
+    if (lot.length === 0) return;
+    await baseDeDonnees.validerOccurrences(lot);
     recharger();
     await rafraichir(instantValidation);
   }
@@ -117,6 +168,7 @@ export function PilulierJourEcran(): ReactNode {
           onSauter={(occurrence) => {
             void baseDeDonnees.sauterOccurrence(occurrence.id).then(recharger);
           }}
+          onToutValider={(momentId) => void toutValider(momentId)}
         />
       </Carte>
       <p className={styles['meta']}>{RAPPEL_NOTICE}</p>
@@ -149,7 +201,7 @@ export function PilulierSemaineEcran(): ReactNode {
       <Carte>
         <PilulierSemaine
           moments={moments}
-          jours={jours.map((valeur) => valeur.slice(8))}
+          jours={jours.map((date) => ({ date, libelle: date.slice(8) }))}
           cellules={cellules}
           indexAujourdhui={jours.indexOf(jour)}
         />

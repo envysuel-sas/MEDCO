@@ -174,7 +174,19 @@ Certains sachets sont dosés « pour 100 g de poudre » : la conversion est exac
 enregistrable, la mention « valeur dérivée » s'affiche. À arbitrer : faut-il
 plutôt les traiter comme non exploitables ?
 
-### 5.3 ZBar ne décode pas le Datamatrix
+### 5.3 Trois erreurs du texte de la spec, trouvées à l'exécution
+
+| Point | Ce que dit la spec | Ce que fait SQLite |
+|---|---|---|
+| §5.3 | `ATTACH … AS cat;` puis `PRAGMA cat.query_only = 1;` | `query_only` est un réglage de **connexion** : le préfixe de schéma est ignoré et **toute** la connexion passe en lecture seule, `user.db` compris. Symptôme : `SQLITE_READONLY` à la première écriture. La lecture seule vient désormais de l'URI `mode=ro` de l'attachement. |
+| §5.1 | `specialite_fts` en `content='specialite'` avec une colonne `substances` | La colonne n'existe pas dans `specialite` : l'index externe n'est pas constructible tel qu'écrit. La colonne a été ajoutée à la table. |
+| §6.3 | bundle Brotli servi tel quel | `DecompressionStream('br')` n'existe ni sur Safari ni sur Firefox, et GitHub Pages ne pose pas `Content-Encoding`. Le pipeline publie donc **aussi** une variante gzip, et l'application vérifie l'empreinte du SQLite décompressé — la seule qui tienne quel que soit l'hébergeur. |
+
+À noter aussi, sans être une erreur de la spec : l'opérande gauche de `MATCH`
+doit être le **nom nu** de la table FTS. Ni `cat.specialite_fts`, ni un alias
+ne fonctionnent (« no such column »).
+
+### 5.4 ZBar ne décode pas le Datamatrix
 
 La spec §4.1 et §13 proposent `zbar-wasm` comme repli sur Safari, où
 `BarcodeDetector` est absent. ZBar couvre les codes-barres linéaires et le QR,
@@ -184,7 +196,7 @@ La spec §4.1 et §13 proposent `zbar-wasm` comme repli sur Safari, où
 `DataMatrixReader`, chargé à la demande pour rester hors du bundle initial.
 À confirmer.
 
-### 5.4 Fragmentation des sels sans fraction thérapeutique
+### 5.5 Fragmentation des sels sans fraction thérapeutique
 
 Quand la BDPM ne publie pas de ligne `FT`, deux sels d'une même molécule
 gardent deux codes distincts (naproxène / naproxène sodique, codéine /

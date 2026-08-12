@@ -13,6 +13,7 @@ import type { Regle, Signal } from '../domain/regles.js';
 import { fenetreGlissante } from '../domain/temps.js';
 import type { Instant, PriseAvecSubstances, Produit } from '../domain/types.js';
 import { BaseDejaOuverte, baseDeDonnees } from '../db/client.js';
+import { regenererTout } from '../services/pilulier.js';
 import reglesEmbarquees from '../../data/regles.json';
 
 export interface EtatMedco {
@@ -29,7 +30,10 @@ export interface EtatMedco {
   demarrer(maintenant: Instant): Promise<void>;
   rafraichir(maintenant: Instant): Promise<void>;
   acquitter(signal: Signal, maintenant: Instant): Promise<void>;
+  choisirProfil(profilId: string, maintenant: Instant): Promise<void>;
 }
+
+export const FUSEAU = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 /** Fenêtre de travail : 90 jours couvrent la Plaquette la plus longue (§14.1). */
 const FENETRE_TRAVAIL = 'P90D';
@@ -54,9 +58,25 @@ export const useMedco = create<EtatMedco>((set, get) => ({
         // signal qu'un signal faux (§8.2).
         set({ erreur: `Règles rejetées : ${bundle.erreurs.map((e) => e.code).join(', ')}` });
       }
-      const version = await baseDeDonnees.versionCatalogue();
-      set({ regles: bundle.regles, catalogueInstalle: version !== null, pret: true });
-      await get().rafraichir(maintenant);
+      const [version, listeProfils] = await Promise.all([
+        baseDeDonnees.versionCatalogue(),
+        baseDeDonnees.profils(),
+      ]);
+      const premier = listeProfils[0]?.id ?? null;
+
+      set({
+        regles: bundle.regles,
+        catalogueInstalle: version !== null,
+        profilId: premier,
+        pret: true,
+      });
+
+      if (premier) {
+        // §9.1 — les occurrences sont régénérées à chaque ouverture, puis les
+        // non traitées passent à `expiree` : sans notification, sans badge.
+        await regenererTout(premier, maintenant, FUSEAU());
+        await get().rafraichir(maintenant);
+      }
     } catch (cause) {
       if (cause instanceof BaseDejaOuverte) set({ secondOnglet: true, pret: true });
       else set({ erreur: cause instanceof Error ? cause.message : String(cause), pret: true });
@@ -68,9 +88,13 @@ export const useMedco = create<EtatMedco>((set, get) => ({
     if (!profilId) return;
 
     const fenetre = fenetreGlissante(maintenant, FENETRE_TRAVAIL);
+    // La borne de fin des fenêtres du domaine est **exclue** (§7.3). Le jeu de
+    // travail, lui, doit contenir la prise qui vient d'être enregistrée : sa
+    // borne dépasse donc l'instant courant d'une seconde.
+    const fin = new Date(Date.parse(maintenant) + 1000).toISOString();
     const [produits, prises, acquittements] = await Promise.all([
       baseDeDonnees.produitsActifs(profilId),
-      baseDeDonnees.prisesAvecSubstances(profilId, fenetre.debut, maintenant),
+      baseDeDonnees.prisesAvecSubstances(profilId, fenetre.debut, fin),
       baseDeDonnees.acquittements(profilId),
     ]);
 
@@ -79,6 +103,12 @@ export const useMedco = create<EtatMedco>((set, get) => ({
       prises,
       signaux: evaluer({ prises, produits, acquittements }, regles, maintenant),
     });
+  },
+
+  async choisirProfil(profilId, maintenant) {
+    set({ profilId });
+    await regenererTout(profilId, maintenant, FUSEAU());
+    await get().rafraichir(maintenant);
   },
 
   async acquitter(signal, maintenant) {

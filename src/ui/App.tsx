@@ -21,6 +21,11 @@ import { PilulierJourEcran, PilulierSemaineEcran } from './ecrans/Pilulier.js';
 import { Reperes } from './ecrans/Reperes.js';
 import { Reglages } from './ecrans/Reglages.js';
 import { Onboarding } from './ecrans/Onboarding.js';
+import { Bienvenue } from './ecrans/Bienvenue.js';
+import { Produit } from './ecrans/Produit.js';
+import { Substance } from './ecrans/Substance.js';
+import { Plan } from './ecrans/Plan.js';
+import { Scan } from './ecrans/Scan.js';
 import { KitchenSink } from './ecrans/KitchenSink.js';
 import styles from './composants/composants.module.css';
 
@@ -37,7 +42,7 @@ export function maintenant(): string {
 }
 
 export function App(): ReactNode {
-  const { pret, secondOnglet, erreur, demarrer } = useMedco();
+  const { pret, secondOnglet, erreur, profilId, demarrer, choisirProfil } = useMedco();
   const [installation, setInstallation] = useState(etatInstallation);
   const [saisieOuverte, setSaisieOuverte] = useState(false);
   const naviguer = useNavigate();
@@ -60,6 +65,11 @@ export function App(): ReactNode {
     return <Onboarding installation={installation} onReessayer={() => setInstallation(etatInstallation())} />;
   }
 
+  // Premier lancement : catalogue puis profil, dans cet ordre.
+  if (!profilId) {
+    return <Bienvenue onPret={(id) => void choisirProfil(id, maintenant())} />;
+  }
+
   return (
     <div className={styles['pileEcran']} style={{ padding: 0, gap: 0 }}>
       {erreur ? (
@@ -73,6 +83,10 @@ export function App(): ReactNode {
         <Route path="/pilulier" element={<PilulierJourEcran />} />
         <Route path="/pilulier/semaine" element={<PilulierSemaineEcran />} />
         <Route path="/produits" element={<Produits />} />
+        <Route path="/produits/:produitId" element={<Produit />} />
+        <Route path="/substances/:code" element={<Substance />} />
+        <Route path="/plans/:produitId" element={<Plan />} />
+        <Route path="/scan" element={<Scan />} />
         <Route path="/reperes" element={<Reperes />} />
         <Route path="/reglages" element={<Reglages />} />
         <Route path="/kitchen-sink" element={<KitchenSink />} />
