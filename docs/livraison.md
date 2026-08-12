@@ -85,13 +85,14 @@ c'est le sixième contrôle bloquant.
 
 | Fichier | Tests |
 |---|---|
-| `domain/__tests__/domaine.test.ts` | 68 |
+| `domain/__tests__/domaine.test.ts` | 74 |
 | `db/__tests__/verrou.test.ts` | 12 |
 | `domain/__tests__/golden.test.ts` | 45 |
 | `services/__tests__/ics.test.ts` | 15 |
 | `services/__tests__/gs1.test.ts` | 14 |
 | `ui/__tests__/textes.test.ts` | 14 |
 | `services/__tests__/sauvegarde.test.ts` | 8 |
+| `db/__tests__/sauvegarde-carnet.test.ts` | 7 |
 
 Couverture du domaine pur, exigée à 100 % de branches :
 
@@ -323,6 +324,28 @@ La spec proposait `zbar-wasm` en repli Safari : ZBar couvre le linéaire et le
 QR, **pas** l'ECC 200 du Datamatrix des boîtes françaises. Le repli est
 `@zxing/library` (`manques.md` §5.4).
 
+Le détecteur natif n'est retenu que s'il déclare `data_matrix` dans
+`getSupportedFormats()` : `BarcodeDetector` peut exister sans connaître ce
+format, et rendait alors une liste vide indéfiniment — caméra ouverte, aucun
+résultat, aucune explication.
+
+**La sauvegarde emporte tout le carnet**, lu en base et non depuis l'état de
+l'écran : profils, produits (y compris archivés), prises (sans fenêtre), plans,
+occurrences, moments, acquittements et réglages. Le code de déverrouillage en
+est exclu — il appartient au téléphone, pas à l'archive, et celle-ci porte déjà
+sa propre phrase de passe.
+
+La restauration remplace le carnet en **une seule transaction** : un échec en
+cours de route laisse le carnet d'avant intact plutôt qu'un carnet à moitié
+écrasé. Une archive issue d'un schéma plus récent est refusée avec le numéro de
+version, pas tentée.
+
+`pnpm verifier:sauvegarde` rejoue le parcours entier dans Chromium, plateforme
+téléphone simulée (`showSaveFilePicker` retiré, comme sur Android et iOS) :
+carnet peuplé → archive chiffrée téléchargée → **appareil effacé** → restauration
+→ carnet retrouvé. Il vérifie aussi que le fichier ne contient rien en clair, et
+qu'une phrase de passe fausse ne détruit pas le carnet en place.
+
 ---
 
 ## Bout en bout, vérifié dans Chromium
@@ -333,6 +356,19 @@ création du profil → ajout de DOLIPRANE 1000 avec sa composition réelle issu
 catalogue → trois prises → **cumul 3 000 mg** → déclenchement de `PARA-24H` avec
 sa citation ANSM datée → création d'un plan → occurrences visibles en vue
 semaine.
+
+Trois parcours sont rejouables à la demande, tous **calés sur `Europe/Paris`** :
+
+| Commande | Ce qu'elle prouve |
+|---|---|
+| `pnpm verifier:ui` | aucun débordement horizontal ni erreur JS, à 320, 390, 768 et 1280 px |
+| `pnpm verifier:prise` | une prise enregistrée apparaît sans rechargement, et survit à un rechargement |
+| `pnpm verifier:sauvegarde` | l'archive sort du téléphone, l'appareil s'efface, le carnet revient intact |
+
+Le fuseau n'est pas décoratif. Deux défauts de restitution — une borne de fenêtre
+écrite en UTC face à des horodatages à offset local, et une prise tombant sur la
+borne exclusive de sa propre fenêtre — étaient **nuls en UTC**, donc invisibles
+depuis l'intégration continue, qui tourne en UTC.
 
 ---
 

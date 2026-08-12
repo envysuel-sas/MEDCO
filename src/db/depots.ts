@@ -902,3 +902,127 @@ export function prisesPourReleve(
 ): PriseAvecSubstances[] {
   return prisesAvecSubstances(profilId, debut, fin);
 }
+
+// ---------------------------------------------------------------------------
+// Sauvegarde et restauration (spec §14.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * Tables du carnet, dans l'ordre où les clés étrangères permettent de les
+ * réinsérer. Le catalogue n'y figure pas : c'est une donnée publique, qui se
+ * retélécharge. L'archive ne porte que ce qui n'existe nulle part ailleurs.
+ *
+ * ⚠ Cette liste est la définition de « tout le carnet ». Toute table ajoutée
+ * au schéma doit y être ajoutée ici, sinon la sauvegarde la perd en silence —
+ * et une sauvegarde qui perd en silence est pire que pas de sauvegarde.
+ */
+const TABLES_CARNET = [
+  'profil',
+  'produit',
+  'produit_compo_libre',
+  'moment',
+  'plan',
+  'prise',
+  'occurrence',
+  'prise_substance',
+  'prise_exclusion',
+  'signal_vu',
+  'reglage',
+] as const;
+
+/**
+ * Réglages exclus de l'archive : le code de déverrouillage de l'appareil.
+ *
+ * L'archive porte déjà sa propre phrase de passe. Y embarquer la preuve du
+ * code ferait voyager un second secret sans raison, et restaurer sur un
+ * téléphone neuf y réimposerait le code de l'ancien.
+ */
+const REGLAGES_HORS_ARCHIVE = new Set(['verrou.sel', 'verrou.preuve', 'verrou.essais']);
+
+export interface ArchiveCarnet {
+  readonly format: 'medco.carnet';
+  readonly version: number;
+  readonly exporteLe: string;
+  readonly tables: Record<string, Ligne[]>;
+}
+
+/**
+ * Tout le carnet, sans fenêtre ni filtre.
+ *
+ * ⚠ Ne jamais reconstruire une archive depuis l'état de l'UI : celui-ci ne
+ * tient que la fenêtre de travail et les produits actifs. Une sauvegarde
+ * bâtie ainsi amputerait l'historique de tout ce qui la précède, sans le dire.
+ */
+export function exporterCarnet(exporteLe: Instant): ArchiveCarnet {
+  const db = base();
+  const [version = 0] = db.selectValues('PRAGMA user_version;') as number[];
+  const tables: Record<string, Ligne[]> = {};
+
+  for (const table of TABLES_CARNET) {
+    const lignes = lire(`SELECT * FROM ${table}`, [], db);
+    tables[table] =
+      table === 'reglage' ? lignes.filter((l) => !REGLAGES_HORS_ARCHIVE.has(texte(l, 'cle'))) : lignes;
+  }
+
+  return { format: 'medco.carnet', version, exporteLe, tables };
+}
+
+/**
+ * Remplace le carnet par celui de l'archive. Tout ou rien : une transaction
+ * unique, pour qu'un échec en cours de route ne laisse pas un carnet à moitié
+ * écrasé.
+ *
+ * Le code de déverrouillage de l'appareil n'est pas touché : il appartient au
+ * téléphone, pas à l'archive.
+ */
+export function restaurerCarnet(archive: ArchiveCarnet): { tables: number; lignes: number } {
+  if (archive.format !== 'medco.carnet') {
+    throw new Error("Ce fichier n'est pas une sauvegarde de carnet Medco.");
+  }
+
+  const db = base();
+  const [version = 0] = db.selectValues('PRAGMA user_version;') as number[];
+  if (archive.version > version) {
+    throw new Error(
+      `Cette sauvegarde vient d'une version plus récente de l'application (schéma ${archive.version} contre ${version}). Mettez Medco à jour avant de la restaurer.`,
+    );
+  }
+
+  let lignes = 0;
+  let tables = 0;
+  db.exec('BEGIN;');
+  try {
+    // Sens inverse : on vide les tables qui référencent avant les référencées.
+    for (const table of [...TABLES_CARNET].reverse()) {
+      if (table === 'reglage') {
+        db.exec({
+          sql: 'DELETE FROM reglage WHERE cle NOT IN (?1, ?2, ?3)',
+          bind: [...REGLAGES_HORS_ARCHIVE],
+        });
+        continue;
+      }
+      db.exec(`DELETE FROM ${table};`);
+    }
+
+    for (const table of TABLES_CARNET) {
+      const contenu = archive.tables[table] ?? [];
+      if (contenu.length === 0) continue;
+      tables += 1;
+      for (const ligne of contenu) {
+        const colonnes = Object.keys(ligne);
+        const trous = colonnes.map((_, index) => `?${index + 1}`).join(',');
+        db.exec({
+          sql: `INSERT INTO ${table} (${colonnes.join(',')}) VALUES (${trous})`,
+          bind: colonnes.map((colonne) => ligne[colonne] ?? null) as never,
+        });
+        lignes += 1;
+      }
+    }
+    db.exec('COMMIT;');
+  } catch (cause) {
+    db.exec('ROLLBACK;');
+    throw cause;
+  }
+
+  return { tables, lignes };
+}

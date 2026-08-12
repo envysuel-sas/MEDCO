@@ -412,6 +412,18 @@
   color: var(--encre-3);
 }
 
+/* Sélecteur de fichiers déclenché par un bouton : l'`input` natif ne se
+   maquille pas, mais reste le seul chemin vers les fichiers sur Android.
+   `display: none` le rendrait inatteignable par `.click()` sur certains
+   navigateurs — on le retire du flux sans le retirer du document. */
+.fichierMasque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* --- Feuille modale --------------------------------------------------------- */
 
 .voile {
