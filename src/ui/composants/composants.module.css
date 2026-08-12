@@ -775,3 +775,115 @@
   font-size: var(--taille-bouton-secondaire);
   color: var(--encre-3);
 }
+
+/* --- Marque ---------------------------------------------------------------
+   Emploi borné par la maquette : onboarding, verrou, documents exportés.
+   Jamais dans l'en-tête courant, qui porte le nom du profil. */
+
+.motSymbole {
+  display: block;
+  width: 100%;
+  max-width: 232px;
+  height: auto;
+}
+
+.motSymboleGrand {
+  max-width: 288px;
+}
+
+.monogramme {
+  display: block;
+  width: var(--espace-14);
+  height: auto;
+}
+
+.verrouEntete {
+  display: grid;
+  gap: var(--espace-5);
+  justify-items: center;
+  text-align: center;
+}
+
+.retour {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-3);
+  background: none;
+  border: 0;
+  padding: var(--espace-3) 0;
+  font: inherit;
+  font-size: var(--taille-bouton-secondaire);
+  color: var(--action);
+  cursor: pointer;
+}
+
+/* --- Coquille -------------------------------------------------------------
+   Colonne pleine hauteur : en-tête, contenu extensible, barre d'onglets collée
+   en bas. `min-height: 100dvh` suit la barre d'adresse mobile, que `100vh`
+   ignore — d'où le contenu coupé sous Safari iOS. */
+
+.coquille {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* --- Adaptation aux largeurs ---------------------------------------------- */
+
+/* La coquille garde le fond pleine largeur ; seul le contenu est borné. */
+.coquille > header,
+.coquille > main,
+.coquille > nav {
+  width: 100%;
+  max-width: var(--largeur-lecture);
+  margin-inline: auto;
+}
+
+.enTete {
+  padding-top: calc(var(--espace-4) + var(--marge-haute));
+}
+
+/* Aucun écran ne doit provoquer de défilement horizontal, y compris à 320 px :
+   les mots longs (noms de spécialités, codes) doivent pouvoir se rompre. */
+.pileEcran {
+  overflow-wrap: anywhere;
+}
+
+/* Les grilles s'ajustent au lieu de déborder. */
+.grilleProduits {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+@media (max-width: 359px) {
+  .grilleProduits {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* La semaine du pilulier ne se comprime pas indéfiniment : elle défile dans
+   son propre conteneur plutôt que d'écraser la page. */
+.semaine {
+  overflow-x: auto;
+}
+
+/* Le pavé du verrou suit la hauteur disponible sur les petits écrans, sinon
+   les touches sortent sous la ligne de flottaison. */
+@media (max-height: 680px) {
+  .verrouPave {
+    max-width: 216px;
+    gap: var(--espace-5);
+  }
+
+  .verrou {
+    gap: var(--espace-8);
+  }
+}
+
+/* Au-delà du téléphone, la barre d'onglets cesse d'être collée au bord bas de
+   l'écran et suit la colonne de lecture. */
+@media (min-width: 600px) {
+  .barreOnglets {
+    border-inline: var(--filet) solid var(--trait);
+    border-radius: var(--rayon-carte) var(--rayon-carte) 0 0;
+  }
+}

@@ -11,7 +11,9 @@
     "test:golden": "vitest run src/domain/__tests__/golden.test.ts",
     "lint": "eslint . && tsc --noEmit",
     "extraire:maquette": "node scripts/extraire-maquette.mjs docs/maquette/export > docs/maquette/inventaire.json",
+    "marque": "node scripts/extraire-marque.mjs && node scripts/generer-icones.mjs",
     "icones": "node scripts/generer-icones.mjs",
+    "verifier:ui": "node scripts/verifier-ui.mjs",
     "pipeline": "python3 pipeline/build.py",
     "test:couverture": "vitest run --coverage"
   },

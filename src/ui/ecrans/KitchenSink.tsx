@@ -40,6 +40,8 @@ import {
 } from '../composants/donnees.js';
 import type { Alveole, LignePriseAffichee } from '../composants/donnees.js';
 import { BlocMoment, PilulierSemaine } from '../composants/pilulier.js';
+import { EnTete } from '../composants/chrome.js';
+import { Monogramme, MotSymbole } from '../composants/marque.js';
 import { ActionsPrisePassee, SelecteurInstant } from '../composants/SelecteurInstant.js';
 import type { CelluleSemaine, OccurrenceAffichee } from '../composants/pilulier.js';
 import { faitDuSignal } from '../textes.js';
@@ -478,6 +480,26 @@ export function KitchenSink(): ReactNode {
             </Bouton>
           </div>
         </Feuille>
+      </Bloc>
+
+      <Bloc titre="Marque — mot-symbole et monogramme">
+        <p className={styles['meta']} style={{ marginBottom: 'var(--espace-8)' }}>
+          Extraits du logo livré dans la maquette. Emploi borné : onboarding, verrou et documents
+          exportés — jamais dans l&apos;en-tête courant, qui porte le nom du profil.
+        </p>
+        <MotSymbole />
+        <div style={{ marginTop: 'var(--espace-8)' }}>
+          <Monogramme />
+        </div>
+      </Bloc>
+
+      <Bloc titre="En-tête — deux variantes">
+        <p className={styles['meta']}>
+          « profil » sur les écrans de premier niveau, « retour » sur les écrans de détail. Sans la
+          seconde, ces écrans sont des culs-de-sac.
+        </p>
+        <EnTete profil="Camille" couleurProfil={COULEUR_ATC.N} />
+        <EnTete variante="retour" />
       </Bloc>
 
       <Bloc titre="Verrou — pavé et points d’état (§15)">

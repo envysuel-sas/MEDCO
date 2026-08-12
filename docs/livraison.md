@@ -152,6 +152,46 @@ Trois erreurs du texte de la spec ont été corrigées et consignées dans
 `manques.md` §5.3 : `PRAGMA cat.query_only`, la colonne `substances` de
 `specialite_fts`, et le service du bundle Brotli.
 
+### Reprise UI — marque, coquille, saisie, responsive
+
+Quatre défauts structurels trouvés en relisant l'application écran par écran,
+tous mesurés avant correction.
+
+**Le logo était inventé.** L'export de la maquette référence une image absente
+du dossier ; au lieu de s'arrêter, un damier 3×3 avait été dessiné et posé en
+icône PWA, dans la couleur d'action alors que `--marque` existait. Le vrai
+logo est désormais dans l'export : `scripts/extraire-marque.mjs` le détoure par
+diffusion depuis les bords — l'intérieur de la croix est blanc, un seuil global
+l'aurait perforé — et sépare le pictogramme du mot-symbole par composantes
+connexes, les feuilles passant au-dessus du « M » sans gouttière entre les deux.
+
+Le mot-symbole est placé où la maquette le veut, et nulle part ailleurs :
+onboarding, bienvenue, verrou, relevé exporté. Pas dans l'en-tête courant, qui
+porte le nom du profil.
+
+**Neuf écrans n'avaient pas d'en-tête.** `EnTete` n'était rendu que par
+`Aujourdhui` : Pilulier, Plan, Produit, Produits, Réglages, Repères, Scan,
+Substance et Mentions légales n'avaient ni nom de profil, ni accès aux réglages,
+ni retour. La coquille est montée dans `App.tsx`, avec une variante « retour »
+pour les écrans de détail.
+
+**La saisie était inutilisable.** Cinq défauts : liste bornée aux huit premiers
+produits sans recherche, carnet vide sans issue, groupe ATC codé en dur — ce qui
+viole §12.2 — unité affichée à la place du dosage, et nom du produit à la place
+de l'équivalent en milligrammes, qui est la fonction même de l'application.
+
+**Rien n'était adaptatif.** Aucune règle `@media` dans tout le CSS, et aucune
+réinitialisation ne posait `box-sizing: border-box` : tout conteneur en
+`width: 100%` additionnait sa marge intérieure à la largeur de l'écran, soit
+32 px de débordement horizontal sur chaque écran à 390 px.
+
+Vérifié par `pnpm verifier:ui` — parcours complet dans Chromium avec le vrai
+bundle, à 320, 390, 768 et 1280 px :
+
+```
+✓ aucun débordement, aucune erreur JS
+```
+
 ### L2 — Jetons et écrans
 
 Extraction d'abord, inventaire ensuite, construction enfin. `tokens.css` et

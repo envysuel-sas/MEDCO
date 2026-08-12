@@ -28,7 +28,10 @@ export default typescript.config(
   },
   {
     files: ['scripts/**/*.mjs', 'src/**/__tests__/**/*.ts'],
-    languageOptions: { globals: { ...globals.node } },
+    // Les scripts Playwright portent du code qui s'exécute dans la page —
+    // `page.evaluate`, `addInitScript` — d'où les globales du navigateur en
+    // plus de celles de Node.
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
     rules: { 'no-console': 'off' },
   },
 );

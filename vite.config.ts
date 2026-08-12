@@ -48,7 +48,7 @@ export default defineConfig({
       filename: 'sw.ts',
       registerType: 'prompt',
       injectRegister: 'auto',
-      includeAssets: ['apple-touch-icon.png', 'favicon.svg'],
+      includeAssets: ['apple-touch-icon.png', 'favicon.png'],
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,wasm}'],
         // Le bundle catalogue est téléchargé et importé par l'app (spec §5.5),

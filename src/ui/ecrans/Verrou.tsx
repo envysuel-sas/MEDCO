@@ -18,6 +18,7 @@ import type { ReactNode } from 'react';
 
 import { LONGUEUR_MAX, LONGUEUR_MIN } from '../../db/verrou.js';
 import { baseDeDonnees } from '../../db/client.js';
+import { MotSymbole } from '../composants/marque.js';
 import { Etiquette, TitreEcran } from '../composants/primitives.js';
 import styles from '../composants/composants.module.css';
 
@@ -104,8 +105,8 @@ export function Verrou({ aPoser, onOuvert }: ProprietesVerrou): ReactNode {
 
   return (
     <main className={styles['verrou']}>
-      <div style={{ display: 'grid', gap: 'var(--espace-5)', textAlign: 'center' }}>
-        <Etiquette>{etape === 'ouverture' ? 'Medco' : 'Premier lancement'}</Etiquette>
+      <div className={styles['verrouEntete']}>
+        {etape === 'ouverture' ? <MotSymbole /> : <Etiquette>Premier lancement</Etiquette>}
         <TitreEcran>
           {etape === 'pose' ? 'Choisissez un code' : null}
           {etape === 'confirmation' ? 'Saisissez-le à nouveau' : null}
