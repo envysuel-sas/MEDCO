@@ -10,6 +10,7 @@
     "test:golden": "vitest run src/domain/__tests__/golden.test.ts",
     "lint": "eslint . && tsc --noEmit",
     "extraire:maquette": "node scripts/extraire-maquette.mjs docs/maquette/export > docs/maquette/inventaire.json",
+    "icones": "node scripts/generer-icones.mjs",
     "pipeline": "python3 pipeline/build.py",
     "test:couverture": "vitest run --coverage"
   },
@@ -33,6 +34,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.14.0",
     "playwright": "^1.62.1",
+    "sharp": "^0.35.3",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.19.0",
     "vite": "^6.0.0",

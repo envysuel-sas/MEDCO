@@ -1,0 +1,25 @@
+<!--
+  Mot-symbole Medco — géométrie relevée dans `docs/maquette/export/`.
+
+  Le carré arrondi porte la couleur d'action (#12566E), la grille 3×3 reprend
+  l'alvéole du pilulier dans la couleur de fond (#F1F6F9). L'alternance
+  d'opacité est celle de la maquette, à l'identique : elle évoque une plaquette
+  entamée.
+
+  Aucune valeur n'est inventée ici. Toute modification doit venir de la
+  maquette, pas de ce fichier.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" width="360" height="360">
+  <rect width="360" height="360" rx="72" fill="#12566E"/>
+  <g transform="translate(76 76)" fill="#F1F6F9">
+    <rect x="0"   y="0"   width="52" height="52" rx="14"/>
+    <rect x="78"  y="0"   width="52" height="52" rx="14" opacity="0.45"/>
+    <rect x="156" y="0"   width="52" height="52" rx="14"/>
+    <rect x="0"   y="78"  width="52" height="52" rx="14" opacity="0.45"/>
+    <rect x="78"  y="78"  width="52" height="52" rx="14"/>
+    <rect x="156" y="78"  width="52" height="52" rx="14" opacity="0.45"/>
+    <rect x="0"   y="156" width="52" height="52" rx="14" opacity="0.45"/>
+    <rect x="78"  y="156" width="52" height="52" rx="14"/>
+    <rect x="156" y="156" width="52" height="52" rx="14" opacity="0.45"/>
+  </g>
+</svg>

@@ -99,28 +99,40 @@ dans la maquette.
 **Fait en attendant :** `theme_color` et `background_color` prennent `#F1F6F9`,
 le fond d'écran de la maquette. À confirmer.
 
-### 2.4 [Chrome] — Barre d'état à 54 px
+### 2.4 [Chrome] — Icône « maskable » : marge non tranchée
+
+La maquette livre le mot-symbole (carré arrondi `#12566E`, damier `#F1F6F9`),
+repris tel quel dans `src/ui/marque/logo.svg` — géométrie relevée, non
+redessinée. Elle ne dit rien de la variante `maskable` : Android y découpe une
+forme dont il ne garantit que les 80 % centraux, et rognerait les coins du
+carré arrondi.
+
+**Fait en attendant :** `scripts/generer-icones.mjs` réduit la marque à 60 % de
+la surface sur un fond plein `#12566E`. La valeur vient de la zone sûre
+d'Android, pas de la maquette. À confirmer sur téléphone.
+
+### 2.5 [Chrome] — Barre d'état à 54 px
 
 Tous les écrans de la maquette posent `padding-top: 54px` : c'est la barre
 d'état du simulateur, pas une valeur de design.
 
 **Fait en attendant :** remplacée par `env(safe-area-inset-top)` (§11.4).
 
-### 2.5 [Écrans] — Aucun état d'erreur
+### 2.6 [Écrans] — Aucun état d'erreur
 
 Ni erreur réseau, ni échec d'installation du catalogue, ni base illisible.
 
 **Fait en attendant :** les erreurs s'affichent dans une `Carte` à filet
 `information` — jamais en rouge, jamais avec un triangle (§12.1).
 
-### 2.6 [EcranSecondOnglet] — Écran non dessiné
+### 2.7 [EcranSecondOnglet] — Écran non dessiné
 
 Le refus d'ouverture en second onglet (§5.5) n'existe pas dans la maquette.
 
 **Fait en attendant :** recomposé avec `TitreEcran`, un paragraphe `meta` et un
 `Bouton`. Aucun motif visuel nouveau.
 
-### 2.7 [KitchenSink] — Écran non dessiné, par nature
+### 2.8 [KitchenSink] — Écran non dessiné, par nature
 
 Recomposé à partir des composants existants.
 
@@ -181,7 +193,7 @@ plutôt les traiter comme non exploitables ?
 | §5.3 | `ATTACH … AS cat;` puis `PRAGMA cat.query_only = 1;` | `query_only` est un réglage de **connexion** : le préfixe de schéma est ignoré et **toute** la connexion passe en lecture seule, `user.db` compris. Symptôme : `SQLITE_READONLY` à la première écriture. La lecture seule vient désormais de l'URI `mode=ro` de l'attachement. |
 | §5.1 | `specialite_fts` en `content='specialite'` avec une colonne `substances` | La colonne n'existe pas dans `specialite` : l'index externe n'est pas constructible tel qu'écrit. La colonne a été ajoutée à la table. |
 | §6.3 | bundle Brotli servi tel quel | `DecompressionStream('br')` n'existe ni sur Safari ni sur Firefox, et un serveur de fichiers statiques ne pose pas `Content-Encoding` sur un fichier pré-compressé. Le pipeline publie donc **aussi** une variante gzip, et l'application vérifie l'empreinte du SQLite décompressé — la seule qui tienne quoi que le serveur ait fait des octets en chemin. |
-| §4, §17.3 | GitHub Pages sert directement | GitHub Pages héberge bien, mais l'entrée publique est un tunnel `cloudflared` : c'est ce qui rend l'enregistrement DNS proxifié, donc capable de porter la route du Worker sur la même origine. Deux conséquences à connaître — GitHub affichera « Domain does not resolve to the GitHub Pages server » (attendu, le TLS est celui de Cloudflare), et Pages n'ayant pas de repli SPA, le build produit un `404.html` copie d'`index.html`. Voir `docs/deploiement.md`. |
+| §4, §17.3 | GitHub Pages sert directement | Exact, et c'est ce qui est fait. Deux conséquences à connaître : Pages n'a pas de repli SPA, donc le build produit un `404.html` copie d'`index.html` ; et le Worker de rappel vit sur un **autre** nom d'hôte, puisque l'enregistrement de Pages doit rester non proxifié pour que GitHub émette son certificat. Le Worker répond donc aux préflights CORS. Voir `docs/deploiement.md`. |
 
 À noter aussi, sans être une erreur de la spec : l'opérande gauche de `MATCH`
 doit être le **nom nu** de la table FTS. Ni `cat.specialite_fts`, ni un alias
