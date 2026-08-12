@@ -69,6 +69,41 @@ export function base(): Database {
  * pool : le VFS ne donne pas accès aux fichiers par leur chemin (§5.5). Un
  * remplacement réutilise le même nom logique, le ATTACH est refait ensuite.
  */
+/**
+ * Efface **tout** ce que l'application détient sur cet appareil.
+ *
+ * Pourquoi c'est indispensable : le carnet vit dans OPFS, et l'application
+ * demande `navigator.storage.persist()` à chaque ouverture. Ni « vider le
+ * cache », ni la désinstallation de la PWA n'y touchent. Sans cette fonction,
+ * un code oublié rend l'application définitivement inutilisable, et le seul
+ * recours est d'aller supprimer les données de site dans les réglages du
+ * navigateur — ce qu'on ne peut pas demander à quelqu'un.
+ *
+ * Efface, dans l'ordre : le carnet et le catalogue (OPFS), les caches du
+ * service worker, et la clé de déchiffrement des notifications (IndexedDB).
+ */
+export async function reinitialiser(): Promise<void> {
+  db?.close();
+  db = undefined;
+
+  if (poolUtil) {
+    // `wipeFiles` vide le pool sans le désinstaller : le VFS reste utilisable
+    // pour la réinstallation qui suit, sans rechargement de page.
+    await poolUtil.wipeFiles();
+  }
+
+  if (typeof caches !== 'undefined') {
+    for (const nom of await caches.keys()) await caches.delete(nom);
+  }
+
+  await new Promise<void>((resoudre) => {
+    const suppression = indexedDB.deleteDatabase('medco-cles');
+    suppression.onsuccess = () => resoudre();
+    suppression.onerror = () => resoudre();
+    suppression.onblocked = () => resoudre();
+  });
+}
+
 export async function installerCatalogue(octets: Uint8Array): Promise<void> {
   if (!poolUtil || !db) throw new Error('ouvrir() doit être appelé avant installerCatalogue().');
 

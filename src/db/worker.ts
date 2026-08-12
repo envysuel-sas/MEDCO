@@ -9,7 +9,13 @@
 /// <reference lib="webworker" />
 
 import * as depots from './depots.js';
-import { BaseDejaOuverteError, installerCatalogue, ouvrir, versionCatalogue } from './sqlite.js';
+import {
+  BaseDejaOuverteError,
+  installerCatalogue,
+  ouvrir,
+  reinitialiser,
+  versionCatalogue,
+} from './sqlite.js';
 import {
   verrouConfigure,
   verrouDefinir,
@@ -31,6 +37,17 @@ const api = {
   verrouDefinir,
   verrouOuvrir,
   verrouFermer,
+  /**
+   * Efface tout. Accessible **verrou fermé** : c'est précisément la porte de
+   * sortie d'un code oublié. Elle ne donne accès à aucune donnée — elle les
+   * détruit.
+   */
+  reinitialiser: async () => {
+    await reinitialiser();
+    verrouFermer();
+    // La prochaine requête rouvrira une base neuve.
+    pret = undefined;
+  },
 } as const;
 
 /**
@@ -52,6 +69,7 @@ const HORS_VERROU: ReadonlySet<string> = new Set([
   'verrouDefinir',
   'verrouOuvrir',
   'verrouFermer',
+  'reinitialiser',
 ]);
 
 export interface RequeteWorker {

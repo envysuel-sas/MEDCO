@@ -49,6 +49,7 @@ export function Reglages(): ReactNode {
   const [message, setMessage] = useState<string | null>(null);
   const [phrase, setPhrase] = useState('');
   const [lienCalendrier, setLienCalendrier] = useState<string | null>(null);
+  const [effacer, setEffacer] = useState(false);
 
   useEffect(() => {
     void baseDeDonnees.versionCatalogue().then(setCatalogue);
@@ -251,6 +252,33 @@ export function Reglages(): ReactNode {
         >
           base-donnees-publique.medicaments.gouv.fr ↗
         </a>
+      </Carte>
+
+      <Carte filet="information">
+        <Etiquette>Effacer cet appareil</Etiquette>
+        <p className={styles['meta']}>
+          Le carnet vit dans le stockage privé du navigateur. Ni « vider le cache », ni la
+          désinstallation de l&apos;application ne l&apos;effacent — c&apos;est ce qui le protège
+          d&apos;une purge accidentelle, et ce qui rend ce bouton nécessaire.
+        </p>
+        <p className={styles['meta']}>
+          Tout est supprimé : profils, produits, prises, plans et code. Sans retour possible.
+        </p>
+        <div style={{ marginTop: 'var(--espace-8)' }}>
+          <Bouton
+            variante="secondaire"
+            pleineLargeur
+            onClick={() => {
+              if (effacer) {
+                void baseDeDonnees.reinitialiser().then(() => window.location.reload());
+                return;
+              }
+              setEffacer(true);
+            }}
+          >
+            {effacer ? 'Confirmer : tout effacer' : 'Effacer cet appareil'}
+          </Bouton>
+        </div>
       </Carte>
 
       <Carte>
