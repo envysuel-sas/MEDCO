@@ -12,6 +12,7 @@
 import { cumulParSubstance, joursDePrise } from '../domain/cumul.js';
 import { jourLocal } from '../domain/temps.js';
 import type { Instant, PriseAvecSubstances, Produit } from '../domain/types.js';
+import logo from '../ui/marque/logo.png';
 
 export interface ContexteReleve {
   readonly profil: string;
@@ -61,7 +62,13 @@ export function genererReleve(contexte: ContexteReleve): string {
   th, td { text-align: left; padding: 1.5mm 0; border-bottom: .3pt solid #D8E4EB; }
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   footer { margin-top: 10mm; font-size: 8pt; color: #56737F; }
+  .marque { height: 12mm; margin-bottom: 4mm; }
 </style></head><body>
+<!-- §maquette — le mot-symbole n'apparaît qu'à l'onboarding et dans les
+     documents exportés. Celui-ci en est un. L'URL est absolue : le document
+     est ouvert dans une fenêtre d'impression, un chemin relatif n'y résoudrait
+     pas. -->
+<img class="marque" src="${new URL(logo, location.href).href}" alt="Medco">
 <h1>Relevé de consommation</h1>
 <p>${echapper(contexte.profil)} · ${periode}</p>
 

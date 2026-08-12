@@ -6,7 +6,7 @@
  *
  * ⚠ Écran absent de la maquette : recomposé à partir des composants existants
  * (`TitreEcran`, `Carte`, `Etiquette`), sans motif visuel nouveau. Consigné
- * dans `docs/maquette/manques.md` §2.9.
+ * dans `docs/maquette/manques.md` §2.10.
  *
  * ⚠ Aucune valeur n'est inventée ici : voir les sources en tête d'`IDENTITE`.
  * Un champ non vérifié reste vide, et un champ vide n'est pas rendu.

@@ -14,3 +14,4 @@ public/bundles/*.sqlite
 # Le bundle compressé est versionné : c'est lui que GitHub Pages sert (§6.3).
 !public/bundles/*.sqlite.br
 .cache/
+captures/

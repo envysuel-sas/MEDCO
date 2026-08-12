@@ -99,17 +99,21 @@ dans la maquette.
 **Fait en attendant :** `theme_color` et `background_color` prennent `#F1F6F9`,
 le fond d'écran de la maquette. À confirmer.
 
-### 2.4 [Chrome] — Icône « maskable » : marge non tranchée
+### 2.4 [Chrome] — Icônes : marges dérivées
 
-La maquette livre le mot-symbole (carré arrondi `#12566E`, damier `#F1F6F9`),
-repris tel quel dans `src/ui/marque/logo.svg` — géométrie relevée, non
-redessinée. Elle ne dit rien de la variante `maskable` : Android y découpe une
-forme dont il ne garantit que les 80 % centraux, et rognerait les coins du
-carré arrondi.
+Le logo est désormais celui de la maquette : `docs/maquette/export/` en porte
+le fichier, `scripts/extraire-marque.mjs` en détoure le fond et en sépare le
+pictogramme du mot-symbole. Rien n'est redessiné.
 
-**Fait en attendant :** `scripts/generer-icones.mjs` réduit la marque à 60 % de
-la surface sur un fond plein `#12566E`. La valeur vient de la zone sûre
-d'Android, pas de la maquette. À confirmer sur téléphone.
+⚠ Correction d'une faute antérieure : le logo avait été **inventé** — un damier
+3×3 dans la couleur d'action — parce que la référence d'image de l'export
+pointait vers un fichier absent. Il aurait fallu s'arrêter et le signaler. Le
+fichier `src/ui/marque/logo.svg` a été supprimé.
+
+**Restent dérivés, non relevés :** la part de surface occupée par le monogramme
+dans les icônes — 82 %, et 60 % pour la variante `maskable`, dont Android ne
+garantit que les 80 % centraux — ainsi que le fond `#F1F6F9`, repris de
+`theme_color`. À confirmer sur téléphone.
 
 ### 2.5 [Chrome] — Barre d'état à 54 px
 
@@ -150,7 +154,29 @@ Deux points à trancher :
 - **Délai de reverrouillage en arrière-plan.** Deux minutes, choisi pour ne pas
   rendre l'application pénible. Aucune valeur dans la maquette ni dans la spec.
 
-### 2.9 [MentionsLegales] — Écran non dessiné
+### 2.9 [Système] — Points de rupture absents de la maquette
+
+La maquette ne montre qu'un cadre de téléphone. Elle ne dit rien des autres
+largeurs, et l'application n'avait **aucune** règle d'adaptation : mesuré,
+`@media` n'apparaissait nulle part hors `prefers-reduced-motion`.
+
+**Fait en attendant, dérivé et à valider :**
+
+| Valeur | Choix | Raison |
+|---|---|---|
+| `--largeur-lecture` | 480 px | au-delà, la ligne de texte devient trop longue |
+| rupture basse | < 360 px | l'iPhone SE manque de place : les marges se resserrent |
+| rupture haute | ≥ 600 px | la colonne cesse de s'étirer et se centre |
+| rupture verticale | hauteur < 680 px | le pavé du verrou se comprime, sinon il sort de l'écran |
+
+Vérifié à 320, 390, 768 et 1280 px : aucun défilement horizontal, aucune erreur
+JavaScript.
+
+Au passage : aucune réinitialisation ne posait `box-sizing: border-box`. Tout
+conteneur en `width: 100%` additionnait sa marge intérieure à la largeur de
+l'écran — 32 px de débordement sur chaque écran à 390 px.
+
+### 2.10 [MentionsLegales] — Écran non dessiné
 
 Obligation légale (LCEN art. 6-III) absente de la maquette : identification de
 l'éditeur et de l'hébergeur.
@@ -170,7 +196,7 @@ comblé par une valeur plausible.
 ⚠ L'hébergeur déclaré ici est **GitHub**, pas celui d'envysuel.fr (Hostinger) :
 deux services distincts, et c'est celui qui sert Medco qui doit figurer.
 
-### 2.10 [KitchenSink] — Écran non dessiné, par nature
+### 2.11 [KitchenSink] — Écran non dessiné, par nature
 
 Recomposé à partir des composants existants.
 

@@ -14,6 +14,7 @@ import { baseDeDonnees } from '../../db/client.js';
 import { installerSiNecessaire } from '../../services/catalogue.js';
 import type { EtapeInstallation } from '../../services/catalogue.js';
 import { maintenant } from '../App.js';
+import { MotSymbole } from '../composants/marque.js';
 import { Bouton, Carte, Etiquette, TitreEcran } from '../composants/primitives.js';
 import styles from '../composants/composants.module.css';
 
@@ -47,6 +48,8 @@ export function Bienvenue({ onPret }: { readonly onPret: (profilId: string) => v
 
   return (
     <main className={styles['pileEcran']} style={{ paddingTop: 'var(--espace-13)' }}>
+      {/* §maquette — premier lancement : le mot-symbole a sa place ici. */}
+      <MotSymbole taille="grande" />
       <TitreEcran>Bienvenue</TitreEcran>
 
       <Carte>

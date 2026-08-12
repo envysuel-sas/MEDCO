@@ -7,7 +7,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router';
 
 import { cumulParSubstance, jourLocal } from '../../domain/cumul.js';
 import { ajouterJours, fenetreGlissante, heureLocale } from '../../domain/temps.js';
@@ -16,10 +15,9 @@ import { baseDeDonnees } from '../../db/client.js';
 import { maintenant } from '../App.js';
 import { useMedco } from '../etat.js';
 import type { EtatMedco } from '../etat.js';
-import { COULEUR_ATC, couleurSubstance } from '../tokens.js';
+import { couleurSubstance } from '../tokens.js';
 import { faitDuSignal, formaterQuantite } from '../textes.js';
 import { Carte, Etiquette, EtatVide } from '../composants/primitives.js';
-import { EnTete } from '../composants/chrome.js';
 import { CarteSignal, CumulJour, ListePrises, Plaquette } from '../composants/donnees.js';
 import type { Alveole, LignePriseAffichee } from '../composants/donnees.js';
 import styles from '../composants/composants.module.css';
@@ -28,8 +26,7 @@ const JOURS_PLAQUETTE = 30;
 
 export function Aujourdhui(): ReactNode {
   const instant = maintenant();
-  const naviguer = useNavigate();
-  const { prises, produits, signaux, regles, profilNom, acquitter } = useMedco();
+  const { prises, produits, signaux, regles, acquitter } = useMedco();
   const [substances, setSubstances] = useState<Map<string, Substance>>(new Map());
 
   const codes = useMemo(
@@ -77,12 +74,6 @@ export function Aujourdhui(): ReactNode {
 
   return (
     <>
-      <EnTete
-        profil={profilNom || 'Profil'}
-        couleurProfil={COULEUR_ATC._}
-        onReglages={() => naviguer('/reglages')}
-      />
-
       <main className={styles['pileEcran']}>
         {codeDominant ? (
           <CumulJour

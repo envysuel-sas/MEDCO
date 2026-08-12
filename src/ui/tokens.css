@@ -229,3 +229,47 @@ textarea,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Modèle de boîte
+   ---------------------------------------------------------------------------
+   Aucune réinitialisation ne le posait. Conséquence mesurée : un conteneur en
+   `width: 100%` additionnait sa marge intérieure à la largeur de l'écran —
+   390 + 2 × 16 = 422 px, soit 32 px de défilement horizontal sur chaque écran.
+--------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------------------------
+   Adaptation aux largeurs — DÉRIVÉ, non extrait de la maquette
+   ---------------------------------------------------------------------------
+   La maquette ne montre qu'un cadre de téléphone : elle ne dit rien des autres
+   largeurs. Ces valeurs sont donc dérivées, pas relevées, et consignées comme
+   telles dans `docs/maquette/manques.md` §2.10.
+
+   `--largeur-lecture` borne la colonne de contenu. Sans elle, une carte
+   s'étirait sur toute la largeur d'un écran de bureau et la ligne de texte
+   devenait illisible.
+--------------------------------------------------------------------------- */
+:root {
+  --largeur-lecture: 480px;
+  --marge-haute: env(safe-area-inset-top, 0px);
+}
+
+/* Petits téléphones (iPhone SE, 320 px) : les marges reprennent de l'espace
+   au contenu, qui en manque déjà. */
+@media (max-width: 359px) {
+  :root {
+    --marge-ecran: var(--espace-5);
+  }
+}
+
+/* Au-delà du téléphone, la colonne cesse de s'étirer et se centre. */
+@media (min-width: 600px) {
+  :root {
+    --marge-ecran: var(--espace-10);
+  }
+}

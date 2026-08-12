@@ -11,17 +11,51 @@ import { NavLink } from 'react-router';
 
 import styles from './composants.module.css';
 
+/**
+ * En-tête d'application.
+ *
+ * Deux variantes, et une seule est montée à la fois par la coquille :
+ *
+ *  · `profil` — écrans de premier niveau. La maquette veut le nom du profil à
+ *    cet emplacement, **pas** le mot-symbole.
+ *  · `retour` — écrans de détail. Sans elle, ces écrans sont des culs-de-sac :
+ *    ni retour, ni accès aux réglages.
+ */
 export function EnTete({
+  variante = 'profil',
   profil,
   couleurProfil,
   onProfil,
+  onRetour,
   onReglages,
 }: {
-  readonly profil: string;
-  readonly couleurProfil: string;
+  readonly variante?: 'profil' | 'retour';
+  readonly profil?: string;
+  readonly couleurProfil?: string;
   readonly onProfil?: () => void;
+  readonly onRetour?: () => void;
   readonly onReglages?: () => void;
 }): ReactNode {
+  if (variante === 'retour') {
+    return (
+      <header className={styles['enTete']}>
+        <button type="button" className={styles['retour']} onClick={onRetour}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M15 5l-7 7 7 7"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Retour
+        </button>
+        <BoutonReglages onReglages={onReglages} />
+      </header>
+    );
+  }
+
   return (
     <header className={styles['enTete']}>
       <button type="button" className={styles['profil']} onClick={onProfil}>
@@ -29,7 +63,7 @@ export function EnTete({
           className={styles['pastille']}
           style={{ background: couleurProfil, width: 'var(--espace-5)', height: 'var(--espace-5)' }}
         />
-        {profil}
+        {profil ?? 'Profil'}
         <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
           <path
             d="M1 1l4 4 4-4"
@@ -39,18 +73,24 @@ export function EnTete({
           />
         </svg>
       </button>
-      <button type="button" className={styles['icone']} aria-label="Réglages" onClick={onReglages}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.5" />
-          <path
-            d="M12 3.5v3M12 17.5v3M4.5 12h3M16.5 12h3M6.7 6.7l2.1 2.1M15.2 15.2l2.1 2.1M17.3 6.7l-2.1 2.1M8.8 15.2l-2.1 2.1"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      </button>
+      <BoutonReglages onReglages={onReglages} />
     </header>
+  );
+}
+
+function BoutonReglages({ onReglages }: { readonly onReglages?: (() => void) | undefined }): ReactNode {
+  return (
+    <button type="button" className={styles['icone']} aria-label="Réglages" onClick={onReglages}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M12 3.5v3M12 17.5v3M4.5 12h3M16.5 12h3M6.7 6.7l2.1 2.1M15.2 15.2l2.1 2.1M17.3 6.7l-2.1 2.1M8.8 15.2l-2.1 2.1"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    </button>
   );
 }
 

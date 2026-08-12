@@ -11,6 +11,7 @@ import type { ReactNode } from 'react';
 
 import type { EtatInstallation } from '../../pwa/installation.js';
 import { proposerInstallation } from '../../pwa/installation.js';
+import { MotSymbole } from '../composants/marque.js';
 import { Bouton, Carte, Etiquette, TitreEcran } from '../composants/primitives.js';
 import styles from '../composants/composants.module.css';
 
@@ -23,6 +24,8 @@ export function Onboarding({
 }): ReactNode {
   return (
     <main className={styles['pileEcran']} style={{ paddingTop: 'var(--espace-13)' }}>
+      {/* §maquette — le mot-symbole n'apparaît qu'ici et dans les documents exportés. */}
+      <MotSymbole taille="grande" />
       <TitreEcran>Installer Medco sur l&apos;écran d&apos;accueil</TitreEcran>
       <p>
         Le carnet ne se crée qu&apos;une fois l&apos;application installée. Dans un onglet de

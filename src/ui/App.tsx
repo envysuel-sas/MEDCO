@@ -8,13 +8,14 @@
 
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 
 import { BaseDejaOuverte, baseDeDonnees } from '../db/client.js';
 import { demanderPersistance, etatInstallation } from '../pwa/installation.js';
 import { useMedco } from './etat.js';
 import { Verrou } from './ecrans/Verrou.js';
-import { BarreOnglets } from './composants/chrome.js';
+import { BarreOnglets, EnTete } from './composants/chrome.js';
+import { COULEUR_ATC } from './tokens.js';
 import { Bouton, Carte, TitreEcran } from './composants/primitives.js';
 import { Aujourdhui } from './ecrans/Aujourdhui.js';
 import { Saisie } from './ecrans/Saisie.js';
@@ -52,8 +53,21 @@ export function maintenant(): string {
  */
 const DELAI_VERROUILLAGE_MS = 120_000;
 
+/**
+ * Écrans de premier niveau : ceux qu'atteint la barre d'onglets. Ils portent
+ * l'en-tête « profil ». Tout le reste est un écran de détail, et porte donc un
+ * retour — sans quoi il n'y a aucun moyen d'en sortir.
+ */
+const PREMIER_NIVEAU: ReadonlySet<string> = new Set([
+  '/',
+  '/pilulier',
+  '/pilulier/semaine',
+  '/produits',
+  '/reperes',
+]);
+
 export function App(): ReactNode {
-  const { pret, secondOnglet, erreur, profilId, demarrer, choisirProfil } = useMedco();
+  const { pret, secondOnglet, erreur, profilId, profilNom, demarrer, choisirProfil } = useMedco();
   const [installation, setInstallation] = useState(etatInstallation);
   const [saisieOuverte, setSaisieOuverte] = useState(false);
   const [verrou, setVerrou] = useState<{ configure: boolean; ouvert: boolean } | null>(null);
@@ -137,7 +151,9 @@ export function App(): ReactNode {
   }
 
   return (
-    <div className={styles['pileEcran']} style={{ padding: 0, gap: 0 }}>
+    <div className={styles['coquille']}>
+      <Coquille profil={profilNom} />
+
       {erreur ? (
         <Carte filet="information">
           <p className={styles['meta']}>{erreur}</p>
@@ -160,7 +176,11 @@ export function App(): ReactNode {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      <Saisie ouverte={saisieOuverte} onFermer={() => setSaisieOuverte(false)} />
+      <Saisie
+        ouverte={saisieOuverte}
+        onFermer={() => setSaisieOuverte(false)}
+        onAjouterProduit={() => naviguer('/produits')}
+      />
       <BarreOnglets
         onSaisie={() => {
           setSaisieOuverte(true);
@@ -170,6 +190,39 @@ export function App(): ReactNode {
         }}
       />
     </div>
+  );
+}
+
+/**
+ * En-tête montée au-dessus des routes : elle couvre **tous** les écrans.
+ *
+ * Elle n'était rendue que par `Aujourdhui`, si bien que neuf écrans n'avaient
+ * ni nom de profil, ni accès aux réglages, ni retour.
+ */
+function Coquille({ profil }: { readonly profil: string }): ReactNode {
+  const naviguer = useNavigate();
+  const { pathname } = useLocation();
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const chemin = pathname.startsWith(base) ? pathname.slice(base.length) || '/' : pathname;
+
+  if (PREMIER_NIVEAU.has(chemin)) {
+    return (
+      <EnTete
+        profil={profil || 'Profil'}
+        couleurProfil={COULEUR_ATC._}
+        onReglages={() => naviguer('/reglages')}
+      />
+    );
+  }
+
+  return (
+    <EnTete
+      variante="retour"
+      // §11.4 — l'historique est géré explicitement : sur Android en mode
+      // autonome, un retour non géré éjecte de l'application.
+      onRetour={() => (window.history.length > 1 ? naviguer(-1) : naviguer('/'))}
+      onReglages={() => naviguer('/reglages')}
+    />
   );
 }
 
