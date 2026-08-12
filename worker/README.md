@@ -31,7 +31,7 @@ l'utilisateur partage son calendrier.
 
 Procédure complète, clés VAPID comprises : [`../docs/deploiement.md`](../docs/deploiement.md).
 
-Le Worker vit sur `rappels.boes-home.com`, distinct de `medco.boes-home.com`
+Le Worker vit sur `rappels.exemple.fr`, distinct de `medco.exemple.fr`
 qui sert l'application : un Worker n'intercepte que du trafic proxifié par
 Cloudflare, or l'enregistrement de GitHub Pages doit rester non proxifié.
 

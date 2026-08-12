@@ -7,7 +7,7 @@ name: deploy
 # service tiers obligatoire. Deux variables de dépôt, toutes deux facultatives,
 # décident du reste (Settings → Secrets and variables → Actions → Variables) :
 #
-#   DOMAINE           domaine personnalisé, ex. medco.boes-home.com.
+#   DOMAINE           domaine personnalisé, ex. medco.exemple.fr.
 #                     Vide → l'app vit sur l'adresse GitHub du dépôt.
 #   VITE_URL_WORKER   Worker de rappel Cloudflare, ex. https://rappels.exemple.fr
 #                     Vide → seule la couche calendrier est proposée, et l'app

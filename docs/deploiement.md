@@ -12,6 +12,51 @@ ce que vous voyez.
 
 ---
 
+## Étape 0 — Le dépôt doit être public (ou le compte payant)
+
+GitHub Pages est gratuit **sur les dépôts publics uniquement**. Sur un dépôt
+privé, il faut GitHub Pro, environ 4 $/mois.
+
+Rendre le dépôt public n'expose **aucune donnée de santé** : il n'y en a pas
+dedans. Les prises, les produits et les profils vivent dans un SQLite sur le
+téléphone, et ne sont jamais transmis nulle part. Le dépôt contient du code, la
+spécification, la maquette, et le catalogue BDPM — une donnée publique sous
+licence ouverte.
+
+### Ce qui a été vérifié avant la bascule
+
+| Vérification | Résultat |
+|---|---|
+| Jetons, clés, mots de passe dans l'historique complet | aucun |
+| Fichier `.env` commité | aucun — `.gitignore` les exclut, seul `.env.example` est versionné |
+| Données de santé, prises, profils | aucune |
+| Clé privée VAPID | jamais dans le dépôt : c'est un secret `wrangler` |
+| Domaine et adresse e-mail personnels | remplacés par `exemple.fr` |
+
+Le jeu doré ne contient que des spécialités réelles du catalogue public
+(Doliprane, Fervex, Actifed), pas de données d'usage.
+
+### Ce que vous seul pouvez faire
+
+1. **La description du dépôt** (« For wify ») s'affichera publiquement.
+   Changez-la dans **Settings → General** si vous préférez.
+2. **Votre adresse e-mail de commit** est dans l'historique git et y restera.
+   Pour les commits futurs : **Settings du compte → Emails → Keep my email
+   addresses private**.
+3. **`worker/wrangler.toml`** porte `contact@exemple.fr`. Si vous déployez les
+   notifications, mettez-y une adresse dédiée — elle sera en clair, et les
+   robots moissonnent.
+
+### Basculer
+
+**Settings → General → tout en bas, Danger Zone → Change repository
+visibility → Make public.**
+
+Si vous préférez rester privé, souscrivez GitHub Pro et passez directement à
+l'étape 1 : rien d'autre ne change.
+
+---
+
 ## Étape 1 — Activer l'hébergement GitHub (3 minutes)
 
 1. Ouvrez le dépôt sur github.com.
@@ -53,7 +98,7 @@ Le message d'erreur est en clair. Une erreur à l'étape `deploy` mentionnant
 
 Retournez dans **Settings → Pages**. Un bandeau en haut affiche :
 
-> **Your site is live at** https://envysuel-sas.github.io/medco/
+> **Your site is live at** https://envysuel-sas.github.io/MEDCO/
 
 C'est l'adresse de votre application. Ouvrez-la : vous devez voir l'écran
 d'accueil de Medco.
@@ -103,12 +148,12 @@ collez-la dans Chrome.
 
 ## Facultatif — Un nom de domaine à vous
 
-L'adresse `envysuel-sas.github.io/medco/` fonctionne parfaitement. Si vous
-préférez `medco.boes-home.com`, il suffit de deux gestes.
+L'adresse `envysuel-sas.github.io/MEDCO/` fonctionne parfaitement. Si vous
+préférez `medco.exemple.fr`, il suffit de deux gestes.
 
 ### A. L'enregistrement DNS
 
-Chez Cloudflare, sur le domaine `boes-home.com` :
+Chez Cloudflare, sur le domaine `exemple.fr` :
 
 1. Menu **DNS → Records**, bouton **Add record**.
 2. Remplissez :
@@ -130,7 +175,7 @@ s'ouvrirait sur une erreur de sécurité.
 
 1. **Settings → Secrets and variables → Actions**, onglet **Variables**.
 2. **New repository variable**.
-3. Name : `DOMAINE`. Value : `medco.boes-home.com`. **Add variable**.
+3. Name : `DOMAINE`. Value : `medco.exemple.fr`. **Add variable**.
 4. Relancez le workflow **deploy** comme à l'étape 2.
 
 Retournez dans **Settings → Pages**. Sous « Custom domain », GitHub affiche
@@ -194,7 +239,7 @@ Enfin :
 wrangler deploy
 ```
 
-Wrangler crée lui-même l'enregistrement `rappels.boes-home.com` et son
+Wrangler crée lui-même l'enregistrement `rappels.exemple.fr` et son
 certificat, dès lors que le domaine est chez Cloudflare.
 
 ### B. Le brancher à l'application
@@ -203,7 +248,7 @@ certificat, dès lors que le domaine est chez Cloudflare.
 variable** :
 
 - Name : `VITE_URL_WORKER`
-- Value : `https://rappels.boes-home.com`
+- Value : `https://rappels.exemple.fr`
 
 Relancez le workflow **deploy**. Le bouton « Activer les notifications » des
 réglages devient opérant.

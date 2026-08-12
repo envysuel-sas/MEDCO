@@ -34,8 +34,13 @@ const URL_WORKER = import.meta.env['VITE_URL_WORKER'] ?? '';
  * ⚠ Figé, et non déduit de `window.location` : un même carnet consulté depuis
  * une prévisualisation ou un domaine de repli produirait des `UID` différents,
  * et l'agenda de l'utilisateur récolterait des alarmes en double (§10.4).
+ *
+ * `.invalid` est réservé par la RFC 2606 : garanti non résolvable et détenu par
+ * personne. Un `UID` n'a besoin que d'être unique, jamais d'être joignable —
+ * y mettre un vrai domaine ne servirait qu'à le publier. Ne pas changer cette
+ * valeur après la première diffusion d'un calendrier.
  */
-const DOMAINE_CALENDRIER = 'medco.boes-home.com';
+const DOMAINE_CALENDRIER = 'medco.invalid';
 
 export function Reglages(): ReactNode {
   const { regles, versionRegles, profilId, produits, prises } = useMedco();
