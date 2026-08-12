@@ -1,23 +1,22 @@
-name: deploy
+name: build
 
-# Spec §17.2 — lint → typecheck → test → build → GitHub Pages.
-# Le jeu doré est **bloquant** : rien n'est déployé si le cumul est faux.
+# Spec §17.2 — lint → typecheck → test → build.
+# Le jeu doré est **bloquant** : rien n'est publié si le cumul est faux.
+#
+# ⚠ Ce workflow ne déploie pas : l'application est servie depuis la maison,
+# derrière un tunnel cloudflared (`docs/deploiement.md`). Il produit l'artefact
+# que le serveur peut récupérer, et fait office de garde-fou sur `main`.
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
-  build:
+  verifier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,29 +34,18 @@ jobs:
 
       - run: pnpm lint
 
-      # Jeu doré d'abord, et seul, pour que son échec soit lisible dans le
+      # Le jeu doré seul d'abord, pour que son échec soit lisible dans le
       # journal : c'est lui qui garantit la justesse du cumul (§16.1).
       - run: pnpm test:golden
       - run: pnpm test
 
       - run: pnpm build
         env:
-          # Domaine personnalisé (public/CNAME) → l'application est à la racine.
-          # Sur <compte>.github.io/medco/, mettre /medco/.
           VITE_BASE: /
-          # Worker de rappel. Vide = couche calendrier seule, l'app le dit.
-          VITE_URL_WORKER: ${{ vars.VITE_URL_WORKER }}
+          VITE_URL_WORKER: https://medco.boes-home.com/rappels
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: medco-dist
           path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          retention-days: 14

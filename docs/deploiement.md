@@ -1,97 +1,93 @@
 # Déploiement
 
-Deux hébergements, deux noms de domaine, une seule zone Cloudflare
-(`boes-home.com`).
+L'application est servie **depuis la maison**, derrière un tunnel
+`cloudflared`. Aucun port n'est ouvert sur la box, aucune IP publique n'est
+exposée, aucun certificat n'est à renouveler : le tunnel sort vers Cloudflare,
+qui termine le TLS à la périphérie.
 
-| Nom | Sert | Hébergeur | Proxy Cloudflare |
-|---|---|---|---|
-| `medco.boes-home.com` | l'application et les bundles | GitHub Pages | **non** (nuage gris) |
-| `rappels.boes-home.com` | le Worker de rappel | Cloudflare Workers | oui, par nature |
+```
+   navigateur ──HTTPS──▶ Cloudflare ──┬── route Worker : /rappels/*
+                                       │      (push + webcal, §10.3)
+                                       │
+                                       └── tunnel ──▶ maison
+                                                      Caddy :8080
+                                                      /srv/medco
+```
+
+Un seul nom : **`medco.boes-home.com`**. L'application et le Worker partagent
+la même origine — pas de CORS, une seule entrée DNS, et un `webcal://` sous le
+domaine de l'application.
 
 ---
 
-## 1. `medco.boes-home.com` → GitHub Pages
+## 1. Le tunnel
 
-### 1.1 L'enregistrement DNS
+### 1.1 Création
 
-Dans Cloudflare, zone `boes-home.com` → **DNS** → **Add record** :
+Sur le serveur de la maison :
+
+```bash
+cloudflared tunnel login                      # ouvre le navigateur, choisir boes-home.com
+cloudflared tunnel create medco               # crée le tunnel et son fichier d'identifiants
+cloudflared tunnel route dns medco medco.boes-home.com
+```
+
+La dernière commande crée l'enregistrement DNS toute seule :
 
 ```
 Type    CNAME
 Name    medco
-Target  envysuel-sas.github.io
-Proxy   DNS only        ← nuage GRIS, pas orange
-TTL     Auto
+Target  <uuid-du-tunnel>.cfargotunnel.com
+Proxy   Proxied          ← nuage ORANGE, obligatoire et automatique
 ```
 
-Le nom cible est `<compte>.github.io`, **sans** le nom du dépôt.
+⚠ **Ce nuage doit rester orange.** Un tunnel n'est joignable qu'à travers le
+réseau Cloudflare ; en « DNS only », le nom ne résout vers rien d'utilisable.
+C'est l'inverse exact de ce qu'exigerait GitHub Pages — et c'est ce qui rend
+possible la route de Worker du §3.
 
-### 1.2 ⚠ Pourquoi le nuage doit rester gris
+### 1.2 Configuration
 
-C'est le point qui coince le plus souvent.
-
-GitHub émet un certificat Let's Encrypt pour le domaine personnalisé, et il le
-fait par une validation HTTP qui doit atteindre **ses** serveurs. Derrière le
-proxy Cloudflare, la requête n'arrive jamais : GitHub reste bloqué sur
-« Certificate not yet created », et l'application répond en `525` ou en
-`ERR_TOO_MANY_REDIRECTS`.
-
-Marche à suivre :
-
-1. créer l'enregistrement en **DNS only** ;
-2. attendre que GitHub affiche le cadenas (§1.3), généralement quelques
-   minutes, parfois une heure ;
-3. **ensuite seulement**, si le proxy est souhaité, basculer en orange avec
-   SSL/TLS en mode **Full (strict)**. Ce n'est pas nécessaire ici : vingt
-   utilisateurs ne justifient ni cache ni pare-feu, et le nuage gris évite
-   toute une classe de problèmes.
-
-Si le proxy est activé un jour, vérifier aussi que la règle
-« Always Use HTTPS » n'entre pas en conflit avec la redirection de GitHub.
-
-### 1.3 Côté GitHub
-
-Dépôt → **Settings** → **Pages** :
-
-- **Source** : GitHub Actions (le workflow `deploy.yml` s'en charge) ;
-- **Custom domain** : `medco.boes-home.com` ;
-- cocher **Enforce HTTPS** une fois le certificat émis.
-
-Le fichier `public/CNAME` contient déjà `medco.boes-home.com` : il est copié
-dans `dist/` à chaque build, ce qui évite que GitHub oublie le domaine à la
-publication suivante.
-
-### 1.4 Vérifier
+Copier [`deploiement/cloudflared-config.yml`](../deploiement/cloudflared-config.yml)
+vers `/etc/cloudflared/config.yml`, puis :
 
 ```bash
-dig +short medco.boes-home.com CNAME          # → envysuel-sas.github.io.
-curl -sI https://medco.boes-home.com | head -3
-curl -s https://medco.boes-home.com/bundles/manifest.json | head -5
+sudo cloudflared service install
+sudo systemctl enable --now cloudflared
+cloudflared tunnel info medco        # doit montrer au moins une connexion active
 ```
-
-Le manifest doit répondre : c'est lui que l'application lit au premier
-lancement pour installer le catalogue.
 
 ---
 
-## 2. `rappels.boes-home.com` → Worker
+## 2. Le serveur statique
 
-### 2.1 Pourquoi un sous-domaine séparé
+[`deploiement/Caddyfile`](../deploiement/Caddyfile) sert `/srv/medco` sur
+`127.0.0.1:8080`. Quatre points ne sont pas décoratifs :
 
-Le Worker ne peut intercepter que du trafic **proxifié** par Cloudflare. Or
-`medco.boes-home.com` doit rester non proxifié pour GitHub Pages (§1.2). Les
-deux ne peuvent donc pas cohabiter sur le même nom sans complication.
+| Réglage | Pourquoi |
+|---|---|
+| `try_files {path} /index.html` | Le routeur gère `/pilulier`, `/reglages`, `/produits/<id>`. Sans ce repli, un rechargement sur une URL profonde renvoie 404. **C'est ce qui manquait à GitHub Pages** — le tunnel règle le problème au lieu de le contourner. |
+| `Content-Type: application/wasm` | `WebAssembly.instantiateStreaming` refuse tout autre type : sans lui, SQLite ne démarre pas et l'application n'a plus de base. |
+| Bundles servis bruts | Les fichiers `bundles/*.br` et `*.gz` sont **pré-compressés**. Poser `Content-Encoding` ferait décompresser le navigateur en chemin ; l'application décompresse elle-même et vérifie l'empreinte SHA-256 de la base. |
+| `sw.js` en `no-cache` | Un service worker mis en cache ne se met jamais à jour : les appareils déjà installés resteraient sur l'ancienne version indéfiniment. |
 
-Le Worker répond avec `Access-Control-Allow-Origin`, l'origine croisée ne pose
-aucun problème. C'est le montage le plus simple, et le plus facile à défaire.
+Caddy est un exemple ; nginx convient tout autant, à condition de reproduire
+ces quatre points.
 
-### 2.2 Déploiement
+---
+
+## 3. Le Worker de rappel
+
+Monté **sur le même nom d'hôte**, sous `/rappels/*`. C'est possible parce que
+le tunnel rend le nom proxifié : une route de Worker n'intercepte que du trafic
+qui traverse Cloudflare. Elle passe **avant** l'origine du tunnel ; tout ce qui
+n'est pas sous `/rappels/` continue vers la maison.
 
 ```bash
 cd worker
 npx wrangler login
 
-# 1. Espace KV
+# 1. Espace KV — abonnements push et calendriers publiés
 npx wrangler kv namespace create ABONNEMENTS
 #    → reporter l'`id` renvoyé dans wrangler.toml
 
@@ -103,75 +99,104 @@ subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign']).then(
   console.log('VAPID_CLE_PUBLIQUE =', publique.toString('base64url'));
   console.log('VAPID_CLE_PRIVEE  =', JSON.stringify(await subtle.exportKey('jwk', paire.privateKey)));
 });"
-#    → la publique va dans wrangler.toml, la privée dans un secret :
+#    → la publique dans wrangler.toml, la privée en secret :
 npx wrangler secret put VAPID_CLE_PRIVEE
 
-# 3. Déploiement — le domaine personnalisé de wrangler.toml crée
-#    l'enregistrement DNS tout seul.
+# 3. Déploiement
 npx wrangler deploy
 ```
 
-`custom_domain = true` fait créer par Cloudflare l'enregistrement de
-`rappels.boes-home.com` et son certificat. Aucun enregistrement à ajouter à la
-main.
-
-### 2.3 Brancher l'application dessus
-
-Dépôt GitHub → **Settings** → **Secrets and variables** → **Actions** →
-onglet **Variables** → **New repository variable** :
-
-```
-Name   VITE_URL_WORKER
-Value  https://rappels.boes-home.com
-```
-
-Tant que cette variable est vide, l'application fonctionne : elle exporte le
-`.ics` manuellement et **le dit**. Le Worker n'est qu'une commodité, la couche
-calendrier reste la garantie (§10.2).
-
-En développement, copier `.env.example` en `.env.local`.
-
-### 2.4 Vérifier
+Vérifier :
 
 ```bash
-curl -s https://rappels.boes-home.com/cle-publique          # → la clé VAPID
-npx wrangler tail                                            # journal en direct
+curl -s https://medco.boes-home.com/rappels/cle-publique   # → la clé VAPID
+curl -sI https://medco.boes-home.com/                       # → l'application
+npx wrangler tail                                           # journal en direct
 ```
 
+Les deux réponses doivent venir de sources différentes tout en partageant le
+nom : c'est la route de Worker qui fait la bascule.
+
 ---
 
-## 3. ⚠ Le domaine des `UID` de calendrier ne se change pas
+## 4. Le déploiement de l'application
 
-`src/ui/ecrans/Reglages.tsx` fige `medco.boes-home.com` comme domaine des
-`UID` du fichier `.ics`. Ce n'est pas une négligence : c'est ce couple
-`UID` + `SEQUENCE` qui permet à un agenda de **mettre à jour** un rappel plutôt
-que d'en créer un second (§10.4).
+[`scripts/deployer.sh`](../scripts/deployer.sh), lancé sur le serveur :
+
+```bash
+cd /opt/medco
+VITE_URL_WORKER=https://medco.boes-home.com/rappels ./scripts/deployer.sh /srv/medco
+```
+
+Il met à jour le dépôt, installe, **passe les contrôles — dont le jeu doré, qui
+est bloquant** — construit, puis bascule le contenu servi par un `mv`
+atomique. Un `rsync` en place laisserait quelques secondes un `index.html` neuf
+pointant vers des fichiers déjà supprimés : un rechargement pendant ce laps de
+temps casse l'application.
+
+Pour automatiser, les unités systemd sont fournies :
+
+```bash
+sudo cp deploiement/medco-deploiement.{service,timer} /etc/systemd/system/
+sudo systemctl enable --now medco-deploiement.timer
+```
+
+Le catalogue BDPM est régénéré le mercredi par `catalogue.yml` et commité ; le
+timer récupère le tout le jeudi matin.
+
+Le serveur a donc besoin de Node et pnpm. Si vous préférez l'en dispenser, la
+CI peut publier `dist/` en artefact et le serveur se contenter de le récupérer
+— le workflow `deploy.yml` produit déjà cet artefact.
+
+---
+
+## 5. ⚠ Cloudflare Access devant l'application : attention
+
+Restreindre l'accès par Cloudflare Access est tentant à vingt utilisateurs
+connus. Deux réserves sérieuses :
+
+- **Le calendrier ne s'authentifie pas.** Apple Calendar récupère le `.ics` en
+  `webcal://` sans cookie ni jeton. Une politique Access sur `/rappels/*`
+  couperait la couche de rappel qui sert justement de garantie (§10.2). Si
+  Access est activé, il faut en **exclure** `/rappels/calendrier/*`.
+- **Les endpoints de push ne sont pas sur ce domaine** — ils sont chez Apple et
+  Google. Access ne les protège pas et n'a pas à les voir.
+
+Le contenu n'est de toute façon jamais exposé : le carnet ne quitte pas
+l'appareil, et le `.ics` publié ne nomme aucun médicament (§10.4).
+
+---
+
+## 6. Ce qui ne se change pas après coup
+
+Le domaine des `UID` du calendrier est figé à `medco.boes-home.com` dans
+`src/ui/ecrans/Reglages.tsx`. C'est le couple `UID` + `SEQUENCE` qui permet à un
+agenda de **mettre à jour** un rappel plutôt que d'en créer un second (§10.4).
 
 Changer ce domaine après une première diffusion ferait apparaître toutes les
-alarmes en double chez les utilisateurs qui ont déjà importé le calendrier. Si
-le domaine devait changer un jour, il faudrait leur faire supprimer l'ancien
-calendrier avant d'importer le nouveau.
+alarmes en double chez ceux qui ont déjà importé le calendrier. Si cela devait
+arriver, il faudrait leur faire supprimer l'ancien calendrier avant d'importer
+le nouveau.
 
 ---
 
-## 4. Le catalogue
+## 7. Le catalogue
 
-Le bundle est versionné dans le dépôt (`public/bundles/`) et servi comme un
-fichier statique. Le workflow `catalogue.yml` le régénère chaque mercredi et le
-commite si les six contrôles bloquants passent.
+Versionné dans le dépôt (`public/bundles/`), servi comme fichier statique,
+régénéré chaque mercredi par `catalogue.yml` si les six contrôles bloquants
+passent.
 
-Deux compressions sont publiées : Brotli (le plus petit) et gzip. GitHub Pages
-sert un fichier pré-compressé tel quel, sans en-tête `Content-Encoding`, et
+Deux compressions sont publiées : Brotli (le plus petit) et gzip.
 `DecompressionStream('br')` n'existe ni sur Safari ni sur Firefox :
 l'application choisit le format qu'elle sait décompresser, puis vérifie
-l'empreinte SHA-256 de la **base décompressée**.
+l'empreinte SHA-256 de la **base décompressée** — la seule vérifiable quel que
+soit ce que le serveur a fait des octets en chemin.
 
-Volume : environ 3 Mo par installation, une fois. GitHub Pages plafonne à
-~100 Go par mois — sans objet à cette échelle.
+Environ 3 Mo par installation, une fois.
 
 ---
 
-## 5. Ce qui reste à valider sur matériel réel
+## 8. Ce qui reste à valider sur matériel réel
 
 Le déploiement ne suffit pas à considérer les rappels comme livrés (§16.2) :
 

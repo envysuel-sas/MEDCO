@@ -45,10 +45,16 @@ pnpm pipeline         # ingestion BDPM (nécessite Python 3.12)
 
 ## Déploiement
 
-L'application est servie par GitHub Pages sur **medco.boes-home.com**, le
-Worker de rappel par Cloudflare sur **rappels.boes-home.com**. Le détail des
-enregistrements DNS — et la raison pour laquelle celui de l'application doit
-rester **non proxifié** — est dans [`docs/deploiement.md`](docs/deploiement.md).
+L'application est servie **depuis la maison** sur `medco.boes-home.com`,
+derrière un tunnel `cloudflared` : aucun port ouvert, aucun certificat à
+gérer. Le Worker de rappel est monté sur la même origine, sous `/rappels/*` —
+une route Cloudflare passe avant le tunnel. Tout est dans
+[`docs/deploiement.md`](docs/deploiement.md) ; les fichiers de configuration
+sont dans [`deploiement/`](deploiement/).
+
+```bash
+./scripts/deployer.sh /srv/medco
+```
 
 ## Vérification visuelle
 

@@ -7,25 +7,27 @@ compatibility_date = "2026-08-01"
 [triggers]
 crons = ["* * * * *"]
 
-# Domaine dédié au Worker, distinct de celui de l'application.
+# Route sur le nom de l'application, sous un préfixe de chemin.
 #
-# ⚠ Pourquoi un sous-domaine séparé plutôt qu'une route sur medco.boes-home.com :
-# l'application est servie par GitHub Pages, dont l'enregistrement DNS doit
-# rester **non proxifié** le temps que GitHub émette son certificat. Un Worker
-# ne peut intercepter que du trafic proxifié par Cloudflare — les deux ne
-# peuvent donc pas cohabiter sur le même nom sans complication.
+# L'application est servie par un tunnel `cloudflared` : son enregistrement DNS
+# est **proxifié** par Cloudflare, ce qu'exige justement une route de Worker.
+# Les deux cohabitent donc sur le même nom d'hôte — même origine, pas de CORS,
+# une seule entrée DNS, et un `webcal://` sous le domaine de l'application.
 #
-# Le Worker répond déjà avec `Access-Control-Allow-Origin`, l'origine croisée
-# ne pose pas de problème. Voir `docs/deploiement.md`.
+# Précédence : une route de Worker passe **avant** l'origine du tunnel. Tout ce
+# qui n'est pas sous `/rappels/` continue vers le serveur de la maison.
 [[routes]]
-pattern = "rappels.boes-home.com"
-custom_domain = true
+pattern = "medco.boes-home.com/rappels/*"
+zone_name = "boes-home.com"
 
 [[kv_namespaces]]
 binding = "ABONNEMENTS"
 id = "à renseigner au premier déploiement"
 
 [vars]
+# Doit correspondre au préfixe de la route ci-dessus.
+BASE_CHEMIN = "/rappels"
+
 # Adresse de contact exigée par VAPID (RFC 8292) : elle identifie l'émetteur
 # auprès des services de push, elle n'est jamais transmise à l'appareil.
 VAPID_SUJET = "mailto:contact@boes-home.com"

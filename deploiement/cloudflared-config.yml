@@ -1,0 +1,23 @@
+# Tunnel cloudflared — /etc/cloudflared/config.yml
+#
+# Le tunnel sort de la maison vers Cloudflare : aucun port entrant, aucune IP
+# publique exposée, aucun certificat à gérer.
+#
+# Créé par :
+#   cloudflared tunnel login
+#   cloudflared tunnel create medco
+#   cloudflared tunnel route dns medco medco.boes-home.com
+
+tunnel: medco
+credentials-file: /etc/cloudflared/medco.json
+
+# Marge confortable : le premier lancement télécharge ~3 Mo de catalogue.
+originRequest:
+  connectTimeout: 30s
+  noTLSVerify: false
+
+ingress:
+  - hostname: medco.boes-home.com
+    service: http://127.0.0.1:8080
+  # Règle terminale obligatoire.
+  - service: http_status:404

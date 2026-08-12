@@ -1,0 +1,13 @@
+# /etc/systemd/system/medco-deploiement.timer
+# Le catalogue BDPM est régénéré le mercredi par GitHub Actions ; le serveur
+# le récupère le jeudi matin.
+
+[Unit]
+Description=Déploiement hebdomadaire de MEDCO
+
+[Timer]
+OnCalendar=Thu 06:30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

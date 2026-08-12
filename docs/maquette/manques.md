@@ -180,7 +180,8 @@ plutôt les traiter comme non exploitables ?
 |---|---|---|
 | §5.3 | `ATTACH … AS cat;` puis `PRAGMA cat.query_only = 1;` | `query_only` est un réglage de **connexion** : le préfixe de schéma est ignoré et **toute** la connexion passe en lecture seule, `user.db` compris. Symptôme : `SQLITE_READONLY` à la première écriture. La lecture seule vient désormais de l'URI `mode=ro` de l'attachement. |
 | §5.1 | `specialite_fts` en `content='specialite'` avec une colonne `substances` | La colonne n'existe pas dans `specialite` : l'index externe n'est pas constructible tel qu'écrit. La colonne a été ajoutée à la table. |
-| §6.3 | bundle Brotli servi tel quel | `DecompressionStream('br')` n'existe ni sur Safari ni sur Firefox, et GitHub Pages ne pose pas `Content-Encoding`. Le pipeline publie donc **aussi** une variante gzip, et l'application vérifie l'empreinte du SQLite décompressé — la seule qui tienne quel que soit l'hébergeur. |
+| §6.3 | bundle Brotli servi tel quel | `DecompressionStream('br')` n'existe ni sur Safari ni sur Firefox, et un serveur de fichiers statiques ne pose pas `Content-Encoding` sur un fichier pré-compressé. Le pipeline publie donc **aussi** une variante gzip, et l'application vérifie l'empreinte du SQLite décompressé — la seule qui tienne quoi que le serveur ait fait des octets en chemin. |
+| §4, §17.3 | hébergement sur GitHub Pages | L'application est finalement servie depuis la maison, derrière un tunnel `cloudflared`. Cela résout au passage un défaut que Pages aurait laissé : sans repli `try_files`, un rechargement sur `/pilulier` ou `/reglages` renvoie 404. Voir `docs/deploiement.md`. |
 
 À noter aussi, sans être une erreur de la spec : l'opérande gauche de `MATCH`
 doit être le **nom nu** de la table FTS. Ni `cat.specialite_fts`, ni un alias

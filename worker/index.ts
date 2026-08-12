@@ -20,6 +20,12 @@
 
 export interface Env {
   ABONNEMENTS: KVNamespace;
+  /**
+   * Préfixe de chemin sous lequel le Worker est monté. L'application et le
+   * Worker partagent le même nom d'hôte (`medco.boes-home.com/rappels/*`) :
+   * même origine, donc pas de CORS, et une seule entrée DNS.
+   */
+  BASE_CHEMIN?: string;
   VAPID_CLE_PUBLIQUE: string;
   /** Clé privée VAPID, JWK P-256 sérialisé en JSON. Secret de déploiement. */
   VAPID_CLE_PRIVEE: string;
@@ -50,7 +56,11 @@ export default {
 
   async fetch(requete: Request, env: Env): Promise<Response> {
     const url = new URL(requete.url);
-    const [, ressource, identifiant] = url.pathname.split('/');
+    const prefixe = env.BASE_CHEMIN ?? '';
+    const chemin = prefixe && url.pathname.startsWith(prefixe)
+      ? url.pathname.slice(prefixe.length)
+      : url.pathname;
+    const [, ressource, identifiant] = chemin.split('/');
 
     if (ressource === 'cle-publique' && requete.method === 'GET') {
       return new Response(env.VAPID_CLE_PUBLIQUE, { headers: entetes('text/plain') });
