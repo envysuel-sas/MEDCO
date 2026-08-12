@@ -45,16 +45,13 @@ pnpm pipeline         # ingestion BDPM (nécessite Python 3.12)
 
 ## Déploiement
 
-L'application est servie **depuis la maison** sur `medco.boes-home.com`,
-derrière un tunnel `cloudflared` : aucun port ouvert, aucun certificat à
-gérer. Le Worker de rappel est monté sur la même origine, sous `/rappels/*` —
-une route Cloudflare passe avant le tunnel. Tout est dans
-[`docs/deploiement.md`](docs/deploiement.md) ; les fichiers de configuration
-sont dans [`deploiement/`](deploiement/).
+**GitHub Pages héberge, `cloudflared` est l'entrée publique** sur
+`medco.boes-home.com`. Le tunnel rend l'enregistrement DNS proxifié, ce qui
+permet de monter le Worker de rappel sur la **même origine**, sous
+`/rappels/*` : pas de CORS, un seul nom, et plus de certificat à faire émettre.
 
-```bash
-./scripts/deployer.sh /srv/medco
-```
+Le détail — dont les deux lignes de `originRequest` sans lesquelles GitHub sert
+la mauvaise page — est dans [`docs/deploiement.md`](docs/deploiement.md).
 
 ## Vérification visuelle
 

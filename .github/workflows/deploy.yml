@@ -1,11 +1,10 @@
-name: build
+name: deploy
 
-# Spec §17.2 — lint → typecheck → test → build.
-# Le jeu doré est **bloquant** : rien n'est publié si le cumul est faux.
+# Spec §17.2 — lint → typecheck → test → build → GitHub Pages.
+# Le jeu doré est **bloquant** : rien n'est déployé si le cumul est faux.
 #
-# ⚠ Ce workflow ne déploie pas : l'application est servie depuis la maison,
-# derrière un tunnel cloudflared (`docs/deploiement.md`). Il produit l'artefact
-# que le serveur peut récupérer, et fait office de garde-fou sur `main`.
+# GitHub Pages héberge ; l'entrée publique est un tunnel cloudflared qui pointe
+# ici (`docs/deploiement.md`). Le domaine personnalisé vient de `public/CNAME`.
 on:
   push:
     branches: [main]
@@ -14,9 +13,15 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  verifier:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,11 +46,23 @@ jobs:
 
       - run: pnpm build
         env:
+          # Domaine personnalisé (public/CNAME) → l'application est à la racine.
           VITE_BASE: /
+          # Worker monté sur la même origine, sous /rappels (route Cloudflare).
           VITE_URL_WORKER: https://medco.boes-home.com/rappels
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
-          name: medco-dist
           path: dist
-          retention-days: 14
+
+  deploy:
+    # Une pull request se contente de vérifier : elle ne publie pas.
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
