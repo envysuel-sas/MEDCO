@@ -114,6 +114,22 @@ Trois réserves ouvertes : le thème sombre est absent de la maquette et n'a pas
 Le détail, lot par lot, avec les chiffres et la façon de les reproduire :
 [`docs/livraison.md`](docs/livraison.md).
 
+## Licence
+
+**Propriétaire, tous droits réservés** — [`LICENSE`](LICENSE).
+
+Le code est consultable ; ça ne vaut aucune concession de droits. Ni
+utilisation, ni copie, ni modification, ni distribution, ni hébergement d'une
+instance sans autorisation écrite. Ce n'est pas un logiciel libre.
+
+Trois ensembles échappent à cette licence et gardent la leur — les données
+BDPM et Open Medic (Licence Ouverte Etalab 2.0), les polices Poppins,
+Newsreader et DM Mono (SIL OFL 1.1), et les bibliothèques tierces (MIT,
+Apache 2.0). Inventaire et obligations dans [`THIRD-PARTY.md`](THIRD-PARTY.md).
+
+Medco est un outil de suivi personnel. Il ne pose aucun diagnostic, ne délivre
+aucun conseil thérapeutique, n'est pas un dispositif médical marqué CE.
+
 ## Données
 
 Référentiel : [Base de données publique des médicaments](https://base-donnees-publique.medicaments.gouv.fr)

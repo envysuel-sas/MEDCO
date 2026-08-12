@@ -1,0 +1,131 @@
+Medco — Licence propriétaire
+Copyright (c) 2026 Envysuel SAS. Tous droits réservés.
+All rights reserved.
+
+═══════════════════════════════════════════════════════════════════════════
+  CE DÉPÔT EST CONSULTABLE, IL N'EST PAS LIBRE DE DROITS
+═══════════════════════════════════════════════════════════════════════════
+
+Le code source est visible publiquement pour des raisons d'hébergement et de
+transparence. Cette visibilité ne vaut **aucune** concession de droits. Ce
+n'est pas un logiciel libre, ni un logiciel open source.
+
+
+1. DÉFINITIONS
+──────────────
+
+« le Logiciel » désigne le code source, le code compilé, les scripts, les
+fichiers de configuration, la documentation, les maquettes, les jetons de
+design et les ressources graphiques contenus dans ce dépôt, à l'exception des
+éléments listés à l'article 6.
+
+« le Titulaire » désigne Envysuel SAS, titulaire des droits patrimoniaux.
+
+
+2. DROITS RÉSERVÉS
+──────────────────
+
+Le Titulaire se réserve l'intégralité des droits de propriété intellectuelle
+sur le Logiciel, notamment les droits de reproduction, de représentation,
+d'adaptation, de traduction, de distribution et d'exploitation commerciale,
+pour le monde entier et pour toute la durée de protection légale.
+
+
+3. CE QUI EST INTERDIT SANS AUTORISATION ÉCRITE PRÉALABLE
+─────────────────────────────────────────────────────────
+
+Sont interdits, à titre gratuit comme onéreux :
+
+  a) l'utilisation du Logiciel, en tout ou partie, dans un produit, un
+     service ou un projet, qu'il soit commercial, associatif ou personnel ;
+  b) la reproduction, la copie ou l'enregistrement durable du Logiciel, hors
+     la copie technique résultant de la simple consultation de ce dépôt ;
+  c) la modification, l'adaptation, la traduction ou la création d'œuvres
+     dérivées ;
+  d) la distribution, la publication, la mise à disposition, la revente, la
+     location, le prêt ou la sous-licence ;
+  e) l'hébergement d'une instance du Logiciel accessible à des tiers ;
+  f) l'ingénierie inverse aux fins de reconstituer le Logiciel, sauf dans la
+     stricte mesure permise par une disposition d'ordre public ;
+  g) l'entraînement, l'affinage ou l'évaluation de modèles d'apprentissage
+     automatique à partir du Logiciel ;
+  h) le retrait ou l'altération des mentions de propriété, de copyright ou
+     des notices de licence.
+
+Le fork proposé par la plateforme d'hébergement ne constitue pas une
+autorisation : il découle des conditions d'utilisation de la plateforme et ne
+confère aucun des droits énumérés ci-dessus.
+
+
+4. CE QUI EST PERMIS
+────────────────────
+
+  a) consulter et lire le code source ;
+  b) le citer à des fins de commentaire, de critique, d'enseignement ou de
+     revue, dans les limites du droit de courte citation, avec mention de la
+     source ;
+  c) signaler une anomalie ou une vulnérabilité au Titulaire ;
+  d) les usages que la loi rend impératifs nonobstant toute stipulation
+     contraire, notamment le droit de l'utilisateur légitime d'observer le
+     fonctionnement du Logiciel.
+
+
+5. ABSENCE DE GARANTIE ET LIMITATION DE RESPONSABILITÉ
+──────────────────────────────────────────────────────
+
+LE LOGICIEL EST FOURNI « EN L'ÉTAT », SANS GARANTIE D'AUCUNE SORTE, EXPRESSE
+OU IMPLICITE, NOTAMMENT SANS GARANTIE DE QUALITÉ MARCHANDE, D'ADÉQUATION À UN
+USAGE PARTICULIER OU D'ABSENCE DE CONTREFAÇON.
+
+LE TITULAIRE NE POURRA ÊTRE TENU RESPONSABLE D'AUCUN DOMMAGE, DIRECT OU
+INDIRECT, RÉSULTANT DE L'UTILISATION OU DE L'IMPOSSIBILITÉ D'UTILISER LE
+LOGICIEL.
+
+  ⚠ AVERTISSEMENT SANITAIRE
+
+  Medco est un outil de suivi personnel. Il ne pose aucun diagnostic, ne
+  délivre aucun conseil thérapeutique et ne remplace ni un médecin ni un
+  pharmacien. Il n'a fait l'objet d'aucun marquage CE en tant que dispositif
+  médical et ne doit pas être utilisé comme tel.
+
+  Les seuils affichés proviennent de sources publiques citées et datées ; ils
+  ne constituent pas une prescription. En cas de doute sur une prise, sur un
+  oubli ou sur un dosage, se référer à la notice du médicament ou consulter
+  un professionnel de santé.
+
+
+6. ÉLÉMENTS TIERS — NON COUVERTS PAR LA PRÉSENTE LICENCE
+────────────────────────────────────────────────────────
+
+Les éléments suivants appartiennent à des tiers et restent régis par leurs
+licences propres. La présente licence ne s'y applique pas et ne saurait les
+restreindre :
+
+  • Données de la Base de données publique des médicaments (ANSM · HAS ·
+    UNCAM) et codes ATC issus d'Open Medic (Assurance Maladie), redistribués
+    dans public/bundles/ — Licence Ouverte Etalab 2.0. Leur réutilisation,
+    y compris commerciale, est libre sous réserve d'attribution.
+
+  • Polices Poppins, Newsreader et DM Mono, redistribuées dans
+    public/polices/ — SIL Open Font License 1.1. Texte intégral dans
+    public/polices/LICENSES.txt.
+
+  • Bibliothèques tierces incorporées au code distribué — MIT et Apache 2.0.
+    Inventaire et notices dans THIRD-PARTY.md.
+
+Le détail complet figure dans THIRD-PARTY.md, qui fait partie intégrante de
+la présente licence.
+
+
+7. DROIT APPLICABLE
+───────────────────
+
+La présente licence est régie par le droit français. Tout litige relève de la
+compétence exclusive des tribunaux français.
+
+
+8. CONTACT
+──────────
+
+Toute demande d'autorisation, de licence commerciale ou de partenariat est à
+adresser au Titulaire via le dépôt.
