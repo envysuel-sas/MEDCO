@@ -18,6 +18,7 @@ import { Bouton, Carte, EtatVide, TitreEcran } from '../composants/primitives.js
 import { PilulierJour, PilulierSemaine } from '../composants/pilulier.js';
 import type { CelluleSemaine, OccurrenceAffichee } from '../composants/pilulier.js';
 import styles from '../composants/composants.module.css';
+import { Link } from 'react-router';
 
 const RAPPEL_NOTICE =
   "En cas de prise oubliée, reportez-vous à la notice du médicament ou demandez conseil à votre pharmacien.";
@@ -149,6 +150,9 @@ export function PilulierJourEcran(): ReactNode {
     return (
       <main className={styles['pileEcran']} style={{ paddingTop: 'var(--espace-10)' }}>
         <TitreEcran>Pilulier</TitreEcran>
+      <Link className={styles['source']} to="/pilulier/preparer">
+        Préparer la semaine →
+      </Link>
         <EtatVide
           titre="Aucun traitement planifié."
           texte="Créez un plan de prise pour un produit."

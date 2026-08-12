@@ -1009,3 +1009,20 @@
   gap: var(--espace-2);
   min-width: 0;
 }
+
+/* --- Notice / RCP (maquette 1j) — intégralement en sérif ------------------- */
+
+.notice {
+  font-family: var(--famille-source);
+}
+
+.notice .titreEcran {
+  font-family: var(--famille-source);
+}
+
+.rubriquesNotice {
+  margin: var(--espace-5) 0 0;
+  padding-left: var(--espace-9);
+  display: grid;
+  gap: var(--espace-3);
+}

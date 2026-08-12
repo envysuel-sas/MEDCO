@@ -261,8 +261,8 @@ Ces valeurs ont été fusionnées. Chaque ligne demande confirmation.
 
 | Écran | Raison |
 |---|---|
-| 1h Préparer la semaine (§9.4) | Hors périmètre V1 : absent de la liste §3.1 de la spec. |
-| 1j Notice / RCP | Spec §3.2 — reporté, un lien vers la page officielle suffit. |
+| ~~1h Préparer la semaine~~ | **Livré.** Entré en V1 le 12/08/2026 sur décision du commanditaire ; spec §3.1 mise en accord. |
+| ~~1j Notice / RCP~~ | **Livré**, sans le texte des rubriques — voir §5.6. |
 | 1p Type dynamique 200 % | Contrainte, pas écran : à vérifier sur chaque écran. Aucune hauteur fixe n'a été posée sur un conteneur de texte. |
 
 ---
@@ -311,6 +311,20 @@ La spec §4.1 et §13 proposent `zbar-wasm` comme repli sur Safari, où
 **Fait en attendant :** le repli est `@zxing/library`, qui embarque un
 `DataMatrixReader`, chargé à la demande pour rester hors du bundle initial.
 À confirmer.
+
+### 5.6 Le texte des notices n'est pas dans le bundle
+
+La maquette 1j montre la posologie mot pour mot. Ce texte n'existe dans aucun
+des fichiers BDPM ingérés : `CIS_bdpm.txt` et ses frères portent compositions,
+présentations et conditions de prescription, pas les notices. Celles-ci vivent
+sur le site de l'ANSM, page par page — les moissonner pour 15 857 spécialités
+est un autre projet.
+
+**Fait :** l'écran affiche l'identité de la spécialité, le sommaire des
+rubriques officielles, et ouvre la page de l'ANSM. Il ne résume pas, ne
+paraphrase pas, n'invente aucune posologie. La maquette exige d'ailleurs une
+reproduction « sans modification, sans surlignage ni synthèse » : reproduire
+suppose de détenir, et tant qu'on ne détient pas, on renvoie.
 
 ### 5.5 Fragmentation des sels sans fraction thérapeutique
 

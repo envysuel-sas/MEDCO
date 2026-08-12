@@ -82,6 +82,11 @@ export interface Produit {
   /** ⚠ R2 — un traitement prescrit est exempté des signaux de fréquence. */
   readonly mode: Mode;
   readonly unite: string | null;
+  /**
+   * Stock restant, en unités de prise. `null` quand il n'est pas suivi —
+   * l'écran « Préparer la semaine » ne réclame alors rien (maquette 1h).
+   */
+  readonly stock: number | null;
   /** Classe du produit : une association n'est une association qu'au niveau du produit. */
   readonly classe: Classe;
 }

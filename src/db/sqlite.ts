@@ -113,7 +113,19 @@ function attacherCatalogue(cible: Database): void {
 }
 
 /** Migrations versionnées. `user_version` porte le numéro appliqué. */
-const MIGRATIONS: readonly string[] = [schema];
+const MIGRATIONS: readonly string[] = [
+  schema,
+  /**
+   * Stock par produit — « Préparer la semaine » (maquette 1h) affiche
+   * « Stock : 12 cp » et signale un stock insuffisant. Le schéma initial ne le
+   * portait pas.
+   *
+   * ⚠ Ajouté par migration et **non** dans `schema.sql` : les migrations sont
+   * rejouées dans l'ordre, une base neuve exécuterait les deux et l'ALTER
+   * échouerait sur une colonne déjà présente.
+   */
+  'ALTER TABLE produit ADD COLUMN stock REAL;',
+];
 
 function appliquerMigrations(cible: Database): void {
   cible.exec('PRAGMA journal_mode = WAL;');

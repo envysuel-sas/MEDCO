@@ -19,6 +19,8 @@ import { COULEUR_ATC } from './tokens.js';
 import { Bouton, Carte, TitreEcran } from './composants/primitives.js';
 import { Aujourdhui } from './ecrans/Aujourdhui.js';
 import { Historique } from './ecrans/Historique.js';
+import { Notice } from './ecrans/Notice.js';
+import { PreparerSemaine } from './ecrans/PreparerSemaine.js';
 import { Saisie } from './ecrans/Saisie.js';
 import { Produits } from './ecrans/Produits.js';
 import { PilulierJourEcran, PilulierSemaineEcran } from './ecrans/Pilulier.js';
@@ -166,6 +168,8 @@ export function App(): ReactNode {
         <Route path="/historique" element={<Historique />} />
         <Route path="/pilulier" element={<PilulierJourEcran />} />
         <Route path="/pilulier/semaine" element={<PilulierSemaineEcran />} />
+        <Route path="/pilulier/preparer" element={<PreparerSemaine />} />
+        <Route path="/notice/:cis" element={<Notice />} />
         <Route path="/produits" element={<Produits />} />
         <Route path="/produits/:produitId" element={<Produit />} />
         <Route path="/substances/:code" element={<Substance />} />

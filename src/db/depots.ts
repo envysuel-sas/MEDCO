@@ -174,8 +174,14 @@ function versProduit(l: Ligne): Produit {
     nomAffiche: texte(l, 'nom_affiche'),
     mode: texte(l, 'mode') as Mode,
     unite: texteOuNull(l, 'unite'),
+    stock: l['stock'] === null || l['stock'] === undefined ? null : nombre(l, 'stock'),
     classe: (texteOuNull(l, 'classe') ?? 'AUTRE') as Classe,
   };
+}
+
+/** Stock restant, saisi par l'aidant (maquette 1h). `null` = non suivi. */
+export function definirStock(produitId: string, stock: number | null): void {
+  base().exec({ sql: 'UPDATE produit SET stock = ?2 WHERE id = ?1', bind: [produitId, stock] });
 }
 
 // ---------------------------------------------------------------------------

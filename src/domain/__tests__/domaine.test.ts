@@ -78,6 +78,7 @@ function prise(
       nomAffiche: nomSpecialite(cis) ?? cis,
       mode: options.mode ?? 'libre',
       unite: lignes.find((l) => l.comptee)?.unite ?? null,
+      stock: null,
       classe: classeSpecialite(cis),
     },
   };
