@@ -82,7 +82,9 @@ function normaliser(brut: string): string {
     .trim()
     // Notation parenthésée de certains lecteurs : (01)0340094949729...
     .replace(/\((\d{2,4})\)/g, (_, ai: string) => ai)
-    .replace(/␝|<GS>|/g, GS);
+    // Trois écritures du même séparateur selon les lecteurs.
+    .replaceAll('␝', GS)
+    .replaceAll('<GS>', GS);
 }
 
 /**
