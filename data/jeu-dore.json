@@ -34,6 +34,7 @@
       "libelle": "Humex Rhume — paracétamol 500 mg par comprimé",
       "cis": "63713344",
       "nom_specialite": "HUMEX RHUME, comprimé et gélule",
+      "element": "comprimé",
       "code_substance": "02202",
       "dose_par_unite_mg": 500,
       "unite": "comprimé",
@@ -132,7 +133,7 @@
       "prises": [
         { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T08:00:00+02:00" },
         { "cis": "69928332", "dose": 1, "horodatage": "2026-08-12T13:00:00+02:00" },
-        { "cis": "63713344", "dose": 1, "horodatage": "2026-08-12T19:00:00+02:00" }
+        { "cis": "63713344", "element": "comprimé", "dose": 1, "horodatage": "2026-08-12T19:00:00+02:00" }
       ],
       "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
       "attendu_mg": { "02202": 2000 }
