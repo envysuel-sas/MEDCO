@@ -18,6 +18,7 @@ import type {
   Mode,
   Moment,
   Occurrence,
+  Plan,
   PriseAvecSubstances,
   Produit,
   Substance,
@@ -561,4 +562,86 @@ export function definirReglage(cle: string, valeur: string): void {
           ON CONFLICT(cle) DO UPDATE SET valeur = excluded.valeur`,
     bind: [cle, valeur],
   });
+}
+
+// ---------------------------------------------------------------------------
+// Plans — §9.1, §9.2
+// ---------------------------------------------------------------------------
+
+export function plansDuProfil(profilId: string): Plan[] {
+  return lire(
+    `SELECT p.id, p.produit_id, pr.profil_id, p.mode, p.rrule, p.moments, p.heures,
+            p.intervalle_h, p.dose, p.debut, p.fin, p.rappel, p.sequence
+     FROM plan p JOIN produit pr ON pr.id = p.produit_id
+     WHERE pr.profil_id = ?1 AND pr.actif = 1`,
+    [profilId],
+  ).map((l) => ({
+    id: texte(l, 'id'),
+    produitId: texte(l, 'produit_id'),
+    profilId: texte(l, 'profil_id'),
+    mode: texte(l, 'mode') as Plan['mode'],
+    rrule: texte(l, 'rrule'),
+    moments: JSON.parse(texteOuNull(l, 'moments') ?? 'null') as string[] | null,
+    heures: JSON.parse(texteOuNull(l, 'heures') ?? 'null') as string[] | null,
+    intervalleH: l['intervalle_h'] === null ? null : nombre(l, 'intervalle_h'),
+    dose: nombre(l, 'dose'),
+    debut: texte(l, 'debut'),
+    fin: texteOuNull(l, 'fin'),
+    rappel: nombre(l, 'rappel') === 1,
+  }));
+}
+
+/**
+ * Crée ou remplace un plan. `sequence` est incrémenté à chaque modification :
+ * c'est lui que porte le `SEQUENCE` du `.ics`, sans quoi les agendas
+ * dupliquent les alarmes au lieu de les mettre à jour (§10.4).
+ */
+export function enregistrerPlan(plan: Plan): number {
+  const db = base();
+  const [existant] = lire('SELECT sequence FROM plan WHERE id = ?1', [plan.id]);
+  const sequence = existant ? nombre(existant, 'sequence') + 1 : 0;
+
+  db.exec({
+    sql: `INSERT INTO plan (id, produit_id, mode, rrule, moments, heures, intervalle_h,
+                            dose, debut, fin, rappel, sequence)
+          VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+          ON CONFLICT(id) DO UPDATE SET
+            mode = excluded.mode, rrule = excluded.rrule, moments = excluded.moments,
+            heures = excluded.heures, intervalle_h = excluded.intervalle_h,
+            dose = excluded.dose, debut = excluded.debut, fin = excluded.fin,
+            rappel = excluded.rappel, sequence = excluded.sequence`,
+    bind: [
+      plan.id,
+      plan.produitId,
+      plan.mode,
+      plan.rrule,
+      plan.moments ? JSON.stringify(plan.moments) : null,
+      plan.heures ? JSON.stringify(plan.heures) : null,
+      plan.intervalleH,
+      plan.dose,
+      plan.debut,
+      plan.fin,
+      plan.rappel ? 1 : 0,
+      sequence,
+    ],
+  });
+  return sequence;
+}
+
+export function sequenceDuPlan(planId: string): number {
+  const [ligne] = lire('SELECT sequence FROM plan WHERE id = ?1', [planId]);
+  return ligne ? nombre(ligne, 'sequence') : 0;
+}
+
+export function supprimerPlan(planId: string): void {
+  base().exec({ sql: 'DELETE FROM plan WHERE id = ?1', bind: [planId] });
+}
+
+/** Occurrences d'un plan, tous statuts — base de la régénération (§9.1). */
+export function occurrencesDuPlan(planId: string): Occurrence[] {
+  return lire(
+    `SELECT id, plan_id, profil_id, prevue_le, moment_id, dose, statut, prise_id
+     FROM occurrence WHERE plan_id = ?1 ORDER BY prevue_le`,
+    [planId],
+  ).map(versOccurrence);
 }

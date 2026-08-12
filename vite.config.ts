@@ -18,10 +18,15 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      // `injectManifest` : le service worker porte du code propre — réception
+      // des push et déchiffrement du contenu utile (§10.3).
+      strategies: 'injectManifest',
+      srcDir: 'src/pwa',
+      filename: 'sw.ts',
       registerType: 'prompt',
       injectRegister: 'auto',
       includeAssets: ['apple-touch-icon.png', 'favicon.svg'],
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,wasm}'],
         // Le bundle catalogue est téléchargé et importé par l'app (spec §5.5),
         // pas mis en cache par Workbox : trop gros et géré par version.
