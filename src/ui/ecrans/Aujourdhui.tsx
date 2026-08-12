@@ -16,7 +16,7 @@ import { maintenant } from '../App.js';
 import { useMedco } from '../etat.js';
 import type { EtatMedco } from '../etat.js';
 import { COULEUR_ATC, couleurSubstance } from '../tokens.js';
-import { faitDuSignal } from '../textes.js';
+import { faitDuSignal, formaterQuantite } from '../textes.js';
 import { Carte, Etiquette, EtatVide } from '../composants/primitives.js';
 import { EnTete } from '../composants/chrome.js';
 import { CarteSignal, CumulJour, ListePrises, Plaquette } from '../composants/donnees.js';
@@ -202,7 +202,7 @@ function lignesDuJour(
         heure: heureLocale(prise.horodatage),
         nom: produit?.nomAffiche ?? '—',
         detail: premiere
-          ? `${substance?.nom.toLowerCase() ?? premiere.code} ${Math.round(premiere.quantiteMg)} mg`
+          ? `${substance?.nom.toLowerCase() ?? premiere.code} · ${formaterQuantite(Math.round(premiere.quantiteMg), 'mg')}`
           : 'dosage non exploitable',
         appoint: `${prise.dose} ${produit?.unite ?? ''}`.trim(),
         groupe: substance?.groupeAtc ?? ('_' as GroupeAtc),

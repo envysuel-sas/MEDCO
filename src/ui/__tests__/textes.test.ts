@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { faitDuSignal } from '../textes.js';
+import { ecartLisible, faitDuSignal } from '../textes.js';
 import type { Signal, TypeRegle } from '../../domain/regles.js';
 
 const INTERDITS = [
@@ -83,6 +83,14 @@ describe('énoncé d’un signal', () => {
 
   it('formate les nombres à la française', () => {
     expect(faitDuSignal(signal('cumul_fenetre', 3000, 'mg'))).toMatch(/3\s000 mg/);
+  });
+
+  it('exprime un écart de moins d’une heure en minutes', () => {
+    expect(ecartLisible(0.001, 'h')).toBe("moins d'une minute");
+    expect(ecartLisible(0.5, 'h')).toBe('30 minutes');
+    expect(ecartLisible(2, 'h')).toBe('2 h');
+    expect(ecartLisible(15, 'jours')).toBe('15 jours');
+    expect(faitDuSignal(signal('intervalle_min', 0.001, 'h'))).toContain("moins d'une minute");
   });
 
   it('ne laisse pas la cible vide produire une phrase bancale', () => {

@@ -26,12 +26,21 @@ export function faitDuSignal(signal: Signal): string {
     case 'dose_unitaire':
       return `${valeur} ${signal.unite} de ${cible} en une seule prise.`;
     case 'intervalle_min':
-      return `${valeur} ${signal.unite} entre deux prises de ${cible}.`;
+      // Sous l'heure, le millième d'heure ne veut rien dire : on passe aux
+      // minutes. `0,001 h` était illisible.
+      return `${ecartLisible(signal.valeur, signal.unite)} entre deux prises de ${cible}.`;
     case 'duree_consecutive':
       return `${valeur} ${signal.unite} consécutifs avec prise de ${cible}.`;
     case 'jours_de_prise':
       return `${valeur} ${signal.unite} avec prise de ${cible} sur les 30 derniers jours.`;
   }
+}
+
+/** Un écart de moins d'une heure s'exprime en minutes. */
+export function ecartLisible(valeur: number, unite: string): string {
+  if (unite !== 'h' || valeur >= 1) return `${nombreFr.format(Math.round(valeur * 10) / 10)} ${unite}`;
+  const minutes = Math.round(valeur * 60);
+  return minutes <= 1 ? "moins d'une minute" : `${nombreFr.format(minutes)} minutes`;
 }
 
 /** Libellé d'une quantité, avec l'espace insécable fine du français. */

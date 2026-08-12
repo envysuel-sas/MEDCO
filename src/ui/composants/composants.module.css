@@ -313,12 +313,14 @@
 }
 
 .ligneTitre {
+  display: block;
   font-size: var(--taille-liste);
   line-height: var(--interligne-liste);
   font-weight: var(--graisse-moyenne);
 }
 
 .ligneDetail {
+  display: block;
   font-size: var(--taille-meta);
   line-height: var(--interligne-meta);
   color: var(--encre-3);
@@ -375,12 +377,14 @@
 }
 
 .chipProduitNom {
+  display: block;
   font-size: var(--taille-chip);
   line-height: var(--interligne-chip);
   font-weight: var(--graisse-moyenne);
 }
 
 .chipProduitDosage {
+  display: block;
   font-family: var(--famille-mono);
   font-size: var(--taille-mono-petit);
   color: var(--encre-3);
