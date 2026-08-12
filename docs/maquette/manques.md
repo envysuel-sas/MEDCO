@@ -150,7 +150,26 @@ Deux points à trancher :
 - **Délai de reverrouillage en arrière-plan.** Deux minutes, choisi pour ne pas
   rendre l'application pénible. Aucune valeur dans la maquette ni dans la spec.
 
-### 2.9 [KitchenSink] — Écran non dessiné, par nature
+### 2.9 [MentionsLegales] — Écran non dessiné
+
+Obligation légale (LCEN art. 6-III) absente de la maquette : identification de
+l'éditeur et de l'hébergeur.
+
+**Fait en attendant :** recomposé avec `TitreEcran`, `Carte` et `Etiquette`,
+aucun composant ni motif visuel nouveau.
+
+Deux champs restent **vides et non affichés**, faute d'avoir été vérifiés :
+
+| Champ | Pourquoi |
+|---|---|
+| Capital social | absent du registre national des entreprises ; exigé par la LCEN, à relever sur le Kbis |
+| TVA intracommunautaire | se calcule depuis le SIREN, mais n'est dû que si la société est assujettie — non vérifié |
+
+Une ligne vide n'est pas rendue : mieux vaut une mention incomplète qu'une
+mention fausse. La ville du greffe (`R.C.S. Versailles`) découle de la
+compétence territoriale des Yvelines et demande confirmation sur le Kbis.
+
+### 2.10 [KitchenSink] — Écran non dessiné, par nature
 
 Recomposé à partir des composants existants.
 
