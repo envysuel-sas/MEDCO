@@ -20,12 +20,6 @@
 
 export interface Env {
   ABONNEMENTS: KVNamespace;
-  /**
-   * Préfixe de chemin sous lequel le Worker est monté. L'application et le
-   * Worker partagent le même nom d'hôte (`medco.boes-home.com/rappels/*`) :
-   * même origine, donc pas de CORS, et une seule entrée DNS.
-   */
-  BASE_CHEMIN?: string;
   VAPID_CLE_PUBLIQUE: string;
   /** Clé privée VAPID, JWK P-256 sérialisé en JSON. Secret de déploiement. */
   VAPID_CLE_PRIVEE: string;
@@ -56,11 +50,15 @@ export default {
 
   async fetch(requete: Request, env: Env): Promise<Response> {
     const url = new URL(requete.url);
-    const prefixe = env.BASE_CHEMIN ?? '';
-    const chemin = prefixe && url.pathname.startsWith(prefixe)
-      ? url.pathname.slice(prefixe.length)
-      : url.pathname;
-    const [, ressource, identifiant] = chemin.split('/');
+
+    // Le Worker vit sur son propre nom d'hôte, l'application sur le sien :
+    // `PUT` et `DELETE` sont donc précédés d'un préflight que le navigateur
+    // abandonne si personne ne répond.
+    if (requete.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: entetes('text/plain') });
+    }
+
+    const [, ressource, identifiant] = url.pathname.split('/');
 
     if (ressource === 'cle-publique' && requete.method === 'GET') {
       return new Response(env.VAPID_CLE_PUBLIQUE, { headers: entetes('text/plain') });
@@ -108,6 +106,9 @@ function entetes(type: string): Record<string, string> {
   return {
     'Content-Type': type,
     'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
     // Aucune télémétrie, aucun journal applicatif (§15).
     'Referrer-Policy': 'no-referrer',
   };

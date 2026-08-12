@@ -45,14 +45,24 @@ pnpm pipeline         # ingestion BDPM (nécessite Python 3.12)
 
 ## Déploiement
 
-**GitHub Pages héberge, `cloudflared` est l'entrée publique** sur
-`medco.boes-home.com`. Le tunnel rend l'enregistrement DNS proxifié, ce qui
-permet de monter le Worker de rappel sur la **même origine**, sous
-`/rappels/*` : pas de CORS, un seul nom, et plus de certificat à faire émettre.
+**Tout tourne sur GitHub.** GitHub Pages héberge l'application et émet le
+certificat ; aucune machine à faire tourner, aucun tunnel, aucun service tiers
+obligatoire. Activer Pages sur « GitHub Actions » et lancer le workflow
+`deploy` suffit : le site est en ligne et installable sur téléphone.
 
-[`docs/deploiement.md`](docs/deploiement.md) est un guide pas à pas qui part de
-zéro : chaque étape indique ce que vous tapez, ce que vous devez voir, et quoi
-faire si ça ne marche pas. Comptez une heure.
+Deux variables de dépôt, **toutes deux facultatives**, complètent l'installation
+par défaut :
+
+| Variable | Vide | Renseignée |
+|---|---|---|
+| `DOMAINE` | l'app vit sur `<compte>.github.io/<dépôt>/` | domaine personnalisé, `CNAME` publié à la racine |
+| `VITE_URL_WORKER` | seule la couche calendrier est proposée, et l'app le dit | notifications poussées actives |
+
+Le Worker de rappel s'exécute chez Cloudflare, sur son propre nom d'hôte : lui
+non plus n'a besoin d'aucune machine.
+
+[`docs/deploiement.md`](docs/deploiement.md) déroule les quatre étapes, écrites
+pour quelqu'un qui n'a jamais déployé de site. Comptez dix minutes.
 
 ## Vérification visuelle
 

@@ -2,6 +2,10 @@
 
 Cloudflare Workers + KV + Cron Triggers. Spec §10.3.
 
+**Facultatif.** Sans lui, l'application propose la couche calendrier — celle
+qui est la garantie (§10.2) — et le dit. Il ne demande aucune machine : c'est
+Cloudflare qui l'exécute, à la demande, sur son propre nom d'hôte.
+
 ## Ce qu'il sait, ce qu'il ne sait pas
 
 Il sait qu'un endpoint veut un ping à 21 h. Il ne peut pas savoir que c'est une
@@ -21,6 +25,7 @@ l'utilisateur partage son calendrier.
 | `DELETE` | `/abonnement/:id` | retire un abonnement |
 | `PUT` | `/calendrier/:id` | dépose le `.ics` produit par l'application |
 | `GET` | `/calendrier/:id.ics` | sert le calendrier — cible du `webcal://` |
+| `OPTIONS` | `*` | préflight CORS : l'application est sur un autre nom d'hôte |
 
 ## Déploiement
 

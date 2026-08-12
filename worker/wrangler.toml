@@ -7,27 +7,23 @@ compatibility_date = "2026-08-01"
 [triggers]
 crons = ["* * * * *"]
 
-# Route sur le nom de l'application, sous un préfixe de chemin.
+# Domaine personnalisé de Worker : Cloudflare crée l'enregistrement DNS et
+# émet le certificat. Le Worker s'exécute sur l'infrastructure Cloudflare —
+# aucune machine à faire tourner, ni chez soi ni ailleurs.
 #
-# L'application est servie par un tunnel `cloudflared` : son enregistrement DNS
-# est **proxifié** par Cloudflare, ce qu'exige justement une route de Worker.
-# Les deux cohabitent donc sur le même nom d'hôte — même origine, pas de CORS,
-# une seule entrée DNS, et un `webcal://` sous le domaine de l'application.
-#
-# Précédence : une route de Worker passe **avant** l'origine du tunnel. Tout ce
-# qui n'est pas sous `/rappels/` continue vers le serveur de la maison.
+# Nom distinct de celui de l'application : `medco.boes-home.com` pointe vers
+# GitHub Pages et doit rester non proxifié pour que GitHub émette son propre
+# certificat. Les deux noms sont donc des origines différentes, d'où les
+# en-têtes CORS du Worker.
 [[routes]]
-pattern = "medco.boes-home.com/rappels/*"
-zone_name = "boes-home.com"
+pattern = "rappels.boes-home.com"
+custom_domain = true
 
 [[kv_namespaces]]
 binding = "ABONNEMENTS"
 id = "à renseigner au premier déploiement"
 
 [vars]
-# Doit correspondre au préfixe de la route ci-dessus.
-BASE_CHEMIN = "/rappels"
-
 # Adresse de contact exigée par VAPID (RFC 8292) : elle identifie l'émetteur
 # auprès des services de push, elle n'est jamais transmise à l'appareil.
 VAPID_SUJET = "mailto:contact@boes-home.com"

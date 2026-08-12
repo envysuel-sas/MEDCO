@@ -3,8 +3,15 @@ name: deploy
 # Spec §17.2 — lint → typecheck → test → build → GitHub Pages.
 # Le jeu doré est **bloquant** : rien n'est déployé si le cumul est faux.
 #
-# GitHub Pages héberge ; l'entrée publique est un tunnel cloudflared qui pointe
-# ici (`docs/deploiement.md`). Le domaine personnalisé vient de `public/CNAME`.
+# Tout tourne sur GitHub. Aucune machine à faire tourner, aucun tunnel, aucun
+# service tiers obligatoire. Deux variables de dépôt, toutes deux facultatives,
+# décident du reste (Settings → Secrets and variables → Actions → Variables) :
+#
+#   DOMAINE           domaine personnalisé, ex. medco.boes-home.com.
+#                     Vide → l'app vit sur l'adresse GitHub du dépôt.
+#   VITE_URL_WORKER   Worker de rappel Cloudflare, ex. https://rappels.exemple.fr
+#                     Vide → seule la couche calendrier est proposée, et l'app
+#                     le dit (§10.2 : le calendrier est la garantie).
 on:
   push:
     branches: [main]
@@ -44,12 +51,29 @@ jobs:
       - run: pnpm test:golden
       - run: pnpm test
 
+      # Sans domaine personnalisé, GitHub sert le site sous /<nom-du-depot>/ :
+      # `base`, `start_url` et `scope` du manifeste doivent le refléter, sans
+      # quoi l'application n'est pas installable.
+      - id: cible
+        env:
+          DOMAINE: ${{ vars.DOMAINE }}
+          DEPOT: ${{ github.event.repository.name }}
+        run: |
+          if [ -n "$DOMAINE" ]; then
+            echo "base=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=/$DEPOT/" >> "$GITHUB_OUTPUT"
+          fi
+
       - run: pnpm build
         env:
-          # Domaine personnalisé (public/CNAME) → l'application est à la racine.
-          VITE_BASE: /
-          # Worker monté sur la même origine, sous /rappels (route Cloudflare).
-          VITE_URL_WORKER: https://medco.boes-home.com/rappels
+          VITE_BASE: ${{ steps.cible.outputs.base }}
+          VITE_URL_WORKER: ${{ vars.VITE_URL_WORKER }}
+
+      # GitHub Pages lit le domaine personnalisé dans un fichier `CNAME` à la
+      # racine du site publié. Absent, il sert l'adresse par défaut du dépôt.
+      - if: vars.DOMAINE != ''
+        run: echo "${{ vars.DOMAINE }}" > dist/CNAME
 
       - uses: actions/upload-pages-artifact@v3
         with:
