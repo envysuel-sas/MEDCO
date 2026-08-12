@@ -21,6 +21,7 @@ export interface EtatMedco {
   readonly secondOnglet: boolean;
   readonly catalogueInstalle: boolean;
   readonly profilId: string | null;
+  readonly profilNom: string;
   readonly produits: readonly Produit[];
   readonly prises: readonly PriseAvecSubstances[];
   readonly regles: readonly Regle[];
@@ -43,6 +44,7 @@ export const useMedco = create<EtatMedco>((set, get) => ({
   secondOnglet: false,
   catalogueInstalle: false,
   profilId: null,
+  profilNom: '',
   produits: [],
   prises: [],
   regles: [],
@@ -68,6 +70,7 @@ export const useMedco = create<EtatMedco>((set, get) => ({
         regles: bundle.regles,
         catalogueInstalle: version !== null,
         profilId: premier,
+        profilNom: listeProfils[0]?.nom ?? '',
         pret: true,
       });
 
@@ -106,7 +109,8 @@ export const useMedco = create<EtatMedco>((set, get) => ({
   },
 
   async choisirProfil(profilId, maintenant) {
-    set({ profilId });
+    const profil = (await baseDeDonnees.profils()).find((p) => p.id === profilId);
+    set({ profilId, profilNom: profil?.nom ?? '' });
     await regenererTout(profilId, maintenant, FUSEAU());
     await get().rafraichir(maintenant);
   },

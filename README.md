@@ -15,6 +15,7 @@ Le comptage se fait **par substance active, pas par boîte** : Doliprane 1000 + 
 | Ce que la maquette ne tranche pas | [`docs/maquette/manques.md`](docs/maquette/manques.md) |
 | Pipeline BDPM | [`pipeline/README.md`](pipeline/README.md) |
 | Worker de rappel | [`worker/README.md`](worker/README.md) |
+| Déploiement et DNS | [`docs/deploiement.md`](docs/deploiement.md) |
 
 ## Démarrage
 
@@ -41,6 +42,13 @@ pnpm test:couverture  # couverture — 100 % de branches exigées sur le domaine
 pnpm lint             # ESLint + tsc --noEmit
 pnpm pipeline         # ingestion BDPM (nécessite Python 3.12)
 ```
+
+## Déploiement
+
+L'application est servie par GitHub Pages sur **medco.boes-home.com**, le
+Worker de rappel par Cloudflare sur **rappels.boes-home.com**. Le détail des
+enregistrements DNS — et la raison pour laquelle celui de l'application doit
+rester **non proxifié** — est dans [`docs/deploiement.md`](docs/deploiement.md).
 
 ## Vérification visuelle
 

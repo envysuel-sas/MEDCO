@@ -24,20 +24,11 @@ l'utilisateur partage son calendrier.
 
 ## Déploiement
 
-```bash
-cd worker
-npx wrangler kv namespace create ABONNEMENTS   # reporter l'id dans wrangler.toml
-npx wrangler secret put VAPID_CLE_PRIVEE       # JWK P-256 sérialisé
-npx wrangler deploy
-```
+Procédure complète, clés VAPID comprises : [`../docs/deploiement.md`](../docs/deploiement.md).
 
-Les clés VAPID se génèrent avec WebCrypto :
-
-```js
-const paire = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign']);
-// publique : exportKey('raw') en base64url  →  VAPID_CLE_PUBLIQUE
-// privée   : exportKey('jwk')               →  secret VAPID_CLE_PRIVEE
-```
+Le Worker vit sur `rappels.boes-home.com`, distinct de `medco.boes-home.com`
+qui sert l'application : un Worker n'intercepte que du trafic proxifié par
+Cloudflare, or l'enregistrement de GitHub Pages doit rester non proxifié.
 
 ## Limite connue
 

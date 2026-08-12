@@ -3,16 +3,32 @@ main = "index.ts"
 compatibility_date = "2026-08-01"
 
 # §10.3 — plan gratuit : Cron Triggers à la minute, 100 000 requêtes/jour.
-# Vingt utilisateurs, quelques rappels par jour : sans objet.
+# Vingt utilisateurs et quelques rappels par jour : sans objet.
 [triggers]
 crons = ["* * * * *"]
+
+# Domaine dédié au Worker, distinct de celui de l'application.
+#
+# ⚠ Pourquoi un sous-domaine séparé plutôt qu'une route sur medco.boes-home.com :
+# l'application est servie par GitHub Pages, dont l'enregistrement DNS doit
+# rester **non proxifié** le temps que GitHub émette son certificat. Un Worker
+# ne peut intercepter que du trafic proxifié par Cloudflare — les deux ne
+# peuvent donc pas cohabiter sur le même nom sans complication.
+#
+# Le Worker répond déjà avec `Access-Control-Allow-Origin`, l'origine croisée
+# ne pose pas de problème. Voir `docs/deploiement.md`.
+[[routes]]
+pattern = "rappels.boes-home.com"
+custom_domain = true
 
 [[kv_namespaces]]
 binding = "ABONNEMENTS"
 id = "à renseigner au premier déploiement"
 
 [vars]
-VAPID_SUJET = "mailto:contact@example.org"
+# Adresse de contact exigée par VAPID (RFC 8292) : elle identifie l'émetteur
+# auprès des services de push, elle n'est jamais transmise à l'appareil.
+VAPID_SUJET = "mailto:contact@boes-home.com"
 VAPID_CLE_PUBLIQUE = "à renseigner au premier déploiement"
 
 # VAPID_CLE_PRIVEE est un secret : `wrangler secret put VAPID_CLE_PRIVEE`.

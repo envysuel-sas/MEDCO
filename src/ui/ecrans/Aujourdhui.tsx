@@ -27,7 +27,7 @@ const JOURS_PLAQUETTE = 30;
 
 export function Aujourdhui(): ReactNode {
   const instant = maintenant();
-  const { prises, produits, signaux, regles, acquitter } = useMedco();
+  const { prises, produits, signaux, regles, profilNom, acquitter } = useMedco();
   const [substances, setSubstances] = useState<Map<string, Substance>>(new Map());
 
   const codes = useMemo(
@@ -75,7 +75,7 @@ export function Aujourdhui(): ReactNode {
 
   return (
     <>
-      <EnTete profil="Profil" couleurProfil={COULEUR_ATC._} />
+      <EnTete profil={profilNom || 'Profil'} couleurProfil={COULEUR_ATC._} />
 
       <main className={styles['pileEcran']}>
         {codeDominant ? (

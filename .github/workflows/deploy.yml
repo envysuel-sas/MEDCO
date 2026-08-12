@@ -1,5 +1,7 @@
 name: deploy
 
+# Spec §17.2 — lint → typecheck → test → build → GitHub Pages.
+# Le jeu doré est **bloquant** : rien n'est déployé si le cumul est faux.
 on:
   push:
     branches: [main]
@@ -22,25 +24,29 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      # Passer à `--frozen-lockfile` une fois pnpm-lock.yaml commité.
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
 
       - run: pnpm lint
 
-      # --passWithNoTests à retirer dès que le jeu doré existe (lot L1).
-      - run: pnpm test -- --passWithNoTests
+      # Jeu doré d'abord, et seul, pour que son échec soit lisible dans le
+      # journal : c'est lui qui garantit la justesse du cumul (§16.1).
+      - run: pnpm test:golden
+      - run: pnpm test
 
       - run: pnpm build
         env:
-          # Domaine personnalisé → racine. Sur <pseudo>.github.io/medco/, mettre /medco/
+          # Domaine personnalisé (public/CNAME) → l'application est à la racine.
+          # Sur <compte>.github.io/medco/, mettre /medco/.
           VITE_BASE: /
+          # Worker de rappel. Vide = couche calendrier seule, l'app le dit.
+          VITE_URL_WORKER: ${{ vars.VITE_URL_WORKER }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

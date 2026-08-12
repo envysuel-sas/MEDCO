@@ -25,8 +25,17 @@ import { FUSEAU, useMedco } from '../etat.js';
 import { Bouton, Carte, Etiquette, TitreEcran } from '../composants/primitives.js';
 import styles from '../composants/composants.module.css';
 
-/** À renseigner au déploiement du Worker (voir `worker/README.md`). */
+/** À renseigner au déploiement du Worker (voir `docs/deploiement.md`). */
 const URL_WORKER = import.meta.env['VITE_URL_WORKER'] ?? '';
+
+/**
+ * Domaine des `UID` du calendrier.
+ *
+ * ⚠ Figé, et non déduit de `window.location` : un même carnet consulté depuis
+ * une prévisualisation ou un domaine de repli produirait des `UID` différents,
+ * et l'agenda de l'utilisateur récolterait des alarmes en double (§10.4).
+ */
+const DOMAINE_CALENDRIER = 'medco.boes-home.com';
 
 export function Reglages(): ReactNode {
   const { regles, profilId, produits, prises } = useMedco();
@@ -54,7 +63,7 @@ export function Reglages(): ReactNode {
     );
 
     const ics = genererIcs(entrees, {
-      domaine: window.location.hostname,
+      domaine: DOMAINE_CALENDRIER,
       fuseau: FUSEAU(),
       maintenant: instant,
       nomCalendrier: 'Medco',

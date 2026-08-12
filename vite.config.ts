@@ -34,6 +34,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
       },
       manifest: {
+        // `id` fige l'identité de la PWA : sans lui, un changement de
+        // `start_url` ferait réinstaller une seconde application (§11.4).
+        id: BASE,
         name: 'Medco',
         short_name: 'Medco',
         description: 'Suivi de consommation médicamenteuse',

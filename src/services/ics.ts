@@ -30,6 +30,12 @@ const PLIAGE = 75; // RFC 5545 §3.1 : lignes de 75 octets au plus
 const SUMMARY_NEUTRE = 'Rappel';
 
 export interface OptionsIcs {
+  /**
+   * Domaine des `UID`. Il doit rester **stable dans le temps** : c'est lui,
+   * avec l'identifiant de plan, qui permet à un agenda de reconnaître un
+   * événement déjà importé plutôt que d'en créer un second (§10.4). Le changer
+   * dupliquerait toutes les alarmes existantes.
+   */
   readonly domaine: string;
   readonly fuseau: string;
   /** Injecté : le module ne lit jamais l'horloge. */
