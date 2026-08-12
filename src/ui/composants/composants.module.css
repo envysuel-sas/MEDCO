@@ -945,3 +945,67 @@
   color: inherit;
   cursor: pointer;
 }
+
+/* --- Onboarding, 5 écrans (maquette 1o) ----------------------------------- */
+
+.progressionOnboarding {
+  display: flex;
+  gap: var(--espace-3);
+  margin-bottom: var(--espace-6);
+}
+
+.pointProgression {
+  flex: 1;
+  height: var(--espace-1);
+  border-radius: var(--rayon-jauge);
+  background: var(--surface-creux);
+}
+
+.pointProgressionFait {
+  background: var(--action);
+}
+
+.choixOnboarding {
+  display: grid;
+  gap: var(--espace-5);
+  margin-top: var(--espace-8);
+}
+
+/* --- Historique, mise en page « ruban » (maquette 2b) ---------------------
+   Même contenu que le journal, la date dans un rail de gauche : plus de jours
+   tiennent à l'écran. */
+
+.rubanJour {
+  display: grid;
+  grid-template-columns: var(--espace-14) 1fr;
+  gap: var(--espace-6);
+  align-items: start;
+  padding-top: var(--espace-5);
+  border-top: var(--filet) solid var(--trait);
+}
+
+.rubanDate {
+  display: grid;
+  justify-items: center;
+  gap: var(--espace-1);
+}
+
+.rubanNumero {
+  font-size: var(--taille-dose);
+  font-weight: var(--graisse-moyenne);
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-1);
+}
+
+.rubanJourSemaine {
+  font-size: var(--taille-jour);
+  text-transform: uppercase;
+  letter-spacing: var(--interlettrage-etiquette);
+  color: var(--encre-3);
+}
+
+.rubanEntrees {
+  display: grid;
+  gap: var(--espace-2);
+  min-width: 0;
+}

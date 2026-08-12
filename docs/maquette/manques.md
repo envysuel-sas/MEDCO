@@ -67,8 +67,11 @@ La maquette pose la question elle-même (« À trancher, 3 · Rayon de l'alvéol
 Elle l'écrit : « Deux mises en page à trancher — journal (2a) ou ruban (2b) »,
 et livre les deux, exactement comme pour le rayon d'alvéole.
 
-**Fait en attendant :** le **journal** (2a) est implémenté — groupes par jour,
-total à droite, filtres par substance. Le ruban (2b) ne l'est pas.
+**Fait en attendant :** les **deux** sont implémentées et permutables par un
+sélecteur en tête d'écran — journal (2a) par défaut, ruban (2b) au choix. La
+maquette livre les deux options sans trancher, exactement comme pour le rayon
+d'alvéole : choisir à sa place aurait été un arbitrage de plus. À trancher, et
+le perdant se retire en supprimant un bloc.
 
 Deux valeurs y sont dérivées, absentes de la maquette :
 
@@ -80,6 +83,23 @@ Deux valeurs y sont dérivées, absentes de la maquette :
 ⚠ À noter : `saisie_le` était écrit en base depuis le début mais **jamais
 relu**. Le marqueur « ajoutée après coup », que la maquette exige, n'existait
 donc nulle part — ni dans l'historique, ni dans les prises du jour.
+
+### 1.7 [Onboarding] — La maquette annonce un chiffrement qui n'existe pas
+
+L'écran 3 de l'onboarding (1o) fait dire à l'application : « Tout reste sur cet
+appareil, **chiffré**. »
+
+C'est faux. Le verrou par code barre l'accès au carnet ; il ne chiffre pas le
+stockage. §15 prévoit un AES-GCM applicatif adossé à WebAuthn PRF — non livré,
+et déjà porté en réserve dans `docs/livraison.md`.
+
+**Fait en attendant :** le texte n'est pas recopié. L'écran dit « Tout reste sur
+cet appareil », mentionne le chiffrement de la **sauvegarde** — lui bien réel —
+et précise que le code protège l'accès sans chiffrer le contenu.
+
+Une maquette qui gagne sur un point visuel ne gagne pas sur une affirmation de
+sécurité fausse. À trancher : livrer le chiffrement promis, ou corriger la
+maquette.
 
 ---
 

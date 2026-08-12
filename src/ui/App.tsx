@@ -68,9 +68,9 @@ const PREMIER_NIVEAU: ReadonlySet<string> = new Set([
 ]);
 
 export function App(): ReactNode {
-  const { pret, secondOnglet, erreur, profilId, profilNom, demarrer, choisirProfil } = useMedco();
+  const { pret, secondOnglet, erreur, profilId, profilNom, saisieOuverte, ouvrirSaisie, fermerSaisie, demarrer, choisirProfil } =
+    useMedco();
   const [installation, setInstallation] = useState(etatInstallation);
-  const [saisieOuverte, setSaisieOuverte] = useState(false);
   const [verrou, setVerrou] = useState<{ configure: boolean; ouvert: boolean } | null>(null);
   const [dejaOuverte, setDejaOuverte] = useState(false);
   const naviguer = useNavigate();
@@ -180,12 +180,12 @@ export function App(): ReactNode {
 
       <Saisie
         ouverte={saisieOuverte}
-        onFermer={() => setSaisieOuverte(false)}
+        onFermer={fermerSaisie}
         onAjouterProduit={() => naviguer('/produits')}
       />
       <BarreOnglets
         onSaisie={() => {
-          setSaisieOuverte(true);
+          ouvrirSaisie();
           // §11.4 — l'historique est géré explicitement, sans quoi le bouton
           // retour d'Android éjecte de l'application.
           naviguer('.', { replace: false });

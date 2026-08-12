@@ -15,8 +15,12 @@
  * Un jour sans prise n'est donc **jamais** sauté.
  *
  * ⚠ La maquette ne tranche pas entre journal (2a) et ruban (2b) : « Deux mises
- * en page à trancher ». Le journal est retenu, l'arbitrage est consigné dans
- * `docs/maquette/manques.md` §1.6.
+ * en page à trancher », et elle livre les deux — exactement comme pour le rayon
+ * d'alvéole. Les deux sont donc implémentées et permutables, plutôt que d'en
+ * choisir une à sa place. Consigné dans `docs/maquette/manques.md` §1.6.
+ *
+ * Le ruban porte « le même contenu, plus de jours à l'écran » : la date passe
+ * dans un rail de gauche au lieu d'un en-tête de section.
  *
  * ⚠ §12.1 — aucun rouge, aucun pourcentage, aucune conclusion. Le total du
  * jour est un fait posé à droite, rien de plus.
@@ -45,6 +49,7 @@ export function Historique(): ReactNode {
   const [substances, setSubstances] = useState<ReadonlyMap<CodeSubstance, Substance>>(new Map());
   // Maquette 2e — toute prise du journal est corrigeable ou retirable.
   const [ouverte, setOuverte] = useState<string | null>(null);
+  const [miseEnPage, setMiseEnPage] = useState<'journal' | 'ruban'>('journal');
   const instant = maintenant();
 
   const codes = useMemo(
@@ -107,6 +112,15 @@ export function Historique(): ReactNode {
         {profilNom || 'Profil'} · {moisEnCours(instant)}
       </p>
 
+      <div className={styles['filtresHistorique']}>
+        <Chip actif={miseEnPage === 'journal'} onClick={() => setMiseEnPage('journal')}>
+          Journal
+        </Chip>
+        <Chip actif={miseEnPage === 'ruban'} onClick={() => setMiseEnPage('ruban')}>
+          Ruban
+        </Chip>
+      </div>
+
       {presentes.length > 0 ? (
         <div className={styles['filtresHistorique']}>
           <Chip actif={filtre === null} onClick={() => setFiltre(null)}>
@@ -122,6 +136,40 @@ export function Historique(): ReactNode {
 
       {jours.map((jour) => {
         const duJour = parJour.get(jour) ?? [];
+        const lignes = [...duJour].sort((a, b) => b.horodatage.localeCompare(a.horodatage));
+
+        // 2b — même contenu, la date dans un rail de gauche.
+        if (miseEnPage === 'ruban') {
+          return (
+            <section key={jour} className={styles['rubanJour']}>
+              <div className={styles['rubanDate']}>
+                <span className={styles['rubanNumero']}>{jour.slice(8, 10)}</span>
+                <span className={styles['rubanJourSemaine']}>{jourSemaine(jour)}</span>
+              </div>
+              <div className={styles['rubanEntrees']}>
+                {lignes.length === 0 ? (
+                  <p className={styles['meta']}>Aucune prise</p>
+                ) : (
+                  lignes.map((prise) => (
+                    <button
+                      key={prise.id}
+                      type="button"
+                      className={styles['ligneJournalCliquable']}
+                      onClick={() => setOuverte(prise.id)}
+                    >
+                      <LigneJournal
+                        prise={prise}
+                        produit={produitsParId.get(prise.produitId)}
+                        substances={substances}
+                      />
+                    </button>
+                  ))
+                )}
+              </div>
+            </section>
+          );
+        }
+
         return (
           <section key={jour} className={styles['jourHistorique']}>
             <header className={styles['entreDeux']}>
@@ -264,6 +312,13 @@ function libelleJour(jour: string, instant: string): string {
   if (jour === aujourdhui) return `Aujourd'hui · ${date}`;
   if (jour === hier) return `Hier · ${date}`;
   return date;
+}
+
+/** Abréviation du jour de la semaine, pour le rail du ruban (2b). */
+function jourSemaine(jour: string): string {
+  return new Date(`${jour}T12:00:00Z`)
+    .toLocaleDateString('fr-FR', { weekday: 'short', timeZone: 'UTC' })
+    .replace('.', '');
 }
 
 function moisEnCours(instant: string): string {

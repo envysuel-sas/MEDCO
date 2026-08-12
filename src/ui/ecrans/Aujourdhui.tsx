@@ -17,7 +17,7 @@ import { useMedco } from '../etat.js';
 import type { EtatMedco } from '../etat.js';
 import { couleurSubstance } from '../tokens.js';
 import { faitDuSignal, formaterQuantite } from '../textes.js';
-import { Carte, Etiquette, EtatVide } from '../composants/primitives.js';
+import { Bouton, Carte, Etiquette, EtatVide } from '../composants/primitives.js';
 import { CarteSignal, CumulJour, ListePrises, Plaquette } from '../composants/donnees.js';
 import type { Alveole, LignePriseAffichee } from '../composants/donnees.js';
 import styles from '../composants/composants.module.css';
@@ -27,7 +27,7 @@ const JOURS_PLAQUETTE = 30;
 
 export function Aujourdhui(): ReactNode {
   const instant = maintenant();
-  const { prises, produits, signaux, regles, acquitter } = useMedco();
+  const { prises, produits, signaux, regles, acquitter, ouvrirSaisie } = useMedco();
   const [substances, setSubstances] = useState<Map<string, Substance>>(new Map());
 
   const codes = useMemo(
@@ -90,6 +90,7 @@ export function Aujourdhui(): ReactNode {
           <EtatVide
             titre="Aucune prise enregistrée aujourd'hui."
             texte="Le bouton central enregistre une prise en deux appuis."
+            action={<Bouton onClick={ouvrirSaisie}>Enregistrer une prise</Bouton>}
           />
         )}
 
