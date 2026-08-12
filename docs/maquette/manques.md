@@ -8,6 +8,42 @@ plausible.
 
 ---
 
+## 0. Le cahier des charges de design manquait
+
+`docs/maquette/cdc-design.md` — 872 lignes — n'était pas dans le dépôt. Les
+jetons ont donc été extraits du seul export HTML, sans la source qui l'explique.
+Les composants `MedcoTabBar` et `MedcoPlaquette` manquaient aussi ; ils y sont
+désormais.
+
+Trois écarts constatés en comparant, pour la première fois, la maquette rendue
+et l'application rendue côte à côte :
+
+| # | Écart | État |
+|---|---|---|
+| 0.1 | **Légende ATC absente sous la Plaquette** — la maquette pose `● nerveux ● musculo ● digestif ● respiratoire` sous la grille, dans les écrans 1b et 1c. L'application n'affiche rien. | à corriger |
+| 0.2 | **L'icône d'en-tête est un soleil, pas une roue crantée** — donc un basculement de thème, pas un accès aux réglages. | à trancher |
+| 0.3 | **Lien « Historique → » sous « PRISES DU JOUR »** — invention de l'implémentation ; la maquette 2a referme l'historique sur « Aujourd'hui » sans dire par où on y entre. | à confirmer |
+
+### 0.4 Le thème sombre n'est plus introuvable
+
+Le CDC §4.2 pose le registre : « **Sombre, chaud, dense.** Fond noir tirant sur
+le brun […] Le mode clair existe et doit être excellent, mais le produit est
+**conçu en sombre d'abord**. » §7.1 en donne toutes les valeurs, y compris le
+laiton `--sable` `#C9B79A`.
+
+Mais l'export de la maquette **abandonne explicitement cette direction** : « La
+direction sombre et chaude du CDC §4.2 est abandonnée : fond clair bleu-gris,
+chrome pétrole tiré du bleu du mot-symbole, laiton remplacé par ce même
+pétrole. »
+
+`CLAUDE.md` tranche — sur un point visuel, la maquette gagne. L'application suit
+donc la maquette, et c'est cohérent. Reste que §1.1 affirmait que les valeurs du
+thème sombre manquaient : **c'est faux, elles sont au CDC §7.1**. Le thème
+sombre est désormais constructible. À décider : le construire d'après le CDC, ou
+acter que la direction claire de la maquette le remplace.
+
+---
+
 ## 1. Contradictions à arbitrer
 
 ### 1.1 [Système] — Thème sombre absent de l'export

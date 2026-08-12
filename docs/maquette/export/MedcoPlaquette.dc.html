@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="font-family:Poppins,system-ui,sans-serif">
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:{{ gap }};margin-bottom:5px">
+    <sc-for list="{{ dow }}" as="d" hint-placeholder-count="7">
+      <div style="text-align:center;font-size:9px;font-weight:500;letter-spacing:0.08em;color:#56737F">{{ d }}</div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:{{ gap }}">
+    <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+      <div aria-label="{{ c.aria }}" style="aspect-ratio:1/1;border-radius:{{ c.radius }};background:#E4EDF2;overflow:hidden;display:flex;flex-direction:column;box-shadow:{{ c.ring }};opacity:{{ c.op }}">
+        <sc-for list="{{ c.bands }}" as="b" hint-placeholder-count="0">
+          <div style="height:{{ b.h }};background:{{ b.bg }}"></div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <sc-if value="{{ legend }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:12px">
+      <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="width:8px;height:8px;border-radius:2px;background:{{ l.bg }}"></span>
+          <span style="font-size:11px;color:#56737F">{{ l.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:330,&quot;height&quot;:260},&quot;days&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:30,&quot;min&quot;:7,&quot;max&quot;:120,&quot;tsType&quot;:&quot;number&quot;},&quot;count&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:18,&quot;min&quot;:0,&quot;max&quot;:120,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Données&quot;},&quot;offset&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:0,&quot;max&quot;:6,&quot;tsType&quot;:&quot;number&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;densite&quot;,&quot;substance&quot;,&quot;observance&quot;],&quot;default&quot;:&quot;densite&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;radius&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:4,&quot;min&quot;:0,&quot;max&quot;:18,&quot;step&quot;:1,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;gap&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:5,&quot;min&quot;:2,&quot;max&quot;:10,&quot;step&quot;:1,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;color&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#C4551F&quot;,&quot;options&quot;:[&quot;#C4551F&quot;,&quot;#2F7A4B&quot;,&quot;#2A6AAC&quot;,&quot;#6552AE&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;legend&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;empty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;seed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:1,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const days = +(p.days ?? 30);
+    const offset = +(p.offset ?? 2);
+    const variant = p.variant || 'densite';
+    const radius = (p.radius ?? 4) + 'px';
+    const gap = (p.gap ?? 5) + 'px';
+    const empty = p.empty === true || p.empty === 'true';
+    let s = ((+(p.seed ?? 7)) * 7919 + 13) % 233280;
+    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+
+    const rgba = (hex, a) => {
+      const n = parseInt(hex.slice(1), 16);
+      return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
+    };
+    const ATC = { N: '#C4551F', M: '#2F7A4B', A: '#2A6AAC', R: '#6552AE', H: '#6B6258', B: '#9A553A', C: '#AC5478' };
+    const NAMES = { N: 'nerveux', M: 'musculo', A: 'digestif', R: 'respiratoire', H: 'hormones', B: 'sang', C: 'cardio' };
+    const pool = variant === 'substance' ? ['S'] : ['N', 'N', 'N', 'N', 'M', 'A', 'R', 'N', 'M'];
+    const mono = p.color || '#C4551F';
+    const opFor = n => n >= 3 ? 1 : n === 2 ? 0.7 : 0.4;
+    const chrome = '#12566E';
+
+    // `count` = nombre de jours avec prise annoncé par l'écran appelant.
+    // Quand il est fourni, la grille le respecte exactement : le chiffre affiché
+    // à côté de la plaquette et la plaquette ne peuvent pas se contredire.
+    const count = (p.count === undefined || p.count === null || p.count === '') ? null : +p.count;
+    let filled = null;
+    if (count != null) {
+      const idx = Array.from({ length: days }, (_, i) => i);
+      for (let i = idx.length - 1; i > 0; i--) {
+        const j = Math.floor(rnd() * (i + 1));
+        const t = idx[i]; idx[i] = idx[j]; idx[j] = t;
+      }
+      filled = new Set(idx.slice(0, Math.max(0, Math.min(days, count))));
+    }
+
+    const cells = [];
+    const blank = { bands: [], ring: 'none', op: 0.35, radius, aria: 'hors période' };
+    for (let i = 0; i < offset; i++) cells.push(blank);
+
+    for (let d = 0; d < days; d++) {
+      const r = rnd();
+      const today = d === days - 1;
+      let n;
+      if (filled) {
+        n = filled.has(d) ? (r < 0.55 ? 1 : r < 0.85 ? 2 : 3) : 0;
+        if (today) n = filled.has(d) ? 1 : 0;
+      } else {
+        n = empty ? (r < 0.93 ? 0 : 1) : (r < 0.38 ? 0 : r < 0.68 ? 1 : r < 0.87 ? 2 : 3);
+        if (today) n = empty ? 0 : 1;
+      }
+      const bands = [];
+      let aria = 'jour ' + (d + 1) + ', aucune prise';
+      if (n > 0) {
+        if (variant === 'observance') {
+          bands.push({ h: '100%', bg: chrome });
+          aria = 'jour ' + (d + 1) + ', prise validée';
+        } else if (variant === 'substance') {
+          bands.push({ h: '100%', bg: rgba(mono, opFor(n)) });
+          aria = 'jour ' + (d + 1) + ', ' + n + ' prise' + (n > 1 ? 's' : '');
+        } else {
+          const k1 = pool[Math.floor(rnd() * pool.length)];
+          const split = n >= 2 && rnd() < 0.32;
+          if (split) {
+            let k2 = pool[Math.floor(rnd() * pool.length)];
+            if (k2 === k1) k2 = k1 === 'N' ? 'A' : 'N';
+            bands.push({ h: '58%', bg: rgba(ATC[k1], opFor(n)) });
+            bands.push({ h: '42%', bg: rgba(ATC[k2], opFor(1)) });
+            aria = 'jour ' + (d + 1) + ', ' + n + ' prises, ' + NAMES[k1] + ' et ' + NAMES[k2];
+          } else {
+            bands.push({ h: '100%', bg: rgba(ATC[k1], opFor(n)) });
+            aria = 'jour ' + (d + 1) + ', ' + n + ' prise' + (n > 1 ? 's' : '') + ', ' + NAMES[k1];
+          }
+        }
+      }
+      cells.push({
+        bands, op: 1, radius,
+        ring: today ? 'inset 0 0 0 1.5px ' + chrome : 'none',
+        aria: today ? "aujourd'hui, " + aria : aria,
+      });
+    }
+    while (cells.length % 7 !== 0) cells.push(blank);
+
+    return {
+      cells, gap,
+      dow: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
+      legend: p.legend === true || p.legend === 'true',
+      legendItems: [
+        { bg: ATC.N, label: 'nerveux' },
+        { bg: ATC.M, label: 'musculo' },
+        { bg: ATC.A, label: 'digestif' },
+        { bg: ATC.R, label: 'respiratoire' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
