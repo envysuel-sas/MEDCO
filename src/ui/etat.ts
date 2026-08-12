@@ -25,6 +25,7 @@ export interface EtatMedco {
   readonly produits: readonly Produit[];
   readonly prises: readonly PriseAvecSubstances[];
   readonly regles: readonly Regle[];
+  readonly versionRegles: string;
   readonly signaux: readonly Signal[];
   readonly erreur: string | null;
 
@@ -48,6 +49,7 @@ export const useMedco = create<EtatMedco>((set, get) => ({
   produits: [],
   prises: [],
   regles: [],
+  versionRegles: '',
   signaux: [],
   erreur: null,
 
@@ -68,6 +70,7 @@ export const useMedco = create<EtatMedco>((set, get) => ({
 
       set({
         regles: bundle.regles,
+        versionRegles: bundle.version,
         catalogueInstalle: version !== null,
         profilId: premier,
         profilNom: listeProfils[0]?.nom ?? '',

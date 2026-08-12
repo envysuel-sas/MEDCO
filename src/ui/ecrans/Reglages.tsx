@@ -38,7 +38,7 @@ const URL_WORKER = import.meta.env['VITE_URL_WORKER'] ?? '';
 const DOMAINE_CALENDRIER = 'medco.boes-home.com';
 
 export function Reglages(): ReactNode {
-  const { regles, profilId, produits, prises } = useMedco();
+  const { regles, versionRegles, profilId, produits, prises } = useMedco();
   const [catalogue, setCatalogue] = useState<{ version: string; dateBdpm: string } | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [phrase, setPhrase] = useState('');
@@ -134,7 +134,7 @@ export function Reglages(): ReactNode {
         produits,
         nomsSubstances: new Map([...substances].map(([code, s]) => [code, s.nom])),
         dateBdpm: catalogue?.dateBdpm ?? '',
-        versionRegles: regles.length > 0 ? 'chargée' : 'absente',
+        versionRegles,
         avecDetail: true,
       }),
     );
@@ -250,8 +250,9 @@ export function Reglages(): ReactNode {
       <Carte>
         <Etiquette>Données</Etiquette>
         <p className={styles['meta']}>
-          {regles.length} repères chargés, chacun avec sa source datée. Tout est stocké sur cet
-          appareil ; aucune donnée n&apos;est transmise, aucune télémétrie n&apos;existe.
+          {regles.length} repères chargés (version {versionRegles || '—'}), chacun avec sa source
+          datée. Tout est stocké sur cet appareil ; aucune donnée n&apos;est transmise, aucune
+          télémétrie n&apos;existe.
         </p>
       </Carte>
     </main>

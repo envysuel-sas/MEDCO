@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 
 import { cumulParSubstance, jourLocal } from '../../domain/cumul.js';
 import { ajouterJours, fenetreGlissante, heureLocale } from '../../domain/temps.js';
@@ -27,6 +28,7 @@ const JOURS_PLAQUETTE = 30;
 
 export function Aujourdhui(): ReactNode {
   const instant = maintenant();
+  const naviguer = useNavigate();
   const { prises, produits, signaux, regles, profilNom, acquitter } = useMedco();
   const [substances, setSubstances] = useState<Map<string, Substance>>(new Map());
 
@@ -75,7 +77,11 @@ export function Aujourdhui(): ReactNode {
 
   return (
     <>
-      <EnTete profil={profilNom || 'Profil'} couleurProfil={COULEUR_ATC._} />
+      <EnTete
+        profil={profilNom || 'Profil'}
+        couleurProfil={COULEUR_ATC._}
+        onReglages={() => naviguer('/reglages')}
+      />
 
       <main className={styles['pileEcran']}>
         {codeDominant ? (
