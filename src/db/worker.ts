@@ -10,6 +10,14 @@
 
 import * as depots from './depots.js';
 import { BaseDejaOuverteError, installerCatalogue, ouvrir, versionCatalogue } from './sqlite.js';
+import {
+  verrouConfigure,
+  verrouDefinir,
+  verrouEstOuvert,
+  verrouEtat,
+  verrouFermer,
+  verrouOuvrir,
+} from './verrou.js';
 
 type Methode = keyof typeof api;
 
@@ -19,7 +27,32 @@ const api = {
   installerCatalogue: async (octets: Uint8Array) => {
     await installerCatalogue(octets);
   },
+  verrouEtat,
+  verrouDefinir,
+  verrouOuvrir,
+  verrouFermer,
 } as const;
+
+/**
+ * Méthodes joignables verrou fermé (§15).
+ *
+ * Le contrôle est **ici**, pas dans l'UI : un écran de saisie qu'on peut
+ * contourner en appelant `client.ts` depuis la console ne protège rien. Tout
+ * ce qui touche au carnet — profils, produits, prises, plans — passe par cette
+ * porte.
+ *
+ * `installerCatalogue` et `versionCatalogue` restent ouverts : le catalogue est
+ * une donnée publique, et son installation doit pouvoir précéder la pose du
+ * code au premier lancement.
+ */
+const HORS_VERROU: ReadonlySet<string> = new Set([
+  'versionCatalogue',
+  'installerCatalogue',
+  'verrouEtat',
+  'verrouDefinir',
+  'verrouOuvrir',
+  'verrouFermer',
+]);
 
 export interface RequeteWorker {
   readonly id: number;
@@ -40,22 +73,37 @@ self.addEventListener('message', (evenement: MessageEvent<RequeteWorker>) => {
 
 async function traiter(id: number, methode: string, args: readonly unknown[]): Promise<void> {
   try {
-    pret ??= ouvrir();
-    await pret;
+    try {
+      pret ??= ouvrir();
+      await pret;
+    } catch (cause) {
+      // Seule une **ouverture** ratée doit pouvoir être retentée. Réinitialiser
+      // `pret` sur n'importe quelle erreur applicative rouvrirait la base à
+      // chaque refus de verrou, et le VFS refuserait la seconde connexion.
+      pret = undefined;
+      throw cause;
+    }
 
     const fonction = api[methode as Methode];
     if (typeof fonction !== 'function') throw new Error(`Méthode inconnue : ${methode}`);
+
+    // Tant qu'aucun code n'est posé, rien à garder : le carnet est vide.
+    if (!HORS_VERROU.has(methode) && verrouConfigure() && !verrouEstOuvert()) {
+      const refus = new Error('Le carnet est verrouillé.');
+      refus.name = 'VerrouFerme';
+      throw refus;
+    }
 
     const valeur = await (fonction as (...parametres: unknown[]) => unknown)(...args);
     // Les Map ne traversent pas structuredClone côté @sqlite.org : on aplatit.
     self.postMessage({ id, ok: true, valeur: aplatir(valeur) } satisfies ReponseWorker);
   } catch (cause) {
-    pret = undefined; // une ouverture ratée doit pouvoir être retentée
     self.postMessage({
       id,
       ok: false,
       erreur: cause instanceof Error ? cause.message : String(cause),
       ...(cause instanceof BaseDejaOuverteError ? { code: 'BASE_DEJA_OUVERTE' } : {}),
+      ...(cause instanceof Error && cause.name === 'VerrouFerme' ? { code: 'VERROU_FERME' } : {}),
     } satisfies ReponseWorker);
   }
 }

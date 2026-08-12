@@ -144,6 +144,59 @@ d'accueil. Ouvrez-la depuis là, plus jamais depuis Safari.
 vous avez ouvert le lien depuis une autre application. Copiez l'adresse et
 collez-la dans Chrome.
 
+### Au premier lancement : un code
+
+Il n'y a **pas de compte**. Rien n'est partagé, rien n'est synchronisé, il n'y
+a pas de serveur : un compte n'aurait rien à authentifier.
+
+L'application demande un code de quatre à huit chiffres, puis le redemande à
+chaque ouverture. Il est propre à l'appareil, il ne se récupère pas et ne part
+nulle part. Il barre l'accès au carnet à qui prend le téléphone en main — il ne
+chiffre pas le stockage, c'est le chiffrement de l'appareil par iOS ou Android
+qui répond à ce cas-là.
+
+⚠ Un code oublié n'a aucun recours. Il n'y a personne à qui le redemander.
+
+---
+
+## Étape 5 — Refermer le robinet (facultatif)
+
+Si vous n'avez ouvert le dépôt que le temps de la diffusion, vous pouvez le
+repasser en privé. **Une PWA installée survit à la disparition de son site** —
+vérifié : le service worker n'est pas désinscrit, l'application démarre, les
+polices et le catalogue restent en cache.
+
+### La seule condition
+
+**Chaque personne doit avoir ouvert l'adresse au moins une fois dans son
+navigateur.** Pas installé, pas ouvert l'application : simplement chargé la
+page.
+
+C'est suffisant parce que le service worker met le catalogue — trois
+mégaoctets, la seule chose sans laquelle l'application ne compte rien — en
+cache **dès son installation**, c'est-à-dire dès la première visite, avant même
+l'ajout à l'écran d'accueil. Quelqu'un qui pose l'icône sans jamais lancer
+l'app trouvera quand même son catalogue au premier lancement, robinet fermé.
+
+Laissez une poignée de minutes entre la visite et la fermeture : le
+téléchargement se fait en arrière-plan, et en 4G il n'est pas instantané.
+
+### Ce que vous perdez
+
+| | |
+|---|---|
+| Nouvelles installations | impossibles — nouveau téléphone, réinstallation, restauration d'usine |
+| Mises à jour du catalogue | arrêtées : la BDPM est reconstruite tous les mercredis, plus rien ne descend |
+| Correctifs | n'atteignent plus les téléphones |
+| Éviction de stockage iOS | sous forte pression mémoire, il faut réinstaller — donc rouvrir |
+
+Pour une poignée d'utilisateurs répartis dans le temps, rouvrir le dépôt à
+chaque nouveau téléphone devient vite une corvée. Laisser public, ou passer à
+GitHub Pro, évite ce va-et-vient.
+
+⚠ Refermer ne rétracte pas ce qui a été public : le code a pu être cloné ou
+archivé pendant la fenêtre.
+
 ---
 
 ## Facultatif — Un nom de domaine à vous

@@ -700,3 +700,78 @@
   letter-spacing: var(--interlettrage-titre);
   margin: 0;
 }
+
+/* --- Verrou (§15) ---------------------------------------------------------
+   Aucun motif visuel nouveau : le pavé reprend la géométrie de l'alvéole du
+   pilulier, les points d'état celle des points d'occurrence, et toutes les
+   valeurs viennent des jetons. L'écran n'est pas dans la maquette — voir
+   `docs/maquette/manques.md` §2.8. */
+
+.verrou {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--espace-12);
+  padding: var(--espace-13) var(--espace-10) calc(var(--espace-13) + env(safe-area-inset-bottom));
+  background: var(--fond);
+}
+
+.verrouPoints {
+  display: flex;
+  gap: var(--espace-6);
+  min-height: var(--espace-7);
+}
+
+.verrouPoint {
+  width: var(--espace-7);
+  height: var(--espace-7);
+  border-radius: 50%;
+  background: var(--surface-creux);
+}
+
+.verrouPointRempli {
+  background: var(--action);
+}
+
+.verrouPave {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--espace-6);
+  width: 100%;
+  max-width: 264px;
+}
+
+.verrouTouche {
+  appearance: none;
+  border: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--surface-1);
+  color: var(--encre-1);
+  font-family: inherit;
+  font-size: var(--taille-chiffre);
+  line-height: var(--interligne-chiffre);
+  font-weight: var(--graisse-normale);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.verrouTouche:active {
+  background: var(--surface-active);
+}
+
+.verrouTouche:disabled {
+  opacity: var(--intensite-1);
+}
+
+.verrouToucheVide {
+  background: none;
+  cursor: default;
+}
+
+.verrouToucheTexte {
+  font-size: var(--taille-bouton-secondaire);
+  color: var(--encre-3);
+}

@@ -313,6 +313,66 @@ la page à comparer à la maquette sur téléphone.
 
 ---
 
+## Le verrou par code — et pourquoi pas un compte
+
+Rien n'est partagé, rien n'est synchronisé, il n'y a pas de serveur applicatif :
+un compte n'aurait rien à authentifier. Le carnet vit sur l'appareil, le code
+protège l'appareil.
+
+`src/db/verrou.ts` dérive une preuve du code par **Argon2id** (paramètres OWASP :
+19 Mio, deux passes) et la range dans `reglage`, salée. Le code lui-même n'est
+jamais stocké.
+
+Argon2id sert ici à protéger **le code**, pas la base : les gens réutilisent
+leurs codes — celui du téléphone, celui de la carte. Un SHA-256 nu de quatre
+chiffres se casse par table exhaustive en quelques millisecondes.
+
+> **Le contrôle est dans le Worker, pas dans l'UI.** `worker.ts` refuse toute
+> méthode hors d'une liste étroite tant que le code n'a pas été donné. Un écran
+> de saisie qu'on contourne en appelant `client.ts` depuis la console ne protège
+> rien.
+
+Ce que le verrou **ne fait pas** : il ne chiffre pas la base. §15 prévoit à
+terme un AES-GCM applicatif sur les champs sensibles, adossé à WebAuthn PRF —
+ce n'est pas livré, et c'est dit dans `livraison.md`. Qui extrairait le stockage
+OPFS lirait le carnet ; le chiffrement du disque par iOS ou Android est la
+couche qui répond à ce cas. **Ne jamais présenter ce verrou comme un
+chiffrement dans l'interface.**
+
+La session se referme au bout de deux minutes en arrière-plan, et à la
+fermeture : la clé n'est jamais persistée (§15, « clé en mémoire »).
+
+---
+
+## Survivre à la disparition du site
+
+L'application peut être hébergée le temps d'une diffusion, puis le site
+refermé. Deux mesures rendent ce scénario sûr, l'une vérifiée, l'autre
+construite :
+
+**Une PWA installée n'est pas désinscrite parce que son site répond 404.**
+Vérifié dans Chromium, y compris en forçant la revérification du script du
+service worker, celle qui n'a normalement lieu qu'une fois par 24 h.
+
+**Le catalogue est mis en cache dès l'installation du service worker**
+(`src/pwa/sw.ts`), c'est-à-dire dès la première visite dans le navigateur,
+avant même l'ajout à l'écran d'accueil. C'était le vrai point de fragilité : le
+bundle était auparavant téléchargé **à la première ouverture de
+l'application**, si bien que poser l'icône sans lancer l'app laissait une
+coquille inutilisable.
+
+La variante **gzip** est retenue pour ce cache : `DecompressionStream('gzip')`
+existe partout, `'br'` n'existe ni sur Safari ni sur Firefox, et mettre les deux
+coûterait cinq mégaoctets pour un seul usage. `services/catalogue.ts` tente donc
+brotli d'abord quand le navigateur sait le lire, puis **retombe sur gzip** — le
+cas exact du site refermé.
+
+Les requêtes `bundles/*` sont servies **réseau d'abord, cache ensuite** : une
+nouvelle version descend tant que le site répond, et le cache prend le relais
+sinon.
+
+---
+
 ## `src/services/` — ce qui touche au monde extérieur
 
 | Module | Rôle | À savoir |

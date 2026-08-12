@@ -85,11 +85,29 @@ export async function installerSiNecessaire(
     // Brotli n'est décompressable ni par Safari ni par Firefox
     // (`DecompressionStream('br')` n'existe pas) : gzip par défaut, brotli
     // quand le navigateur sait le lire.
-    const brotli = brotliDisponible();
-    const fichier = brotli ? manifest.fichier : manifest.fichier_gzip;
-    const taille = brotli ? manifest.octets : manifest.octets_gzip;
+    //
+    // L'ordre compte au-delà de la taille : le service worker ne met en cache
+    // que la variante gzip (§11.5). Brotli n'est donc joignable qu'en ligne, et
+    // son échec doit retomber sur gzip plutôt que faire échouer l'installation
+    // — c'est exactement le cas du site refermé après diffusion.
+    const variantes = brotliDisponible()
+      ? [
+          { fichier: manifest.fichier, taille: manifest.octets },
+          { fichier: manifest.fichier_gzip, taille: manifest.octets_gzip },
+        ]
+      : [{ fichier: manifest.fichier_gzip, taille: manifest.octets_gzip }];
 
-    const recu = await telecharger(`${base}bundles/${fichier}`, taille, onEtape);
+    let recu: Uint8Array | null = null;
+    let derniere: unknown = null;
+    for (const variante of variantes) {
+      try {
+        recu = await telecharger(`${base}bundles/${variante.fichier}`, variante.taille, onEtape);
+        break;
+      } catch (cause) {
+        derniere = cause;
+      }
+    }
+    if (!recu) throw derniere instanceof Error ? derniere : new Error(String(derniere));
 
     onEtape({ etat: 'installation' });
     const sqlite = await decompresser(recu);

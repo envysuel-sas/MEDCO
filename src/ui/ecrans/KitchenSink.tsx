@@ -480,6 +480,41 @@ export function KitchenSink(): ReactNode {
         </Feuille>
       </Bloc>
 
+      <Bloc titre="Verrou — pavé et points d’état (§15)">
+        <p className={styles['meta']} style={{ marginBottom: 'var(--espace-8)' }}>
+          Écran absent de la maquette, recomposé sans motif visuel nouveau : le pavé reprend la
+          géométrie de l&apos;alvéole, les points celle des occurrences. Voir manques.md §2.8.
+        </p>
+        <div className={styles['verrouPoints']} style={{ marginBottom: 'var(--espace-9)' }}>
+          {[true, true, false, false].map((rempli, index) => (
+            <span
+              key={index}
+              className={`${styles['verrouPoint']} ${rempli ? styles['verrouPointRempli'] : ''}`}
+            />
+          ))}
+        </div>
+        <div className={styles['verrouPave']}>
+          {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((chiffre) => (
+            <button key={chiffre} type="button" className={styles['verrouTouche']}>
+              {chiffre}
+            </button>
+          ))}
+          <button type="button" className={`${styles['verrouTouche']} ${styles['verrouToucheTexte']}`}>
+            Suivant
+          </button>
+          <button type="button" className={styles['verrouTouche']}>
+            0
+          </button>
+          <button
+            type="button"
+            className={`${styles['verrouTouche']} ${styles['verrouToucheTexte']}`}
+            disabled
+          >
+            Effacer
+          </button>
+        </div>
+      </Bloc>
+
       <Bloc titre="Typographie">
         <div className={styles['cumulChiffre']}>2 000 mg</div>
         <div className={styles['chiffreSecondaire']}>18 jours</div>

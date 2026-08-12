@@ -132,7 +132,25 @@ Le refus d'ouverture en second onglet (§5.5) n'existe pas dans la maquette.
 **Fait en attendant :** recomposé avec `TitreEcran`, un paragraphe `meta` et un
 `Bouton`. Aucun motif visuel nouveau.
 
-### 2.8 [KitchenSink] — Écran non dessiné, par nature
+### 2.8 [Verrou] — Écran non dessiné
+
+L'ouverture par code (§15) n'existe pas dans la maquette : ni pavé numérique, ni
+points d'état, ni écran de pose du code.
+
+**Fait en attendant :** recomposé avec `Etiquette`, `TitreEcran` et un pavé dont
+la géométrie reprend l'alvéole du pilulier ; les points d'état reprennent le
+point d'occurrence. Toutes les valeurs viennent des jetons — aucun motif visuel
+nouveau. La touche a un `aspect-ratio: 1` et un rayon de 50 %, seule décision de
+forme prise ici, et elle attend confirmation.
+
+Deux points à trancher :
+
+- **Longueur du code.** De 4 à 8 chiffres, 4 par défaut à l'usage. La maquette
+  ne dit rien ; le seuil bas est celui des téléphones.
+- **Délai de reverrouillage en arrière-plan.** Deux minutes, choisi pour ne pas
+  rendre l'application pénible. Aucune valeur dans la maquette ni dans la spec.
+
+### 2.9 [KitchenSink] — Écran non dessiné, par nature
 
 Recomposé à partir des composants existants.
 

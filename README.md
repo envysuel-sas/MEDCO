@@ -91,9 +91,20 @@ pour quelqu'un qui n'a jamais déployé de site. Comptez dix minutes.
 à comparer à la maquette côte à côte, sur téléphone ; elle reste accessible
 sans installer l'application.
 
+## Pas de compte, un code
+
+Rien n'est partagé, rien n'est synchronisé, il n'y a pas de serveur applicatif :
+un compte n'aurait rien à authentifier. Un code de 4 à 8 chiffres est posé au
+premier lancement sur l'appareil et redemandé à chaque ouverture. La preuve est
+dérivée par Argon2id et salée ; le code n'est jamais stocké, et le contrôle vit
+dans le Worker propriétaire de la base, pas dans l'interface.
+
+Il barre l'accès au carnet. Il ne chiffre pas le stockage — voir la réserve dans
+[`docs/livraison.md`](docs/livraison.md).
+
 ## État
 
-15 857 spécialités, 98,89 % de fiabilité sur les formes orales sèches, 164 tests
+15 857 spécialités, 98,89 % de fiabilité sur les formes orales sèches, 176 tests
 dont 45 de jeu doré sur le vrai bundle, 100 % de branches sur le domaine.
 
 Trois réserves ouvertes : le thème sombre est absent de la maquette et n'a pas

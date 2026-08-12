@@ -17,6 +17,7 @@ reproduit par `pnpm test`, `pnpm test:couverture` et
 | L2 | Jetons et écrans | livré **sauf thème sombre** — absent de la maquette |
 | L3 | Pilulier, plans, occurrences | livré |
 | L4 | Rappels, Worker, installation PWA | livré, **réception non vérifiable sans matériel réel** |
+| — | Verrou par code, survie au site refermé | livré — hors lots, demandé après coup |
 | L5 | Scan, relevé, sauvegarde | livré |
 
 Trois réserves, détaillées plus bas : le thème sombre, la réception des rappels,
@@ -80,11 +81,12 @@ c'est le sixième contrôle bloquant.
 
 ### Suite complète
 
-**164 tests, 6 fichiers.**
+**176 tests, 7 fichiers.**
 
 | Fichier | Tests |
 |---|---|
 | `domain/__tests__/domaine.test.ts` | 68 |
+| `db/__tests__/verrou.test.ts` | 12 |
 | `domain/__tests__/golden.test.ts` | 45 |
 | `services/__tests__/ics.test.ts` | 15 |
 | `services/__tests__/gs1.test.ts` | 14 |
@@ -221,6 +223,55 @@ service worker : scope actif
 > secret `wrangler`, elle ne figurera jamais dans le dépôt. Procédure dans
 > [`deploiement.md`](deploiement.md). Sans ces clés, l'application fonctionne
 > avec la seule couche calendrier et l'annonce.
+
+### Hors lots — Verrou par code et survie au site refermé
+
+Demandés après la livraison des six lots.
+
+**Verrou.** Pas de compte : rien n'est partagé ni synchronisé, il n'y aurait
+rien à authentifier. Un code de 4 à 8 chiffres est posé au premier lancement sur
+l'appareil, redemandé à chaque ouverture, et la session se referme au bout de
+deux minutes en arrière-plan. La preuve est dérivée par **Argon2id** (paramètres
+OWASP), salée, et le code n'est jamais stocké. Attente croissante après cinq
+essais ratés, plafonnée à 30 s. 12 tests.
+
+Le contrôle est **dans le Worker propriétaire de la base**, pas dans l'UI :
+toute méthode touchant au carnet est refusée tant que le code n'a pas été donné.
+Un écran qu'on contourne depuis la console ne protège rien.
+
+> **Réserve — le verrou ne chiffre pas la base.**
+>
+> §15 prévoit à terme un AES-GCM applicatif sur les champs sensibles, adossé à
+> WebAuthn PRF. Ce n'est **pas** livré. Le verrou couvre la menace que §15 nomme
+> — « un téléphone perdu ou prêté, pas une attaque ciblée » — mais qui
+> extrairait le stockage OPFS lirait le carnet. Le chiffrement du disque par iOS
+> ou Android reste la couche qui répond à ce cas.
+>
+> L'interface ne dit nulle part que les données sont chiffrées, et ne doit
+> jamais le dire.
+
+**Survie au site refermé.** Le scénario visé : héberger le temps que tout le
+monde installe, puis repasser le dépôt en privé. Deux constats, l'un vérifié,
+l'autre construit.
+
+Vérifié dans Chromium, tout répondant 404 : une PWA installée **n'est pas
+désinscrite**, y compris après avoir forcé la revérification du script du
+service worker — celle qui n'a normalement lieu qu'une fois par 24 h.
+
+Construit : le catalogue est désormais mis en cache **dès l'installation du
+service worker**, donc dès la première visite dans le navigateur, avant même
+l'ajout à l'écran d'accueil. C'était le vrai point de fragilité — il était
+auparavant téléchargé à la première ouverture de l'application, si bien que
+poser l'icône sans lancer l'app laissait une coquille inutilisable.
+
+```
+visite, site ouvert → manifest.json + catalogue-2026-08-12.sqlite.gz (3 041 235 o)
+robinet fermé       → 404 sur tout
+app hors robinet    → manifest 200 (2 310 o), catalogue 200 (3 041 235 o)
+```
+
+Reste vrai malgré tout : aucune nouvelle installation n'est possible site fermé,
+et le catalogue ne se met plus à jour.
 
 ### L5 — Scan, relevé, sauvegarde
 

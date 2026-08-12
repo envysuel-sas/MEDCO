@@ -23,6 +23,78 @@ cleanupOutdatedCaches();
 const BASE_INDEXEDDB = 'medco-cles';
 const CLE_STOCKAGE = 'medco-push';
 
+// ---------------------------------------------------------------------------
+// Catalogue : mis en cache dès l'installation
+// ---------------------------------------------------------------------------
+
+/**
+ * Le bundle catalogue n'est pas précaché par Workbox — il est versionné par
+ * date et vaut trois mégaoctets. Il est en revanche **indispensable** : sans
+ * lui, l'application n'a rien à compter.
+ *
+ * Le scénario à couvrir est celui d'un hébergement qu'on referme : le site
+ * reste public le temps que tout le monde installe, puis redevient privé et
+ * répond 404. Une PWA installée survit à ça — le service worker n'est pas
+ * désinscrit — mais elle ne survivait pas si le catalogue n'avait pas encore
+ * été téléchargé, car il l'était **à la première ouverture**, pas à
+ * l'installation.
+ *
+ * D'où cette mise en cache dès l'installation du service worker, c'est-à-dire
+ * dès la première visite dans le navigateur, avant même l'ajout à l'écran
+ * d'accueil. Le fichier reste disponible ensuite, robinet fermé ou non.
+ *
+ * La variante **gzip** est retenue : `DecompressionStream('gzip')` existe
+ * partout, `'br'` n'existe ni sur Safari ni sur Firefox. Mettre les deux en
+ * cache coûterait cinq mégaoctets pour un seul usage.
+ */
+const CACHE_CATALOGUE = 'medco-catalogue-v1';
+
+self.addEventListener('install', (evenement) => {
+  evenement.waitUntil(mettreEnCacheLeCatalogue());
+});
+
+async function mettreEnCacheLeCatalogue(): Promise<void> {
+  try {
+    const base = new URL('./', self.registration.scope);
+    const urlManifest = new URL('bundles/manifest.json', base);
+    const reponse = await fetch(urlManifest, { cache: 'no-cache' });
+    if (!reponse.ok) return;
+
+    const manifest = (await reponse.clone().json()) as { fichier_gzip: string };
+    const cache = await caches.open(CACHE_CATALOGUE);
+    await cache.put(urlManifest, reponse);
+    await cache.add(new URL(`bundles/${manifest.fichier_gzip}`, base));
+  } catch {
+    // Hors ligne à l'installation : l'application retentera au premier
+    // lancement. Échouer ici empêcherait le service worker de s'activer.
+  }
+}
+
+self.addEventListener('fetch', (evenement) => {
+  const requete = evenement.request;
+  if (requete.method !== 'GET' || !new URL(requete.url).pathname.includes('/bundles/')) return;
+
+  // Réseau d'abord : une nouvelle version du catalogue doit pouvoir descendre
+  // tant que le site répond. Cache ensuite : c'est le filet du robinet fermé.
+  evenement.respondWith(
+    (async () => {
+      try {
+        const reseau = await fetch(requete);
+        if (reseau.ok) {
+          const cache = await caches.open(CACHE_CATALOGUE);
+          await cache.put(requete, reseau.clone());
+          return reseau;
+        }
+        return (await caches.match(requete)) ?? reseau;
+      } catch (cause) {
+        const enCache = await caches.match(requete);
+        if (enCache) return enCache;
+        throw cause;
+      }
+    })(),
+  );
+});
+
 self.addEventListener('push', (evenement) => {
   evenement.waitUntil(afficher(evenement.data?.text() ?? ''));
 });

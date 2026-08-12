@@ -7,12 +7,24 @@
  */
 
 import type * as depots from './depots.js';
+import type { EtatVerrou } from './verrou.js';
 import type { ReponseWorker, RequeteWorker } from './worker.js';
 
 export class BaseDejaOuverte extends Error {
   constructor() {
     super("L'application est déjà ouverte dans un autre onglet.");
     this.name = 'BaseDejaOuverte';
+  }
+}
+
+/**
+ * Le Worker a refusé : le carnet est verrouillé (§15). Remonté comme type
+ * pour que l'UI puisse réafficher l'écran de code au lieu d'une erreur brute.
+ */
+export class VerrouFerme extends Error {
+  constructor() {
+    super('Le carnet est verrouillé.');
+    this.name = 'VerrouFerme';
   }
 }
 
@@ -24,6 +36,10 @@ type Asynchrone<T> = T extends (...args: infer A) => infer R
 export type ApiBase = { [K in keyof Depots]: Asynchrone<Depots[K]> } & {
   installerCatalogue(octets: Uint8Array): Promise<void>;
   versionCatalogue(): Promise<{ version: string; dateBdpm: string } | null>;
+  verrouEtat(): Promise<EtatVerrou>;
+  verrouDefinir(code: string): Promise<void>;
+  verrouOuvrir(code: string): Promise<boolean>;
+  verrouFermer(): Promise<void>;
 };
 
 const attentes = new Map<number, { resoudre: (v: unknown) => void; rejeter: (e: Error) => void }>();
@@ -39,7 +55,9 @@ function obtenirWorker(): Worker {
     if (!attente) return;
     attentes.delete(reponse.id);
     if (reponse.ok) attente.resoudre(reponse.valeur);
-    else attente.rejeter(reponse.code === 'BASE_DEJA_OUVERTE' ? new BaseDejaOuverte() : new Error(reponse.erreur));
+    else if (reponse.code === 'BASE_DEJA_OUVERTE') attente.rejeter(new BaseDejaOuverte());
+    else if (reponse.code === 'VERROU_FERME') attente.rejeter(new VerrouFerme());
+    else attente.rejeter(new Error(reponse.erreur));
   });
   return worker;
 }
