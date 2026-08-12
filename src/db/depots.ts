@@ -310,6 +310,57 @@ export function annulerPrise(priseId: string): void {
   base().exec({ sql: "UPDATE prise SET statut = 'annulee' WHERE id = ?1", bind: [priseId] });
 }
 
+/**
+ * Retire définitivement une prise (maquette 2e, « Retirer cette prise »).
+ *
+ * La maquette est explicite sur l'effet attendu : « Le retrait recalcule le
+ * total du jour et la plaquette. Rien n'est conservé en double. » D'où une
+ * suppression, et non un simple changement de statut : les lignes de
+ * `prise_substance` et `prise_exclusion` partent en cascade.
+ */
+export function supprimerPrise(priseId: string): void {
+  base().exec({ sql: 'DELETE FROM prise WHERE id = ?1', bind: [priseId] });
+}
+
+/**
+ * Corrige l'heure ou la dose d'une prise déjà enregistrée (maquette 2e).
+ *
+ * ⚠ R1 — la décomposition en substances n'est **pas** recalculée ici. La prise
+ * est supprimée puis réenregistrée par `enregistrerPrise`, seul chemin qui sait
+ * choisir la ligne comptée par liaison. Refaire ce calcul à la main ouvrirait
+ * la porte au double comptage que R1 interdit.
+ *
+ * `saisie_le` est conservé : une prise ajoutée après coup le reste, même
+ * corrigée. C'est ce que la feuille 2e affiche — « ajoutée le 12 août à 08:40 ».
+ */
+export function corrigerPrise(
+  priseId: string,
+  changements: { readonly horodatage?: Instant; readonly dose?: number },
+): ResultatEnregistrement {
+  const [existante] = lire(
+    `SELECT id, profil_id, produit_id, occurrence_id, horodatage, fuseau, dose,
+            saisie_le, source
+     FROM prise WHERE id = ?1`,
+    [priseId],
+  );
+  if (!existante) throw new Error('Prise introuvable.');
+
+  const reprise: NouvellePrise = {
+    id: texte(existante, 'id'),
+    profilId: texte(existante, 'profil_id'),
+    produitId: texte(existante, 'produit_id'),
+    occurrenceId: texteOuNull(existante, 'occurrence_id'),
+    horodatage: changements.horodatage ?? texte(existante, 'horodatage'),
+    fuseau: texte(existante, 'fuseau'),
+    dose: changements.dose ?? nombre(existante, 'dose'),
+    saisieLe: texte(existante, 'saisie_le'),
+    source: texte(existante, 'source') as NouvellePrise['source'],
+  };
+
+  supprimerPrise(priseId);
+  return enregistrerPrise(reprise);
+}
+
 /** Prises d'un profil sur une période, décomposées, prêtes pour le domaine. */
 export function prisesAvecSubstances(
   profilId: string,

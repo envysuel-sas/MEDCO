@@ -33,15 +33,18 @@ import { maintenant } from '../App.js';
 import { useMedco } from '../etat.js';
 import { couleurSubstance } from '../tokens.js';
 import { Carte, Chip, Etiquette, TitreEcran } from '../composants/primitives.js';
+import { PrisePassee } from '../composants/PrisePassee.js';
 import styles from '../composants/composants.module.css';
 
 /** Fenêtre lue par le journal. La Plaquette en couvre 30 ; le journal va plus loin. */
 const JOURS_AFFICHES = 30;
 
 export function Historique(): ReactNode {
-  const { prises, produits, profilNom } = useMedco();
+  const { prises, produits, profilNom, rafraichir } = useMedco();
   const [filtre, setFiltre] = useState<CodeSubstance | null>(null);
   const [substances, setSubstances] = useState<ReadonlyMap<CodeSubstance, Substance>>(new Map());
+  // Maquette 2e — toute prise du journal est corrigeable ou retirable.
+  const [ouverte, setOuverte] = useState<string | null>(null);
   const instant = maintenant();
 
   const codes = useMemo(
@@ -135,18 +138,33 @@ export function Historique(): ReactNode {
                 {[...duJour]
                   .sort((a, b) => b.horodatage.localeCompare(a.horodatage))
                   .map((prise) => (
-                    <LigneJournal
+                    <button
                       key={prise.id}
-                      prise={prise}
-                      produit={produitsParId.get(prise.produitId)}
-                      substances={substances}
-                    />
+                      type="button"
+                      className={styles['ligneJournalCliquable']}
+                      onClick={() => setOuverte(prise.id)}
+                    >
+                      <LigneJournal
+                        prise={prise}
+                        produit={produitsParId.get(prise.produitId)}
+                        substances={substances}
+                      />
+                    </button>
                   ))}
               </Carte>
             )}
           </section>
         );
       })}
+
+      <PrisePassee
+        prise={prises.find((p) => p.id === ouverte) ?? null}
+        produit={produitsParId.get(prises.find((p) => p.id === ouverte)?.produitId ?? '')}
+        substances={substances}
+        maintenant={instant}
+        onFerme={() => setOuverte(null)}
+        onModifiee={() => rafraichir(maintenant())}
+      />
     </main>
   );
 }

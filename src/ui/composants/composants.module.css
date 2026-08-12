@@ -929,3 +929,19 @@
   font-variant-numeric: tabular-nums;
   flex: none;
 }
+
+.actionsPrisePassee {
+  display: grid;
+  gap: var(--espace-5);
+  margin-top: var(--espace-9);
+}
+
+.ligneJournalCliquable {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
