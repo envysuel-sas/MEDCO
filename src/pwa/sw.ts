@@ -50,7 +50,17 @@ const CLE_STOCKAGE = 'medco-push';
 const CACHE_CATALOGUE = 'medco-catalogue-v1';
 
 self.addEventListener('install', (evenement) => {
+  // Sans cela, le nouveau service worker attend la fermeture de **tous** les
+  // clients. Sur une PWA installée, « fermer » veut dire tuer l'application :
+  // en pratique, la mise à jour n'arrivait jamais.
+  void self.skipWaiting();
   evenement.waitUntil(mettreEnCacheLeCatalogue());
+});
+
+self.addEventListener('activate', (evenement) => {
+  // Prendre la main sur les pages déjà ouvertes, sinon elles continuent d'être
+  // servies par l'ancien service worker jusqu'à leur propre rechargement.
+  evenement.waitUntil(self.clients.claim());
 });
 
 async function mettreEnCacheLeCatalogue(): Promise<void> {
