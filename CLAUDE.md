@@ -8,7 +8,9 @@ PWA de suivi de consommation médicamenteuse. Usage personnel, ~20 utilisateurs 
 
 | Sujet | Fichier |
 |---|---|
-| Spécification technique complète | `docs/spec-technique.md` |
+| **Ce qui a été construit, et pourquoi** | `docs/architecture.md` |
+| **Ce qui est livré, avec les chiffres** | `docs/livraison.md` |
+| Spécification technique complète — l'intention | `docs/spec-technique.md` |
 | Direction visuelle, composants | `docs/maquette/` — voir `docs/maquette/README.md` |
 | Jetons de design extraits | `src/ui/tokens.css` + `src/ui/tokens.ts` |
 | Règles de seuils | `data/regles.json` |

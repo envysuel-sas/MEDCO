@@ -7,15 +7,36 @@ Le comptage se fait **par substance active, pas par boîte** : Doliprane 1000 + 
 
 ## Documentation
 
+**Commencer par [`docs/architecture.md`](docs/architecture.md)** : ce qui a été
+construit, comment les pièces s'emboîtent, et où une erreur rendrait
+l'application dangereuse. La spécification décrit l'intention ; l'architecture
+décrit le code tel qu'il est.
+
 | | |
 |---|---|
-| Instructions Claude Code | [`CLAUDE.md`](CLAUDE.md) |
-| Spécification technique | [`docs/spec-technique.md`](docs/spec-technique.md) |
-| Maquette et extraction | [`docs/maquette/README.md`](docs/maquette/README.md) |
+| **Ce qui a été construit** | [`docs/architecture.md`](docs/architecture.md) |
+| **Ce qui est livré, et les chiffres** | [`docs/livraison.md`](docs/livraison.md) |
+| Mise en ligne, pas à pas | [`docs/deploiement.md`](docs/deploiement.md) |
+| Spécification technique — l'intention | [`docs/spec-technique.md`](docs/spec-technique.md) |
+| Maquette et protocole d'extraction | [`docs/maquette/README.md`](docs/maquette/README.md) |
 | Ce que la maquette ne tranche pas | [`docs/maquette/manques.md`](docs/maquette/manques.md) |
 | Pipeline BDPM | [`pipeline/README.md`](pipeline/README.md) |
 | Worker de rappel | [`worker/README.md`](worker/README.md) |
-| Mise en ligne, pas à pas | [`docs/deploiement.md`](docs/deploiement.md) |
+| Instructions Claude Code | [`CLAUDE.md`](CLAUDE.md) |
+
+### Les quatre règles qui ne se négocient pas
+
+Elles sont détaillées dans [`architecture.md`](docs/architecture.md) ; les
+ignorer rend l'application plus dangereuse que son absence.
+
+1. **Une seule ligne comptée par `num_liaison`.** Sommer `SA` et `FT` double le
+   paracétamol.
+2. **Aucune estimation de dosage.** Un dosage illisible donne `fiabilite = 0` :
+   la prise est enregistrée, exclue du cumul, et l'écran le dit.
+3. **Les traitements prescrits sont exemptés des signaux de fréquence.** Un
+   patient sous ordonnance ne doit jamais lire que sa consommation est élevée.
+4. **Restituer, jamais conclure.** Deux faits juxtaposés, une source datée. Ni
+   score, ni taux d'observance, ni jauge de risque.
 
 ## Démarrage
 
@@ -70,13 +91,17 @@ pour quelqu'un qui n'a jamais déployé de site. Comptez dix minutes.
 à comparer à la maquette côte à côte, sur téléphone ; elle reste accessible
 sans installer l'application.
 
-## Ce qui reste à faire sur matériel réel
+## État
 
-Les rappels ne se testent pas en simulateur (spec §16.2). Un iPhone et un
-Android physiques sont indispensables pour valider la réception d'un push sur
-PWA iOS installée, la réception Android en doze mode, l'import `.ics` sur Apple
-Calendar **et** sur Google Agenda, et la réimportation après modification d'un
-plan — c'est là que se jouent les doublons d'alarmes.
+15 857 spécialités, 98,89 % de fiabilité sur les formes orales sèches, 164 tests
+dont 45 de jeu doré sur le vrai bundle, 100 % de branches sur le domaine.
+
+Trois réserves ouvertes : le thème sombre est absent de la maquette et n'a pas
+été inventé, la réception d'un rappel n'est vérifiable que sur téléphone réel
+(§16.2), et les clés du Worker restent à générer au premier déploiement.
+
+Le détail, lot par lot, avec les chiffres et la façon de les reproduire :
+[`docs/livraison.md`](docs/livraison.md).
 
 ## Données
 
