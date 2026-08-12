@@ -18,7 +18,12 @@ import type { Substance } from '../../domain/types.js';
 import { baseDeDonnees } from '../../db/client.js';
 import { genererIcs } from '../../services/ics.js';
 import { genererReleve, imprimer } from '../../services/releve.js';
-import { chiffrerArchive, enregistrer as enregistrerArchive } from '../../services/sauvegarde.js';
+import {
+  chiffrerArchive,
+  dechiffrerArchive,
+  enregistrer as enregistrerArchive,
+} from '../../services/sauvegarde.js';
+import type { ArchiveCarnet } from '../../db/depots.js';
 import { abonner, publierCalendrier, pushDisponible } from '../../pwa/push.js';
 import { plateforme } from '../../pwa/installation.js';
 import { maintenant } from '../App.js';
@@ -50,6 +55,7 @@ export function Reglages(): ReactNode {
   const [phrase, setPhrase] = useState('');
   const [lienCalendrier, setLienCalendrier] = useState<string | null>(null);
   const [effacer, setEffacer] = useState(false);
+  const [restaurerArme, setRestaurerArme] = useState(false);
 
   useEffect(() => {
     void baseDeDonnees.versionCatalogue().then(setCatalogue);
@@ -153,14 +159,54 @@ export function Reglages(): ReactNode {
       return;
     }
     const instant = maintenant();
-    const contenu = new TextEncoder().encode(
-      JSON.stringify({ version: 1, exporteLe: instant, produits, prises }),
-    );
-    await enregistrerArchive(await chiffrerArchive(contenu, phrase, instant));
+
+    // ⚠ Le carnet est lu **en base**, jamais depuis l'état de l'écran : celui-ci
+    // ne tient que la fenêtre de travail et les produits actifs. Une archive
+    // bâtie à partir de lui amputerait l'historique de tout ce qui la précède,
+    // et ne le dirait pas.
+    const carnet = await baseDeDonnees.exporterCarnet(instant);
+    const contenu = new TextEncoder().encode(JSON.stringify(carnet));
+
+    try {
+      await enregistrerArchive(await chiffrerArchive(contenu, phrase, instant));
+    } catch (cause) {
+      // Le sélecteur de fichiers refermé sans choisir lève `AbortError`. Sans
+      // ce message, l'écran ne dirait rien du tout — et l'utilisateur croirait
+      // sa sauvegarde faite.
+      setMessage(
+        cause instanceof DOMException && cause.name === 'AbortError'
+          ? 'Sauvegarde annulée : aucun fichier écrit.'
+          : `La sauvegarde a échoué : ${cause instanceof Error ? cause.message : String(cause)}`,
+      );
+      return;
+    }
+
+    const lignes = Object.values(carnet.tables).reduce((total, table) => total + table.length, 0);
     setPhrase('');
     setMessage(
-      'Sauvegarde enregistrée. Sans cette phrase de passe, elle est définitivement irrécupérable.',
+      `Sauvegarde enregistrée : ${lignes} lignes, tout le carnet. Sans cette phrase de passe, elle est définitivement irrécupérable.`,
     );
+  }
+
+  async function restaurer(fichier: File): Promise<void> {
+    if (phrase.length < 12) {
+      setMessage('Saisissez d’abord la phrase de passe de la sauvegarde.');
+      return;
+    }
+    setMessage('Déchiffrement en cours…');
+    try {
+      const clair = await dechiffrerArchive(new Uint8Array(await fichier.arrayBuffer()), phrase);
+      const bilan = await baseDeDonnees.restaurerCarnet(
+        JSON.parse(new TextDecoder().decode(clair)) as ArchiveCarnet,
+      );
+      setPhrase('');
+      setMessage(`Carnet restauré : ${bilan.lignes} lignes. L’application va se recharger.`);
+      // Tout l'état en mémoire décrit le carnet d'avant : on repart de zéro
+      // plutôt que de rafraîchir écran par écran.
+      window.setTimeout(() => window.location.reload(), 1500);
+    } catch (cause) {
+      setMessage(cause instanceof Error ? cause.message : String(cause));
+    }
   }
 
   return (
@@ -215,6 +261,11 @@ export function Reglages(): ReactNode {
       <Carte>
         <Etiquette>Sauvegarde chiffrée</Etiquette>
         <p className={styles['meta']}>
+          Le fichier contient tout le carnet — profils, produits, prises, plans — chiffré par votre
+          phrase de passe. Enregistrez-le hors du téléphone : un fichier resté sur l&apos;appareil
+          disparaît avec lui.
+        </p>
+        <p className={styles['meta']}>
           ⚠ Une phrase de passe perdue rend l&apos;archive irrécupérable. Aucun mécanisme de
           récupération n&apos;existe, ni ne peut exister.
         </p>
@@ -227,9 +278,40 @@ export function Reglages(): ReactNode {
           onChange={(evenement) => setPhrase(evenement.target.value)}
           style={{ marginTop: 'var(--espace-5)' }}
         />
-        <div style={{ marginTop: 'var(--espace-5)' }}>
+        <div style={{ display: 'grid', gap: 'var(--espace-5)', marginTop: 'var(--espace-5)' }}>
           <Bouton variante="secondaire" pleineLargeur onClick={() => void sauvegarder()}>
             Enregistrer une sauvegarde
+          </Bouton>
+
+          {/* Une sauvegarde qu'on ne sait pas relire n'est pas une sauvegarde.
+              L'`input` est masqué mais reste le seul sélecteur de fichiers
+              disponible sur Android : `showOpenFilePicker` n'y existe pas. */}
+          <input
+            id="archive"
+            type="file"
+            accept=".medco,application/octet-stream"
+            className={styles['fichierMasque']}
+            onChange={(evenement) => {
+              const fichier = evenement.target.files?.[0];
+              evenement.target.value = '';
+              if (fichier) void restaurer(fichier);
+            }}
+          />
+          <Bouton
+            variante="secondaire"
+            pleineLargeur
+            onClick={() => {
+              if (!restaurerArme) {
+                setRestaurerArme(true);
+                setMessage(
+                  'La restauration remplace le carnet de cet appareil par celui de la sauvegarde. Les prises enregistrées depuis sont perdues.',
+                );
+                return;
+              }
+              document.getElementById('archive')?.click();
+            }}
+          >
+            {restaurerArme ? 'Confirmer : choisir le fichier' : 'Restaurer une sauvegarde'}
           </Bouton>
         </div>
       </Carte>
