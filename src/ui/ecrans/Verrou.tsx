@@ -19,7 +19,7 @@ import type { ReactNode } from 'react';
 import { LONGUEUR_MAX, LONGUEUR_MIN } from '../../db/verrou.js';
 import { baseDeDonnees } from '../../db/client.js';
 import { MotSymbole } from '../composants/marque.js';
-import { Etiquette, TitreEcran } from '../composants/primitives.js';
+import { Bouton, Etiquette, TitreEcran } from '../composants/primitives.js';
 import styles from '../composants/composants.module.css';
 
 type Etape = 'pose' | 'confirmation' | 'ouverture';
@@ -36,6 +36,10 @@ export function Verrou({ aPoser, onOuvert }: ProprietesVerrou): ReactNode {
   const [premier, setPremier] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [occupe, setOccupe] = useState(false);
+  // Porte de sortie d'un code oublié. Sans elle, l'application est
+  // définitivement inutilisable et le seul recours est d'aller supprimer les
+  // données de site dans les réglages du navigateur.
+  const [demandeOubli, setDemandeOubli] = useState(false);
 
   // La dérivation Argon2id prend une demi-seconde : elle se déclenche seule
   // quand le code atteint sa longueur, sans bouton à chercher.
@@ -131,6 +135,36 @@ export function Verrou({ aPoser, onOuvert }: ProprietesVerrou): ReactNode {
       <p className={styles['meta']} role="status" style={{ minHeight: 'var(--interligne-meta)' }}>
         {occupe ? 'Vérification…' : (message ?? '')}
       </p>
+
+      {etape === 'ouverture' ? (
+        demandeOubli ? (
+          <div className={styles['oubliCode']}>
+            <p className={styles['meta']}>
+              Il n&apos;existe aucun moyen de retrouver un code oublié : rien n&apos;est envoyé
+              nulle part, personne ne le détient. Repartir de zéro efface le carnet, les produits
+              et les plans de cet appareil, définitivement.
+            </p>
+            <Bouton
+              variante="secondaire"
+              pleineLargeur
+              disabled={occupe}
+              onClick={() => {
+                setOccupe(true);
+                void baseDeDonnees.reinitialiser().then(() => window.location.reload());
+              }}
+            >
+              Effacer et repartir de zéro
+            </Bouton>
+            <Bouton variante="texte" pleineLargeur onClick={() => setDemandeOubli(false)}>
+              Annuler
+            </Bouton>
+          </div>
+        ) : (
+          <Bouton variante="texte" onClick={() => setDemandeOubli(true)}>
+            Code oublié ?
+          </Bouton>
+        )
+      ) : null}
 
       <div className={styles['verrouPave']}>
         {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((chiffre) => (

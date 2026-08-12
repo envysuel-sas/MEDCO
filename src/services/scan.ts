@@ -31,6 +31,25 @@ export function detecteurNatifDisponible(): boolean {
 }
 
 /**
+ * ⚠ Présence n'est pas compétence. `BarcodeDetector` peut exister sans
+ * connaître `data_matrix` — selon l'appareil et la version d'Android. Le
+ * détecteur retournait alors une liste vide **indéfiniment** : caméra ouverte,
+ * aucun résultat, aucune explication. C'est ce que « le scanner ne marche pas
+ * du tout » décrit.
+ */
+async function natifSaitLireDatamatrix(): Promise<boolean> {
+  try {
+    const Constructeur = (globalThis as unknown as {
+      BarcodeDetector: { getSupportedFormats?: () => Promise<string[]> };
+    }).BarcodeDetector;
+    const formats = (await Constructeur.getSupportedFormats?.()) ?? [];
+    return formats.includes('data_matrix');
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Ouvre la caméra et rend le premier Datamatrix lisible.
  * `signal` permet d'abandonner : l'utilisateur ferme l'écran de scan.
  */
@@ -49,7 +68,8 @@ export async function scanner(video: HTMLVideoElement, signal: AbortSignal): Pro
   await video.play().catch(() => undefined);
 
   try {
-    const lire = detecteurNatifDisponible() ? await lecteurNatif() : await lecteurDeRepli();
+    const natif = detecteurNatifDisponible() && (await natifSaitLireDatamatrix());
+    const lire = natif ? await lecteurNatif() : await lecteurDeRepli();
     if (!lire) return { etat: 'indisponible' };
 
     while (!signal.aborted) {
@@ -79,15 +99,34 @@ async function lecteurNatif(): Promise<((video: HTMLVideoElement) => Promise<str
   };
 }
 
-/** Repli Safari : décodeur chargé à la demande, jamais dans le bundle initial. */
+/**
+ * Repli : décodeur chargé à la demande, jamais dans le bundle initial.
+ *
+ * ⚠ `decodeFromVideoElement` ne rend la main qu'une fois un code trouvé. Il
+ * était appelé dans une boucle toutes les 150 ms, ce qui empilait les
+ * décodeurs concurrents sur le même flux, et son rejet asynchrone échappait au
+ * `try` qui prétendait l'attraper. Une seule tentative est désormais en vol à
+ * la fois.
+ */
 async function lecteurDeRepli(): Promise<((video: HTMLVideoElement) => Promise<string | null>) | null> {
-  const { BrowserDatamatrixCodeReader } = await import('@zxing/library');
-  const lecteur = new BrowserDatamatrixCodeReader();
-  return async (video) => {
-    try {
-      return lecteur.decodeFromVideoElement(video).then((resultat) => resultat.getText());
-    } catch {
-      return null;
-    }
-  };
+  try {
+    const { BrowserDatamatrixCodeReader } = await import('@zxing/library');
+    const lecteur = new BrowserDatamatrixCodeReader();
+    let enCours: Promise<string | null> | null = null;
+
+    return async (video) => {
+      if (enCours) return null;
+      enCours = lecteur
+        .decodeFromVideoElement(video)
+        .then((resultat: { getText: () => string }) => resultat.getText())
+        .catch(() => null)
+        .finally(() => {
+          enCours = null;
+        });
+      return enCours;
+    };
+  } catch {
+    // Le module de repli n'a pas pu être chargé : hors ligne au premier scan.
+    return null;
+  }
 }

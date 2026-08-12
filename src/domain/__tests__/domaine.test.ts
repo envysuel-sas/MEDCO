@@ -681,3 +681,30 @@ describe('occurrences — branches complémentaires', () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Régression : la borne de fenêtre doit être comparable au format stocké
+// ---------------------------------------------------------------------------
+
+describe('borne de fenêtre et format d’horodatage', () => {
+  // `prise.horodatage` est de l'ISO 8601 **avec offset**, et les requêtes
+  // comparent des chaînes. Une borne produite par `toISOString()` (UTC, `Z`)
+  // est textuellement inférieure à une prise du même instant en `+02:00` :
+  // la prise sortait de sa propre fenêtre. Invisible en France, correcte en
+  // UTC — donc jamais vue en test avant d'être signalée à l'usage.
+  it('reste supérieure à une prise du même instant, hors UTC', () => {
+    const instant = '2026-08-12T19:30:00+02:00';
+    const borne = instantDepuisEpoch(epoch(instant) + 1000, 'Europe/Paris');
+
+    expect(borne > instant).toBe(true);
+    // La preuve du contraire, avec l'ancienne implémentation :
+    const borneUtc = new Date(epoch(instant) + 1000).toISOString();
+    expect(borneUtc > instant).toBe(false);
+  });
+
+  it('reste correcte en UTC, où le défaut ne se voyait pas', () => {
+    const instant = '2026-08-12T17:30:00+00:00';
+    const borne = instantDepuisEpoch(epoch(instant) + 1000, 'UTC');
+    expect(borne > instant).toBe(true);
+  });
+});

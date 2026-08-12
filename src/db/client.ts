@@ -40,6 +40,7 @@ export type ApiBase = { [K in keyof Depots]: Asynchrone<Depots[K]> } & {
   verrouDefinir(code: string): Promise<void>;
   verrouOuvrir(code: string): Promise<boolean>;
   verrouFermer(): Promise<void>;
+  reinitialiser(): Promise<void>;
 };
 
 const attentes = new Map<number, { resoudre: (v: unknown) => void; rejeter: (e: Error) => void }>();

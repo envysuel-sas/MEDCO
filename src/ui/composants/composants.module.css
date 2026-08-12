@@ -1026,3 +1026,11 @@
   display: grid;
   gap: var(--espace-3);
 }
+
+.oubliCode {
+  display: grid;
+  gap: var(--espace-5);
+  width: 100%;
+  max-width: 264px;
+  text-align: center;
+}
