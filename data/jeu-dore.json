@@ -1,0 +1,166 @@
+{
+  "version": "2026.08.12",
+  "note": "Jeu doré (spec §16.1). Tous les cas portent sur des spécialités réelles du catalogue BDPM : aucune composition n'est fabriquée. Le contrôle de build (§6.5) et le test `src/domain/__tests__/golden.test.ts` lisent ce même fichier et le même bundle.",
+
+  "cas_catalogue": [
+    {
+      "libelle": "Doliprane 1000 mg comprimé — paracétamol 1 000 mg par comprimé",
+      "cis": "60234100",
+      "nom_specialite": "DOLIPRANE 1000 mg, comprimé",
+      "code_substance": "02202",
+      "dose_par_unite_mg": 1000,
+      "unite": "comprimé",
+      "fiabilite_min": 2
+    },
+    {
+      "libelle": "Fervex adultes sachet — paracétamol 500 mg par sachet",
+      "cis": "69329731",
+      "nom_specialite": "FERVEX ADULTES, granulés pour solution buvable en sachet",
+      "code_substance": "02202",
+      "dose_par_unite_mg": 500,
+      "unite": "sachet",
+      "fiabilite_min": 2
+    },
+    {
+      "libelle": "Actifed Rhume comprimé — paracétamol 500 mg par comprimé",
+      "cis": "69928332",
+      "nom_specialite": "ACTIFED RHUME, comprimé",
+      "code_substance": "02202",
+      "dose_par_unite_mg": 500,
+      "unite": "comprimé",
+      "fiabilite_min": 2
+    },
+    {
+      "libelle": "Humex Rhume — paracétamol 500 mg par comprimé",
+      "cis": "63713344",
+      "nom_specialite": "HUMEX RHUME, comprimé et gélule",
+      "element": "comprimé",
+      "code_substance": "02202",
+      "dose_par_unite_mg": 500,
+      "unite": "comprimé",
+      "fiabilite_min": 2
+    },
+    {
+      "libelle": "Advil 400 mg — ibuprofène 400 mg par comprimé",
+      "cis": "63646874",
+      "nom_specialite": "ADVIL 400 mg, comprimé enrobé",
+      "code_substance": "02092",
+      "dose_par_unite_mg": 400,
+      "unite": "comprimé",
+      "fiabilite_min": 2
+    },
+    {
+      "libelle": "Nurofenfem 400 mg — lignes SA (lysinate 684 mg) et FT (ibuprofène 400 mg) : comptée une seule fois, sur la molécule imprimée sur la boîte",
+      "cis": "68354856",
+      "nom_specialite": "NUROFENFEM 400 mg, comprimé pelliculé",
+      "code_substance": "02092",
+      "dose_par_unite_mg": 400,
+      "unite": "comprimé",
+      "fiabilite_min": 1
+    },
+    {
+      "libelle": "Doliprane 2,4 % suspension buvable — paracétamol 24 mg par ml, dose exprimée en ml",
+      "cis": "66477582",
+      "nom_specialite": "DOLIPRANE 2,4 POUR CENT, suspension buvable",
+      "code_substance": "02202",
+      "dose_par_unite_mg": 24,
+      "unite": "ml",
+      "fiabilite_min": 1
+    },
+    {
+      "libelle": "Codoliprane 500/30 — paracétamol de l'association",
+      "cis": "60904643",
+      "nom_specialite": "CODOLIPRANE 500 mg/30 mg, comprimé",
+      "code_substance": "02202",
+      "dose_par_unite_mg": 500,
+      "unite": "comprimé",
+      "fiabilite_min": 2
+    },
+    {
+      "libelle": "Aspirine UPSA 500 mg effervescent — acide acétylsalicylique 500 mg",
+      "cis": "65265765",
+      "nom_specialite": "ASPIRINE UPSA 500 mg, comprimé effervescent",
+      "code_substance": "00005",
+      "dose_par_unite_mg": 500,
+      "unite": "comprimé",
+      "fiabilite_min": 2
+    }
+  ],
+
+  "cas_non_comptes": [
+    {
+      "libelle": "Humex mal de gorge lidocaïne — dosages absents de la source : prise enregistrable, exclue du cumul (R1)",
+      "cis": "66938773",
+      "nom_specialite": "HUMEX GORGE IRRITEE LIDOCAINE, gomme orale"
+    }
+  ],
+
+  "scenarios_cumul": [
+    {
+      "id": "fondateur",
+      "libelle": "2 × Doliprane 1000 + 2 sachets Fervex = 3 000 mg de paracétamol",
+      "prises": [
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T08:00:00+02:00" },
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T14:00:00+02:00" },
+        { "cis": "69329731", "dose": 1, "horodatage": "2026-08-12T18:00:00+02:00" },
+        { "cis": "69329731", "dose": 1, "horodatage": "2026-08-12T22:00:00+02:00" }
+      ],
+      "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
+      "attendu_mg": { "02202": 3000 }
+    },
+    {
+      "id": "prise-unique",
+      "libelle": "1 × Doliprane 1000 = 1 000 mg de paracétamol",
+      "prises": [{ "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T08:00:00+02:00" }],
+      "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
+      "attendu_mg": { "02202": 1000 }
+    },
+    {
+      "id": "trois-doliprane",
+      "libelle": "3 × Doliprane 1000 sur 24 h = 3 000 mg, seuil PARA-24H atteint",
+      "prises": [
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T08:00:00+02:00" },
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T14:00:00+02:00" },
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T20:00:00+02:00" }
+      ],
+      "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
+      "attendu_mg": { "02202": 3000 },
+      "regle_attendue": "PARA-24H"
+    },
+    {
+      "id": "trois-boites-une-medco",
+      "libelle": "Doliprane + Actifed Rhume + Humex Rhume : cumul correct, aucune substance omise",
+      "prises": [
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T08:00:00+02:00" },
+        { "cis": "69928332", "dose": 1, "horodatage": "2026-08-12T13:00:00+02:00" },
+        { "cis": "63713344", "element": "comprimé", "dose": 1, "horodatage": "2026-08-12T19:00:00+02:00" }
+      ],
+      "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
+      "attendu_mg": { "02202": 2000 }
+    },
+    {
+      "id": "sa-et-ft",
+      "libelle": "Spécialité à lignes SA et FT (Nurofenfem) : comptée une seule fois",
+      "prises": [{ "cis": "68354856", "dose": 1, "horodatage": "2026-08-12T08:00:00+02:00" }],
+      "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
+      "attendu_mg": { "02092": 400 }
+    },
+    {
+      "id": "sirop-mg-par-ml",
+      "libelle": "Sirop dosé en mg/ml, dose en ml : 15 ml de Doliprane 2,4 % = 360 mg",
+      "prises": [{ "cis": "66477582", "dose": 15, "horodatage": "2026-08-12T08:00:00+02:00" }],
+      "fenetre": { "debut": "2026-08-12T00:00:00+02:00", "fin": "2026-08-13T00:00:00+02:00" },
+      "attendu_mg": { "02202": 360 }
+    },
+    {
+      "id": "fenetre-glissante",
+      "libelle": "Prise à 23 h et prise à 1 h : même fenêtre PT24H",
+      "prises": [
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-12T23:00:00+02:00" },
+        { "cis": "60234100", "dose": 1, "horodatage": "2026-08-13T01:00:00+02:00" }
+      ],
+      "fenetre": { "debut": "2026-08-12T02:00:00+02:00", "fin": "2026-08-13T02:00:00+02:00" },
+      "attendu_mg": { "02202": 2000 }
+    }
+  ]
+}

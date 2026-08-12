@@ -1,0 +1,231 @@
+/**
+ * Jetons de design — extraits de `docs/maquette/export/medco-maquettes.html`.
+ *
+ * ⚠ Ce fichier est le SEUL endroit où une valeur brute a le droit d'exister.
+ * Aucun composant ne porte de couleur, de taille ni d'espacement en dur.
+ *
+ * Chaque jeton est nommé par son **rôle**, jamais par son apparence :
+ * `--surface-1`, pas `--blanc`. Un jeton nommé par sa couleur devient un
+ * mensonge dès que le thème change.
+ *
+ * Protocole d'extraction : `docs/maquette/README.md`.
+ * Regroupements de quasi-doublons et valeurs absentes : `docs/maquette/manques.md`.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* --- Surfaces ------------------------------------------------------- */
+  --fond: #f1f6f9;
+  --surface-1: #ffffff; /* cartes, feuilles */
+  --surface-creux: #e4edf2; /* jauge vide, alvéole sans prise */
+  --surface-active: #eaf2f6; /* chip sélectionné */
+  --trait: #d8e4eb; /* filets de 0,5 px */
+  --trait-marque: #bcceda; /* contour des boutons secondaires */
+  --trait-fort: #8aa0ab; /* contours et chevrons — jamais un mot */
+  --voile: rgba(15, 46, 61, 0.45); /* fond de feuille modale */
+  --voile-jour: rgba(18, 86, 110, 0.06); /* colonne du jour, vue semaine */
+
+  /* --- Encre ---------------------------------------------------------- */
+  --encre-1: #0f2e3d;
+  --encre-2: #31505e;
+  --encre-3: #56737f; /* le plus clair admis sur le fond */
+
+  /* --- Action et marque ----------------------------------------------- */
+  --action: #12566e;
+  --action-appuyee: #0f2e3d;
+  --sur-action: #ffffff;
+  --marque: #2f9fa8;
+  --degrade-action: linear-gradient(150deg, #1b6e92, #12566e);
+  --degrade-marque: linear-gradient(150deg, #2f9fa8, #12566e);
+
+  /* --- Signal — aucun rouge (§12.1) ----------------------------------- */
+  --signal-information: #56737f;
+  --signal-vigilance: #c07a12;
+  --signal-attention: #8c5f86;
+
+  /* --- Groupes ATC (§12.2) — la couleur porte la molécule ------------- */
+  --atc-n: #c4551f; /* système nerveux */
+  --atc-m: #2f7a4b; /* muscle et squelette */
+  --atc-a: #2a6aac; /* voies digestives et métabolisme */
+  --atc-r: #6552ae; /* système respiratoire */
+  --atc-j: #1f8880; /* anti-infectieux */
+  --atc-c: #ac5478; /* cardiovasculaire */
+  --atc-d: #93763a; /* dermatologie */
+  --atc-g: #84518c; /* génito-urinaire, hormones sexuelles */
+  --atc-b: #9a553a; /* sang */
+  --atc-s: #4f8770; /* organes sensoriels */
+  --atc-h: #6b6258; /* H · L · P · V regroupés par la maquette */
+  --atc-l: #6b6258;
+  --atc-p: #6b6258;
+  --atc-v: #6b6258;
+  --atc-libre: #8a8178; /* produit libre, ou sans ATC */
+
+  /* Intensité = nombre de prises, jamais la teinte. */
+  --intensite-1: 0.4;
+  --intensite-2: 0.7;
+  --intensite-3: 1;
+
+  /* --- Ombres ---------------------------------------------------------- */
+  --ombre-feuille: 0 -8px 40px rgba(15, 46, 61, 0.18);
+  --ombre-flottant: 0 6px 16px rgba(18, 86, 110, 0.32);
+  --ombre-legere: 0 1px 2px rgba(15, 46, 61, 0.2);
+
+  /* --- Typographie ----------------------------------------------------- */
+  --famille-ui: 'Poppins', system-ui, sans-serif;
+  --famille-source: 'Newsreader', serif; /* le sérif cite, et lui seul (§12.3) */
+  --famille-mono: 'DM Mono', ui-monospace, monospace; /* CIS, CIP, heures */
+
+  --taille-chiffre-cle: 56px;
+  --interligne-chiffre-cle: 58px;
+  --interlettrage-chiffre-cle: -0.03em;
+
+  --taille-chiffre: 34px;
+  --interligne-chiffre: 40px;
+  --interlettrage-chiffre: -0.02em;
+
+  --taille-dose: 22px;
+  --taille-titre: 20px;
+  --interligne-titre: 27px;
+  --interlettrage-titre: -0.01em;
+
+  --taille-corps: 16px;
+  --interligne-corps: 25px;
+  --interligne-corps-serre: 24px;
+
+  --taille-source: 15px;
+  --interligne-source: 25px;
+
+  --taille-liste: 15px;
+  --interligne-liste: 21px;
+
+  --taille-bouton: 16px;
+  --taille-bouton-secondaire: 14px;
+
+  --taille-meta: 12px;
+  --interligne-meta: 18px;
+
+  --taille-chip: 13px;
+  --interligne-chip: 17px;
+
+  --taille-etiquette: 11px;
+  --interligne-etiquette: 17px;
+  --interlettrage-etiquette: 0.07em;
+  --interlettrage-etiquette-large: 0.09em;
+
+  --taille-mono: 13px;
+  --taille-mono-petit: 11px;
+  --taille-mono-mini: 10px;
+  --interligne-mono-mini: 16px;
+
+  --taille-onglet: 10px;
+  --interlettrage-onglet: 0.01em;
+
+  --taille-jour: 9px;
+  --interlettrage-jour: 0.08em;
+
+  --graisse-normale: 400;
+  --graisse-moyenne: 500;
+  --graisse-forte: 600;
+
+  /* --- Espacement ------------------------------------------------------ */
+  --espace-1: 2px;
+  --espace-2: 4px;
+  --espace-3: 6px;
+  --espace-4: 8px;
+  --espace-5: 10px;
+  --espace-6: 12px;
+  --espace-7: 14px;
+  --espace-8: 16px;
+  --espace-9: 18px;
+  --espace-10: 20px;
+  --espace-11: 22px;
+  --espace-12: 26px;
+  --espace-13: 30px;
+  --espace-14: 34px;
+
+  --marge-ecran: var(--espace-8);
+
+  /* --- Rayons ---------------------------------------------------------- */
+  --rayon-alveole: 4px; /* alvéole carrée (CDC §8.3) — voir manques.md */
+  --rayon-jauge: 4px;
+  --rayon-badge: 6px;
+  --rayon-champ: 10px;
+  --rayon-chip: 12px;
+  --rayon-carte: 14px;
+  --rayon-feuille: 22px;
+  --rayon-pastille: 50%;
+
+  /* --- Épaisseurs de trait --------------------------------------------- */
+  --filet: 0.5px;
+  --filet-marque: 1px;
+  --filet-actif: 1.5px;
+  --filet-signal: 2px; /* filet latéral de la CarteSignal */
+
+  /* --- Hauteurs de touche ----------------------------------------------- */
+  --touche-secondaire: 44px;
+  --touche-champ: 48px;
+  --touche-primaire: 52px;
+  --touche-flottant: 52px;
+  --hauteur-jauge: 8px;
+
+  /* --- Encoches et barres système --------------------------------------- */
+  /* La maquette pose 54 px en tête : c'est la barre d'état du simulateur.
+     Elle est remplacée par la valeur réelle de l'appareil (§11.4). */
+  --marge-haute: env(safe-area-inset-top, 0px);
+  --marge-basse: env(safe-area-inset-bottom, 0px);
+}
+
+/*
+ * ⚠ THÈME SOMBRE ABSENT DE L'EXPORT.
+ *
+ * La direction exportée est claire ; la maquette y fait référence à une
+ * palette sombre antérieure (« le sérif sur fond clair pèse plus qu'en
+ * sombre ») sans en livrer les valeurs. Inventer un thème sombre reviendrait
+ * à inventer douze couleurs, dont les onze teintes ATC.
+ *
+ * `color-scheme: light` est donc déclaré pour que le navigateur n'inverse
+ * rien de lui-même. Consigné dans `docs/maquette/manques.md`.
+ */
+
+html,
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre-1);
+  font-family: var(--famille-ui);
+  font-size: var(--taille-corps);
+  line-height: var(--interligne-corps);
+  /* §11.4 — comportements natifs à neutraliser en mode autonome */
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  user-select: none;
+}
+
+input,
+textarea,
+[contenteditable] {
+  user-select: text;
+}
+
+/*
+ * État de focus — absent de l'export, dérivé du jeton d'action.
+ * Consigné dans `docs/maquette/manques.md`.
+ */
+:focus-visible {
+  outline: var(--filet-actif) solid var(--action);
+  outline-offset: var(--espace-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

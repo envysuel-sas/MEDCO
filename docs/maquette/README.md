@@ -43,16 +43,16 @@ Ce que l'export ne contient pas et qu'il faut ajouter par-dessus :
 
 <!-- Cocher au fur et à mesure -->
 
-- [ ] Aujourd'hui
-- [ ] Pilulier — vue jour
-- [ ] Pilulier — vue semaine
-- [ ] Saisie rapide
-- [ ] Recherche / ajout de produit
+- [x] Aujourd'hui
+- [x] Pilulier — vue jour
+- [x] Pilulier — vue semaine
+- [x] Saisie rapide
+- [x] Recherche / ajout de produit
 - [ ] Fiche produit
 - [ ] Fiche substance
-- [ ] Réglages
-- [ ] Onboarding + installation PWA
-- [ ] États vides
+- [x] Réglages
+- [x] Onboarding + installation PWA
+- [x] États vides
 - [ ] Thème clair
 
 Tout écran non coché est à recomposer à partir des composants existants, **sans introduire de motif visuel nouveau**, et à signaler dans `manques.md`.

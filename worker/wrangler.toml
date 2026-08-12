@@ -1,0 +1,38 @@
+name = "medco-rappels"
+main = "index.ts"
+compatibility_date = "2026-08-01"
+
+# §10.3 — plan gratuit : Cron Triggers à la minute, 100 000 requêtes/jour.
+# Vingt utilisateurs et quelques rappels par jour : sans objet.
+[triggers]
+crons = ["* * * * *"]
+
+# Domaine personnalisé de Worker : Cloudflare crée l'enregistrement DNS et
+# émet le certificat. Le Worker s'exécute sur l'infrastructure Cloudflare —
+# aucune machine à faire tourner, ni chez soi ni ailleurs.
+#
+# Nom distinct de celui de l'application : l'enregistrement qui pointe vers
+# GitHub Pages doit rester non proxifié pour que GitHub émette son propre
+# certificat. Les deux noms sont donc des origines différentes, d'où les
+# en-têtes CORS du Worker.
+#
+# ⚠ À remplacer par votre propre sous-domaine avant `wrangler deploy`.
+[[routes]]
+pattern = "rappels.exemple.fr"
+custom_domain = true
+
+[[kv_namespaces]]
+binding = "ABONNEMENTS"
+id = "à renseigner au premier déploiement"
+
+[vars]
+# Adresse de contact exigée par VAPID (RFC 8292) : elle identifie l'émetteur
+# auprès des services de push, elle n'est jamais transmise à l'appareil.
+#
+# ⚠ Elle est en clair dans le dépôt. Sur un dépôt public, mettre une adresse
+# dédiée, pas une adresse personnelle : les robots moissonnent.
+VAPID_SUJET = "mailto:contact@exemple.fr"
+VAPID_CLE_PUBLIQUE = "à renseigner au premier déploiement"
+
+# VAPID_CLE_PRIVEE est un secret : `wrangler secret put VAPID_CLE_PRIVEE`.
+# Elle ne figure jamais dans le dépôt.

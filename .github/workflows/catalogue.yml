@@ -1,0 +1,60 @@
+name: Catalogue BDPM
+
+# Spec §17.2 — ingestion hebdomadaire. La BDPM est mise à jour en début de
+# semaine ; le bundle est reconstruit le mercredi.
+on:
+  schedule:
+    - cron: '17 4 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install -r pipeline/requirements.txt
+
+      # Open Medic ne change qu'une fois par an : inutile de retélécharger
+      # 470 Mo chaque semaine.
+      - uses: actions/cache@v4
+        with:
+          path: .cache/pipeline/openmedic
+          key: openmedic-2025
+
+      # Les six contrôles bloquants de §6.5 s'exécutent dans build.py :
+      # un échec interrompt le job et rien n'est publié.
+      - name: Ingestion, contrôles et bundle
+        run: python -m pipeline.build
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Pas de `version:` ici : `packageManager` de package.json fait foi.
+      # Déclarer les deux fait échouer l'action (ERR_PNPM_BAD_PM_VERSION).
+      - uses: pnpm/action-setup@v4
+
+      - run: pnpm install --frozen-lockfile
+
+      # Le jeu doré s'exécute sur le bundle qui vient d'être produit.
+      - run: pnpm test:golden
+
+      - name: Commit du bundle
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add public/bundles
+          if git diff --cached --quiet; then
+            echo 'Catalogue inchangé.'
+          else
+            DATE=$(python -c "import json;print(json.load(open('public/bundles/manifest.json'))['date_bdpm'])")
+            git commit -m "chore(catalogue): bundle BDPM du $DATE"
+            git push
+          fi

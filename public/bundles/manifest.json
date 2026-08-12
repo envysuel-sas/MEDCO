@@ -1,0 +1,75 @@
+{
+  "version": "2026-08-12",
+  "fichier": "catalogue-2026-08-12.sqlite.br",
+  "fichier_gzip": "catalogue-2026-08-12.sqlite.gz",
+  "date_bdpm": "2026-08-03",
+  "date_build": "2026-08-12",
+  "nb_specialites": 15857,
+  "octets": 1923671,
+  "octets_gzip": 3041235,
+  "octets_decompresses": 11309056,
+  "sha256": "8bc72f90bbfe43a6ae2909737086d0088cf6f88590a83b8fce46e704a8f6043c",
+  "sha256_gzip": "481dd84f55d8574e544bfddc82d57af8e7d2b983d9e610095249624aed6e02fa",
+  "sha256_sqlite": "e9c64de0860ac0f703da68bc05b1724395800849046c63e3344650031b459613",
+  "version_regles": "2026.08.12",
+  "source": {
+    "libelle": "Base de données publique des médicaments (ANSM · HAS · UNCAM)",
+    "url": "https://base-donnees-publique.medicaments.gouv.fr/telechargement",
+    "licence": "Licence ouverte Etalab"
+  },
+  "metriques": {
+    "substances": 3895,
+    "substances_avec_atc": 1390,
+    "origine_atc": {
+      "nom": 611,
+      "aucune": 2505,
+      "vote": 374,
+      "liaison": 405
+    },
+    "specialites_avec_atc": 8958,
+    "presentations": 20901,
+    "lignes_composition": 32420,
+    "lignes_comptees": 17450,
+    "politique_liaison": "fraction_therapeutique",
+    "formes_orales_seches": {
+      "liaisons": 16604,
+      "homeopathiques_exclues": 6499,
+      "denominateur": 10105,
+      "comptees": 9993,
+      "taux": 0.9889,
+      "taux_toutes_liaisons": 0.6018
+    },
+    "controles": [
+      {
+        "nom": "nombre de spécialités",
+        "ok": true,
+        "detail": "15857 (attendu 12000–20000)"
+      },
+      {
+        "nom": "variation vs bundle précédent",
+        "ok": true,
+        "detail": "0.00% (15857 → 15857, plafond 5%)"
+      },
+      {
+        "nom": "fiabilité des formes orales sèches",
+        "ok": true,
+        "detail": "98.89% sur 10105 liaisons (seuil 95% ; 6499 liaisons homéopathiques exclues du dénominateur, non convertibles en mg)"
+      },
+      {
+        "nom": "liaison sans ligne SA",
+        "ok": true,
+        "detail": "0 liaison(s) sans substance active"
+      },
+      {
+        "nom": "couverture ATC des substances réglées",
+        "ok": true,
+        "detail": "3 substances ciblées, 6 classes ciblées"
+      },
+      {
+        "nom": "jeu doré (catalogue)",
+        "ok": true,
+        "detail": "9 cas vérifiés"
+      }
+    ]
+  }
+}

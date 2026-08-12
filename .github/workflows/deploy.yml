@@ -1,8 +1,21 @@
 name: deploy
 
+# Spec §17.2 — lint → typecheck → test → build → GitHub Pages.
+# Le jeu doré est **bloquant** : rien n'est déployé si le cumul est faux.
+#
+# Tout tourne sur GitHub. Aucune machine à faire tourner, aucun tunnel, aucun
+# service tiers obligatoire. Deux variables de dépôt, toutes deux facultatives,
+# décident du reste (Settings → Secrets and variables → Actions → Variables) :
+#
+#   DOMAINE           domaine personnalisé, ex. medco.exemple.fr.
+#                     Vide → l'app vit sur l'adresse GitHub du dépôt.
+#   VITE_URL_WORKER   Worker de rappel Cloudflare, ex. https://rappels.exemple.fr
+#                     Vide → seule la couche calendrier est proposée, et l'app
+#                     le dit (§10.2 : le calendrier est la garantie).
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -20,33 +33,55 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Pas de `version:` ici : `packageManager` de package.json fait foi.
+      # Déclarer les deux fait échouer l'action (ERR_PNPM_BAD_PM_VERSION).
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      # Passer à `--frozen-lockfile` une fois pnpm-lock.yaml commité.
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
 
       - run: pnpm lint
 
-      # --passWithNoTests à retirer dès que le jeu doré existe (lot L1).
-      - run: pnpm test -- --passWithNoTests
+      # Le jeu doré seul d'abord, pour que son échec soit lisible dans le
+      # journal : c'est lui qui garantit la justesse du cumul (§16.1).
+      - run: pnpm test:golden
+      - run: pnpm test
+
+      # Sans domaine personnalisé, GitHub sert le site sous /<nom-du-depot>/ :
+      # `base`, `start_url` et `scope` du manifeste doivent le refléter, sans
+      # quoi l'application n'est pas installable.
+      - id: cible
+        env:
+          DOMAINE: ${{ vars.DOMAINE }}
+          DEPOT: ${{ github.event.repository.name }}
+        run: |
+          if [ -n "$DOMAINE" ]; then
+            echo "base=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=/$DEPOT/" >> "$GITHUB_OUTPUT"
+          fi
 
       - run: pnpm build
         env:
-          # Domaine personnalisé → racine. Sur <pseudo>.github.io/medco/, mettre /medco/
-          VITE_BASE: /
+          VITE_BASE: ${{ steps.cible.outputs.base }}
+          VITE_URL_WORKER: ${{ vars.VITE_URL_WORKER }}
+
+      # GitHub Pages lit le domaine personnalisé dans un fichier `CNAME` à la
+      # racine du site publié. Absent, il sert l'adresse par défaut du dépôt.
+      - if: vars.DOMAINE != ''
+        run: echo "${{ vars.DOMAINE }}" > dist/CNAME
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
+    # Une pull request se contente de vérifier : elle ne publie pas.
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

@@ -1,0 +1,777 @@
+/**
+ * Styles des composants — **uniquement** des jetons de `../tokens.css`.
+ *
+ * Aucune valeur en dur : pas de couleur hexadécimale, pas de pixel, pas de
+ * graisse littérale. Une valeur en dur ici est un motif de rejet.
+ */
+
+/* --- Bouton ----------------------------------------------------------- */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espace-3);
+  border: none;
+  border-radius: var(--rayon-chip);
+  font-family: var(--famille-ui);
+  font-size: var(--taille-bouton);
+  font-weight: var(--graisse-moyenne);
+  min-height: var(--touche-primaire);
+  padding-inline: var(--espace-8);
+  background: var(--action);
+  color: var(--sur-action);
+  cursor: pointer;
+}
+
+.bouton:active {
+  background: var(--action-appuyee);
+}
+
+.bouton:disabled {
+  opacity: var(--intensite-1);
+  cursor: default;
+}
+
+.secondaire {
+  background: transparent;
+  color: var(--action);
+  border: var(--filet-marque) solid var(--trait-marque);
+  border-radius: var(--rayon-champ);
+  min-height: var(--touche-secondaire);
+  font-size: var(--taille-bouton-secondaire);
+}
+
+.secondaire:active {
+  background: var(--surface-active);
+}
+
+.texte {
+  background: transparent;
+  color: var(--action);
+  min-height: var(--touche-secondaire);
+  padding-inline: 0;
+  font-size: var(--taille-bouton-secondaire);
+}
+
+.pleineLargeur {
+  width: 100%;
+}
+
+/* --- Pas (− / +) ------------------------------------------------------- */
+
+.pas {
+  width: var(--touche-champ);
+  height: var(--touche-champ);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--filet-marque) solid var(--trait-marque);
+  border-radius: var(--rayon-champ);
+  background: transparent;
+  color: var(--action);
+  cursor: pointer;
+}
+
+.pas:disabled {
+  opacity: var(--intensite-1);
+  cursor: default;
+}
+
+/* --- Étiquette de section ---------------------------------------------- */
+
+.etiquette {
+  font-size: var(--taille-etiquette);
+  line-height: var(--interligne-etiquette);
+  font-weight: var(--graisse-moyenne);
+  letter-spacing: var(--interlettrage-etiquette);
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+
+/* --- Carte -------------------------------------------------------------- */
+
+.carte {
+  background: var(--surface-1);
+  border: var(--filet) solid var(--trait);
+  border-radius: var(--rayon-carte);
+  padding: var(--espace-8);
+}
+
+.filetInformation {
+  border-left: var(--filet-signal) solid var(--signal-information);
+}
+
+.filetVigilance {
+  border-left: var(--filet-signal) solid var(--signal-vigilance);
+}
+
+.filetAttention {
+  border-left: var(--filet-signal) solid var(--signal-attention);
+}
+
+/* --- Pastille ATC ------------------------------------------------------- */
+
+.pastille {
+  display: inline-block;
+  border-radius: var(--rayon-pastille);
+  flex: none;
+}
+
+/* --- Jauge linéaire ----------------------------------------------------- */
+/* ⚠ §12.1 — une jauge de cumul est linéaire, jamais circulaire.            */
+
+.jauge {
+  position: relative;
+  height: var(--hauteur-jauge);
+  border-radius: var(--rayon-jauge);
+  background: var(--surface-creux);
+  overflow: hidden;
+}
+
+.jaugeRemplissage {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: var(--rayon-jauge);
+}
+
+.jaugeGraduation {
+  position: absolute;
+  inset-block: 0;
+  width: var(--filet-signal);
+  background: var(--encre-1);
+  opacity: var(--intensite-2);
+}
+
+.jaugeLegendes {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espace-4);
+  margin-top: var(--espace-3);
+  font-size: var(--taille-meta);
+  color: var(--encre-3);
+}
+
+/* --- Cumul du jour ------------------------------------------------------ */
+
+.cumulChiffre {
+  font-size: var(--taille-chiffre-cle);
+  line-height: var(--interligne-chiffre-cle);
+  font-weight: var(--graisse-moyenne);
+  letter-spacing: var(--interlettrage-chiffre-cle);
+  font-variant-numeric: tabular-nums;
+  margin-top: var(--espace-1);
+}
+
+.cumulSubstance {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-3);
+  margin-top: var(--espace-1);
+  font-size: var(--taille-corps);
+  color: var(--encre-2);
+}
+
+.cumulJauge {
+  margin-top: var(--espace-7);
+}
+
+.mentionFiabilite {
+  margin-top: var(--espace-3);
+  font-size: var(--taille-meta);
+  line-height: var(--interligne-meta);
+  color: var(--encre-3);
+}
+
+/* --- Plaquette ---------------------------------------------------------- */
+
+.plaquette {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--espace-2);
+}
+
+.plaquetteJours {
+  composes: plaquette;
+  margin-bottom: var(--espace-2);
+}
+
+.plaquetteJour {
+  text-align: center;
+  font-size: var(--taille-jour);
+  font-weight: var(--graisse-moyenne);
+  letter-spacing: var(--interlettrage-jour);
+  color: var(--encre-3);
+}
+
+.alveole {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--rayon-alveole);
+  background: var(--surface-creux);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.alveoleAujourdhui {
+  box-shadow: inset 0 0 0 var(--filet-actif) var(--action);
+}
+
+.alveoleHorsPeriode {
+  opacity: var(--intensite-1);
+}
+
+.legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-5) var(--espace-7);
+  margin-top: var(--espace-6);
+}
+
+.legendeEntree {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  font-size: var(--taille-etiquette);
+  color: var(--encre-3);
+}
+
+.legendePastille {
+  width: var(--espace-4);
+  height: var(--espace-4);
+  border-radius: var(--rayon-alveole);
+  flex: none;
+}
+
+/* --- Carte de signal ----------------------------------------------------- */
+/* Trois blocs, dans cet ordre, jamais un quatrième (§8.6).                  */
+
+.signalFait {
+  font-size: var(--taille-corps);
+  line-height: var(--interligne-corps-serre);
+  font-weight: var(--graisse-moyenne);
+}
+
+.citation {
+  font-family: var(--famille-source);
+  font-size: var(--taille-source);
+  line-height: var(--interligne-source);
+  color: var(--encre-2);
+  margin: var(--espace-6) 0 0;
+}
+
+.source {
+  display: inline-block;
+  margin-top: var(--espace-6);
+  font-size: var(--taille-meta);
+  color: var(--encre-3);
+}
+
+.signalActions {
+  display: flex;
+  gap: var(--espace-5);
+  margin-top: var(--espace-8);
+}
+
+.signalActions > * {
+  flex: 1;
+}
+
+/* --- Listes -------------------------------------------------------------- */
+
+.lignePrise {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-5);
+  padding-block: var(--espace-6);
+  border-bottom: var(--filet) solid var(--surface-creux);
+  width: 100%;
+  background: none;
+  border-inline: none;
+  border-top: none;
+  text-align: start;
+  font-family: var(--famille-ui);
+  color: inherit;
+}
+
+.lignePrise:last-child {
+  border-bottom: none;
+}
+
+.heure {
+  font-family: var(--famille-mono);
+  font-size: var(--taille-mono);
+  font-weight: var(--graisse-normale);
+  color: var(--encre-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ligneCorps {
+  flex: 1;
+  min-width: 0;
+}
+
+.ligneTitre {
+  display: block;
+  font-size: var(--taille-liste);
+  line-height: var(--interligne-liste);
+  font-weight: var(--graisse-moyenne);
+}
+
+.ligneDetail {
+  display: block;
+  font-size: var(--taille-meta);
+  line-height: var(--interligne-meta);
+  color: var(--encre-3);
+}
+
+.ligneAnnulee {
+  text-decoration: line-through;
+  color: var(--encre-3);
+}
+
+.ligneAppoint {
+  font-size: var(--taille-meta);
+  color: var(--encre-3);
+  white-space: nowrap;
+}
+
+/* --- Chips ---------------------------------------------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-3);
+  padding: var(--espace-3) var(--espace-6);
+  border-radius: var(--rayon-chip);
+  border: var(--filet-marque) solid var(--trait);
+  background: transparent;
+  font-family: var(--famille-ui);
+  font-size: var(--taille-chip);
+  font-weight: var(--graisse-moyenne);
+  color: var(--encre-1);
+  cursor: pointer;
+}
+
+.chipActif {
+  border-color: var(--action);
+  border-width: var(--filet-actif);
+  background: var(--surface-active);
+}
+
+.chipProduit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+  min-height: var(--espace-14);
+  padding: var(--espace-5) var(--espace-4) var(--espace-6);
+  border-radius: var(--rayon-chip);
+  border: var(--filet-marque) solid var(--trait);
+  background: transparent;
+  font-family: var(--famille-ui);
+  color: var(--encre-1);
+  text-align: start;
+  cursor: pointer;
+}
+
+.chipProduitNom {
+  display: block;
+  font-size: var(--taille-chip);
+  line-height: var(--interligne-chip);
+  font-weight: var(--graisse-moyenne);
+}
+
+.chipProduitDosage {
+  display: block;
+  font-family: var(--famille-mono);
+  font-size: var(--taille-mono-petit);
+  color: var(--encre-3);
+}
+
+.chipProduitSelectionne .chipProduitDosage {
+  color: var(--encre-2);
+}
+
+/* --- Champ de recherche ---------------------------------------------------- */
+
+.champ {
+  width: 100%;
+  min-height: var(--touche-champ);
+  padding-inline: var(--espace-6);
+  border-radius: var(--rayon-champ);
+  border: var(--filet-marque) solid var(--trait);
+  background: var(--surface-1);
+  font-family: var(--famille-ui);
+  font-size: var(--taille-corps);
+  color: var(--encre-1);
+}
+
+.champ::placeholder {
+  color: var(--encre-3);
+}
+
+/* --- Feuille modale --------------------------------------------------------- */
+
+.voile {
+  position: fixed;
+  inset: 0;
+  background: var(--voile);
+  border: none;
+  padding: 0;
+  z-index: 5;
+}
+
+.feuille {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 10;
+  background: var(--surface-1);
+  border-radius: var(--rayon-feuille) var(--rayon-feuille) 0 0;
+  padding: var(--espace-10) var(--marge-ecran) calc(var(--espace-13) + var(--marge-basse));
+  box-shadow: var(--ombre-feuille);
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+.feuilleEntete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--espace-9);
+}
+
+/* --- Sélecteur de dose -------------------------------------------------------- */
+
+.selecteurDose {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-6);
+  margin-top: var(--espace-10);
+}
+
+.doseValeur {
+  font-size: var(--taille-dose);
+  font-weight: var(--graisse-moyenne);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.doseEquivalent {
+  font-size: var(--taille-meta);
+  color: var(--encre-3);
+  text-align: center;
+}
+
+/* --- Grille de produits ---------------------------------------------------------- */
+
+.grilleProduits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--espace-14), 1fr));
+  gap: var(--espace-4);
+}
+
+/* --- En-tête et onglets ------------------------------------------------------------ */
+
+.enTete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-4);
+  padding: var(--espace-4) var(--marge-ecran) var(--espace-3);
+}
+
+.profil {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-4);
+  background: none;
+  border: none;
+  font-family: var(--famille-ui);
+  font-size: var(--taille-liste);
+  font-weight: var(--graisse-forte);
+  color: var(--encre-1);
+  cursor: pointer;
+}
+
+.icone {
+  background: none;
+  border: none;
+  color: var(--encre-3);
+  cursor: pointer;
+  display: inline-flex;
+  padding: var(--espace-2);
+}
+
+.barreOnglets {
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface-1);
+  border-top: var(--filet) solid var(--trait);
+  padding: var(--espace-4) var(--espace-4) calc(var(--espace-12) + var(--marge-basse));
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+}
+
+.onglet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espace-2);
+  padding-top: var(--espace-2);
+  background: none;
+  border: none;
+  color: var(--encre-3);
+  font-family: var(--famille-ui);
+  font-size: var(--taille-onglet);
+  font-weight: var(--graisse-moyenne);
+  letter-spacing: var(--interlettrage-onglet);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ongletActif {
+  color: var(--action);
+}
+
+.actionCentrale {
+  justify-self: center;
+  width: var(--touche-flottant);
+  height: var(--touche-flottant);
+  border-radius: var(--rayon-pastille);
+  border: none;
+  background: var(--degrade-action);
+  box-shadow: var(--ombre-flottant);
+  color: var(--sur-action);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* --- État vide ------------------------------------------------------------------------ */
+
+.etatVide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+  padding-block: var(--espace-10);
+  color: var(--encre-3);
+}
+
+.etatVideTitre {
+  font-size: var(--taille-corps);
+  line-height: var(--interligne-corps);
+  color: var(--encre-1);
+}
+
+/* --- Pilulier -------------------------------------------------------------------------- */
+
+.blocMoment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.blocMomentEntete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-4);
+}
+
+.momentHeure {
+  font-family: var(--famille-mono);
+  font-size: var(--taille-mono);
+  color: var(--encre-3);
+}
+
+.occurrence {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-5);
+  padding-block: var(--espace-6);
+  border-bottom: var(--filet) solid var(--surface-creux);
+}
+
+.occurrence:last-child {
+  border-bottom: none;
+}
+
+.statutValidee {
+  color: var(--encre-3);
+}
+
+.statutExpiree {
+  color: var(--encre-3);
+  opacity: var(--intensite-2);
+}
+
+.semaine {
+  display: grid;
+  gap: var(--espace-2);
+  overflow-x: auto;
+}
+
+.semaineLigne {
+  display: grid;
+  grid-template-columns: minmax(var(--espace-14), auto) repeat(7, 1fr);
+  align-items: center;
+  gap: var(--espace-2);
+}
+
+.semaineCellule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espace-1);
+  min-height: var(--touche-secondaire);
+  border-radius: var(--rayon-badge);
+}
+
+.semaineAujourdhui {
+  background: var(--voile-jour);
+}
+
+.point {
+  width: var(--espace-5);
+  height: var(--espace-5);
+  border-radius: var(--rayon-pastille);
+  flex: none;
+}
+
+.pointAttendu {
+  background: transparent;
+  border: var(--filet-actif) solid currentColor;
+}
+
+.pointSaute {
+  background: transparent;
+  border: var(--filet-actif) solid var(--trait-fort);
+}
+
+/* --- Divers --------------------------------------------------------------------------- */
+
+.pileEcran {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-7);
+  padding: 0 var(--marge-ecran) var(--espace-7);
+  flex: 1;
+}
+
+.entreDeux {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-4);
+}
+
+.meta {
+  font-size: var(--taille-meta);
+  line-height: var(--interligne-meta);
+  color: var(--encre-3);
+}
+
+.mono {
+  font-family: var(--famille-mono);
+  font-size: var(--taille-mono);
+  color: var(--encre-3);
+}
+
+.chiffreSecondaire {
+  font-size: var(--taille-chiffre);
+  line-height: var(--interligne-chiffre);
+  font-weight: var(--graisse-moyenne);
+  letter-spacing: var(--interlettrage-chiffre);
+  font-variant-numeric: tabular-nums;
+}
+
+.titreEcran {
+  font-size: var(--taille-titre);
+  line-height: var(--interligne-titre);
+  font-weight: var(--graisse-moyenne);
+  letter-spacing: var(--interlettrage-titre);
+  margin: 0;
+}
+
+/* --- Verrou (§15) ---------------------------------------------------------
+   Aucun motif visuel nouveau : le pavé reprend la géométrie de l'alvéole du
+   pilulier, les points d'état celle des points d'occurrence, et toutes les
+   valeurs viennent des jetons. L'écran n'est pas dans la maquette — voir
+   `docs/maquette/manques.md` §2.8. */
+
+.verrou {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--espace-12);
+  padding: var(--espace-13) var(--espace-10) calc(var(--espace-13) + env(safe-area-inset-bottom));
+  background: var(--fond);
+}
+
+.verrouPoints {
+  display: flex;
+  gap: var(--espace-6);
+  min-height: var(--espace-7);
+}
+
+.verrouPoint {
+  width: var(--espace-7);
+  height: var(--espace-7);
+  border-radius: 50%;
+  background: var(--surface-creux);
+}
+
+.verrouPointRempli {
+  background: var(--action);
+}
+
+.verrouPave {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--espace-6);
+  width: 100%;
+  max-width: 264px;
+}
+
+.verrouTouche {
+  appearance: none;
+  border: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--surface-1);
+  color: var(--encre-1);
+  font-family: inherit;
+  font-size: var(--taille-chiffre);
+  line-height: var(--interligne-chiffre);
+  font-weight: var(--graisse-normale);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.verrouTouche:active {
+  background: var(--surface-active);
+}
+
+.verrouTouche:disabled {
+  opacity: var(--intensite-1);
+}
+
+.verrouToucheVide {
+  background: none;
+  cursor: default;
+}
+
+.verrouToucheTexte {
+  font-size: var(--taille-bouton-secondaire);
+  color: var(--encre-3);
+}

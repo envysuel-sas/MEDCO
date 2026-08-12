@@ -1,0 +1,29 @@
+name: Worker
+
+# Spec §17.2 — déploiement du Worker.
+#
+# ⚠ Déclenchement **manuel** uniquement, et c'est délibéré. Le Worker est
+# facultatif (§10.2 : le calendrier est la garantie, le push est l'appoint) et
+# `wrangler.toml` porte deux valeurs à renseigner au premier déploiement —
+# l'identifiant du namespace KV et la clé publique VAPID. Un déclenchement sur
+# push échouerait à chaque modification de `worker/**` tant que ces valeurs
+# n'existent pas, et ferait passer le dépôt pour cassé alors qu'il ne l'est pas.
+#
+# Une fois les clés en place, lancer depuis l'onglet Actions.
+# Procédure : docs/deploiement.md, section « Les notifications de rappel ».
+on:
+  workflow_dispatch:
+
+jobs:
+  deployer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker

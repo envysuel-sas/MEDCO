@@ -1,0 +1,30 @@
+{
+  "version": "2026.08.12",
+  "objet": "Correspondance code ATC → classe de substance (spec §5.4). Cible des règles de fréquence (§8).",
+  "methode": "Chaque ligne traduit une entrée du tableau §5.4 en codes ATC de la classification OMS. Aucune classe n'est ajoutée à celles de la spec ; le préfixe le plus long l'emporte. Le libellé ATC officiel est reporté tel quel pour permettre la relecture.",
+  "correspondances": [
+    { "prefixe_atc": "N02BE01", "classe": "ANTALGIQUE_SIMPLE", "libelle_atc": "paracétamol", "spec": "§5.4 — antalgique simple" },
+    { "prefixe_atc": "N02BA01", "classe": "ANTALGIQUE_SIMPLE", "libelle_atc": "acide acétylsalicylique", "spec": "§5.4 — aspirine. B01AC06 (antiagrégant) est volontairement exclu : ce n'est pas un usage antalgique." },
+    { "prefixe_atc": "M01AE01", "classe": "ANTALGIQUE_SIMPLE", "libelle_atc": "ibuprofène", "spec": "§5.4" },
+    { "prefixe_atc": "M01AE02", "classe": "ANTALGIQUE_SIMPLE", "libelle_atc": "naproxène", "spec": "§5.4" },
+    { "prefixe_atc": "M01AE03", "classe": "ANTALGIQUE_SIMPLE", "libelle_atc": "kétoprofène", "spec": "§5.4" },
+
+    { "prefixe_atc": "N02BE51", "classe": "ANTALGIQUE_ASSOCIATION", "libelle_atc": "paracétamol en association hors psycholeptiques", "spec": "§5.4 — paracétamol + caféine, + codéine…" },
+    { "prefixe_atc": "N02BA51", "classe": "ANTALGIQUE_ASSOCIATION", "libelle_atc": "acide acétylsalicylique en association hors psycholeptiques", "spec": "§5.4" },
+    { "prefixe_atc": "N02AJ", "classe": "ANTALGIQUE_ASSOCIATION", "libelle_atc": "opioïdes en association avec des analgésiques non opioïdes", "spec": "§5.4 — paracétamol + codéine / tramadol / opium" },
+    { "prefixe_atc": "N02AA59", "classe": "ANTALGIQUE_ASSOCIATION", "libelle_atc": "codéine en association hors psycholeptiques", "spec": "§5.4" },
+
+    { "prefixe_atc": "N02A", "classe": "OPIOIDE", "libelle_atc": "opioïdes", "spec": "§5.4 — codéine, tramadol, opium, morphiniques" },
+    { "prefixe_atc": "N07BC", "classe": "OPIOIDE", "libelle_atc": "médicaments de la dépendance aux opioïdes (méthadone, buprénorphine)", "spec": "§5.4 — morphiniques" },
+    { "prefixe_atc": "R05DA", "classe": "OPIOIDE", "libelle_atc": "alcaloïdes de l'opium et dérivés, antitussifs", "spec": "§5.4 — la codéine antitussive est le même produit que la codéine antalgique" },
+
+    { "prefixe_atc": "N02CC", "classe": "TRIPTAN", "libelle_atc": "agonistes sélectifs de la sérotonine 5HT1", "spec": "§5.4 — sumatriptan, zolmitriptan…" },
+    { "prefixe_atc": "N02CA", "classe": "ERGOTAMINE", "libelle_atc": "alcaloïdes de l'ergot de seigle", "spec": "§5.4 — dérivés ergotés" },
+
+    { "prefixe_atc": "R01A", "classe": "DECONGESTIONNANT_NASAL", "libelle_atc": "décongestionnants et autres préparations nasales à usage topique", "spec": "§5.4 — oxymétazoline (R01AA05), tuaminoheptane (R01AB08), éphédrine (R01AB05)" },
+    { "prefixe_atc": "R01BA", "classe": "DECONGESTIONNANT_NASAL", "libelle_atc": "sympathomimétiques décongestionnants par voie générale", "spec": "§5.4 — pseudoéphédrine orale, même repère de durée consécutive" },
+
+    { "prefixe_atc": "A06AB", "classe": "LAXATIF_STIMULANT", "libelle_atc": "laxatifs de contact", "spec": "§5.4 — bisacodyl (A06AB02), séné (A06AB06)" },
+    { "prefixe_atc": "A06AA02", "classe": "LAXATIF_STIMULANT", "libelle_atc": "docusate sodique", "spec": "§5.4 — la spec range le docusate avec les stimulants ; l'OMS le classe en émollient (A06AA). La classe de la spec est retenue." }
+  ]
+}
