@@ -82,6 +82,11 @@ export interface Produit {
   /** ⚠ R2 — un traitement prescrit est exempté des signaux de fréquence. */
   readonly mode: Mode;
   readonly unite: string | null;
+  /**
+   * Stock restant, en unités de prise. `null` quand il n'est pas suivi —
+   * l'écran « Préparer la semaine » ne réclame alors rien (maquette 1h).
+   */
+  readonly stock: number | null;
   /** Classe du produit : une association n'est une association qu'au niveau du produit. */
   readonly classe: Classe;
 }
@@ -95,6 +100,12 @@ export interface PriseAvecSubstances {
   readonly fuseau: string;
   readonly dose: number;
   readonly statut: 'prise' | 'annulee';
+  /**
+   * Instant de la saisie, distinct de l'horodatage de la prise. Leur écart est
+   * ce qui permet d'écrire « ajoutée après coup » dans l'historique, comme la
+   * maquette le demande. Facultatif : le cumul n'en a que faire.
+   */
+  readonly saisieLe?: Instant;
   readonly substances: readonly SubstancePrise[];
 }
 

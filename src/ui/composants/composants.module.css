@@ -887,3 +887,142 @@
     border-radius: var(--rayon-carte) var(--rayon-carte) 0 0;
   }
 }
+
+/* --- Historique (maquette 2a) --------------------------------------------- */
+
+.filtresHistorique {
+  display: flex;
+  gap: var(--espace-4);
+  flex-wrap: wrap;
+}
+
+.jourHistorique {
+  display: grid;
+  gap: var(--espace-5);
+}
+
+.totalJour {
+  font-size: var(--taille-liste);
+  line-height: var(--interligne-liste);
+  font-weight: var(--graisse-moyenne);
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-2);
+}
+
+.ligneJournal {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-6);
+  padding: var(--espace-6) 0;
+  border-top: var(--filet) solid var(--trait);
+}
+
+.ligneJournal:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.heureJournal {
+  font-family: var(--famille-mono);
+  font-size: var(--taille-mono);
+  color: var(--encre-3);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+.actionsPrisePassee {
+  display: grid;
+  gap: var(--espace-5);
+  margin-top: var(--espace-9);
+}
+
+.ligneJournalCliquable {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* --- Onboarding, 5 écrans (maquette 1o) ----------------------------------- */
+
+.progressionOnboarding {
+  display: flex;
+  gap: var(--espace-3);
+  margin-bottom: var(--espace-6);
+}
+
+.pointProgression {
+  flex: 1;
+  height: var(--espace-1);
+  border-radius: var(--rayon-jauge);
+  background: var(--surface-creux);
+}
+
+.pointProgressionFait {
+  background: var(--action);
+}
+
+.choixOnboarding {
+  display: grid;
+  gap: var(--espace-5);
+  margin-top: var(--espace-8);
+}
+
+/* --- Historique, mise en page « ruban » (maquette 2b) ---------------------
+   Même contenu que le journal, la date dans un rail de gauche : plus de jours
+   tiennent à l'écran. */
+
+.rubanJour {
+  display: grid;
+  grid-template-columns: var(--espace-14) 1fr;
+  gap: var(--espace-6);
+  align-items: start;
+  padding-top: var(--espace-5);
+  border-top: var(--filet) solid var(--trait);
+}
+
+.rubanDate {
+  display: grid;
+  justify-items: center;
+  gap: var(--espace-1);
+}
+
+.rubanNumero {
+  font-size: var(--taille-dose);
+  font-weight: var(--graisse-moyenne);
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-1);
+}
+
+.rubanJourSemaine {
+  font-size: var(--taille-jour);
+  text-transform: uppercase;
+  letter-spacing: var(--interlettrage-etiquette);
+  color: var(--encre-3);
+}
+
+.rubanEntrees {
+  display: grid;
+  gap: var(--espace-2);
+  min-width: 0;
+}
+
+/* --- Notice / RCP (maquette 1j) — intégralement en sérif ------------------- */
+
+.notice {
+  font-family: var(--famille-source);
+}
+
+.notice .titreEcran {
+  font-family: var(--famille-source);
+}
+
+.rubriquesNotice {
+  margin: var(--espace-5) 0 0;
+  padding-left: var(--espace-9);
+  display: grid;
+  gap: var(--espace-3);
+}

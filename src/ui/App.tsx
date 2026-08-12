@@ -18,6 +18,9 @@ import { BarreOnglets, EnTete } from './composants/chrome.js';
 import { COULEUR_ATC } from './tokens.js';
 import { Bouton, Carte, TitreEcran } from './composants/primitives.js';
 import { Aujourdhui } from './ecrans/Aujourdhui.js';
+import { Historique } from './ecrans/Historique.js';
+import { Notice } from './ecrans/Notice.js';
+import { PreparerSemaine } from './ecrans/PreparerSemaine.js';
 import { Saisie } from './ecrans/Saisie.js';
 import { Produits } from './ecrans/Produits.js';
 import { PilulierJourEcran, PilulierSemaineEcran } from './ecrans/Pilulier.js';
@@ -67,9 +70,9 @@ const PREMIER_NIVEAU: ReadonlySet<string> = new Set([
 ]);
 
 export function App(): ReactNode {
-  const { pret, secondOnglet, erreur, profilId, profilNom, demarrer, choisirProfil } = useMedco();
+  const { pret, secondOnglet, erreur, profilId, profilNom, saisieOuverte, ouvrirSaisie, fermerSaisie, demarrer, choisirProfil } =
+    useMedco();
   const [installation, setInstallation] = useState(etatInstallation);
-  const [saisieOuverte, setSaisieOuverte] = useState(false);
   const [verrou, setVerrou] = useState<{ configure: boolean; ouvert: boolean } | null>(null);
   const [dejaOuverte, setDejaOuverte] = useState(false);
   const naviguer = useNavigate();
@@ -162,8 +165,11 @@ export function App(): ReactNode {
 
       <Routes>
         <Route path="/" element={<Aujourdhui />} />
+        <Route path="/historique" element={<Historique />} />
         <Route path="/pilulier" element={<PilulierJourEcran />} />
         <Route path="/pilulier/semaine" element={<PilulierSemaineEcran />} />
+        <Route path="/pilulier/preparer" element={<PreparerSemaine />} />
+        <Route path="/notice/:cis" element={<Notice />} />
         <Route path="/produits" element={<Produits />} />
         <Route path="/produits/:produitId" element={<Produit />} />
         <Route path="/substances/:code" element={<Substance />} />
@@ -178,12 +184,12 @@ export function App(): ReactNode {
 
       <Saisie
         ouverte={saisieOuverte}
-        onFermer={() => setSaisieOuverte(false)}
+        onFermer={fermerSaisie}
         onAjouterProduit={() => naviguer('/produits')}
       />
       <BarreOnglets
         onSaisie={() => {
-          setSaisieOuverte(true);
+          ouvrirSaisie();
           // §11.4 — l'historique est géré explicitement, sans quoi le bouton
           // retour d'Android éjecte de l'application.
           naviguer('.', { replace: false });

@@ -103,10 +103,30 @@ for (const taille of LARGEURS) {
       await page.waitForTimeout(1000);
     }
   }
-  await page.waitForTimeout(3000);
+  // La création du profil et l'installation du catalogue prennent un temps
+  // variable. Attendre une durée fixe rendait le contrôle instable : il
+  // signalait des écrans « introuvables » alors qu'ils n'étaient pas encore
+  // montés. On attend la barre d'onglets, qui prouve que l'app est en place.
+  await page
+    .getByRole('link', { name: "Aujourd'hui" })
+    .first()
+    .waitFor({ state: 'visible', timeout: 60000 })
+    .catch(() => probleme.push(`l'application n'a jamais démarré @${taille.nom}px`));
 
   // 3. Écrans de l'application — navigation **interne**, sans rechargement.
   await capturer('03-aujourdhui');
+  // L'historique (maquette 2a) est un écran de détail, atteint depuis
+  // « Aujourd'hui » : c'est ce chemin-là qu'on emprunte.
+  const versHistorique = page.getByRole('link', { name: /historique/i }).first();
+  if (await versHistorique.count()) {
+    await versHistorique.click();
+    await capturer('03b-historique');
+    const retour = page.getByRole('button', { name: 'Retour' }).first();
+    if (await retour.count()) await retour.click();
+    else probleme.push(`pas de retour depuis l'historique @${taille.nom}px`);
+  } else {
+    probleme.push(`lien vers l'historique introuvable @${taille.nom}px`);
+  }
   for (const [nom, onglet] of [
     ['04-pilulier', 'Pilulier'],
     ['05-produits', 'Produits'],

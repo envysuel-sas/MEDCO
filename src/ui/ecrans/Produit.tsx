@@ -64,6 +64,11 @@ export function Produit(): ReactNode {
   return (
     <main className={styles['pileEcran']} style={{ paddingTop: 'var(--espace-10)' }}>
       <TitreEcran>{produit.nomAffiche}</TitreEcran>
+      {produit?.cis ? (
+        <Link className={styles['source']} to={`/notice/${produit.cis}`}>
+          Notice et RCP officiels →
+        </Link>
+      ) : null}
       {produit.cis ? <p className={styles['mono']}>CIS {produit.cis}</p> : null}
       {produit.element ? <p className={styles['meta']}>Élément : {produit.element}</p> : null}
 

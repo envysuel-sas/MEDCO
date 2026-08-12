@@ -28,7 +28,15 @@ export interface EtatMedco {
   readonly versionRegles: string;
   readonly signaux: readonly Signal[];
   readonly erreur: string | null;
+  /**
+   * Feuille de saisie. Portée par le store et non par `App` : l'état vide
+   * d'« Aujourd'hui » doit pouvoir l'ouvrir (maquette 1d), et il ne reçoit
+   * aucune propriété.
+   */
+  readonly saisieOuverte: boolean;
 
+  ouvrirSaisie(): void;
+  fermerSaisie(): void;
   demarrer(maintenant: Instant): Promise<void>;
   rafraichir(maintenant: Instant): Promise<void>;
   acquitter(signal: Signal, maintenant: Instant): Promise<void>;
@@ -52,6 +60,10 @@ export const useMedco = create<EtatMedco>((set, get) => ({
   versionRegles: '',
   signaux: [],
   erreur: null,
+  saisieOuverte: false,
+
+  ouvrirSaisie: () => set({ saisieOuverte: true }),
+  fermerSaisie: () => set({ saisieOuverte: false }),
 
   async demarrer(maintenant) {
     try {

@@ -174,8 +174,14 @@ function versProduit(l: Ligne): Produit {
     nomAffiche: texte(l, 'nom_affiche'),
     mode: texte(l, 'mode') as Mode,
     unite: texteOuNull(l, 'unite'),
+    stock: l['stock'] === null || l['stock'] === undefined ? null : nombre(l, 'stock'),
     classe: (texteOuNull(l, 'classe') ?? 'AUTRE') as Classe,
   };
+}
+
+/** Stock restant, saisi par l'aidant (maquette 1h). `null` = non suivi. */
+export function definirStock(produitId: string, stock: number | null): void {
+  base().exec({ sql: 'UPDATE produit SET stock = ?2 WHERE id = ?1', bind: [produitId, stock] });
 }
 
 // ---------------------------------------------------------------------------
@@ -310,6 +316,57 @@ export function annulerPrise(priseId: string): void {
   base().exec({ sql: "UPDATE prise SET statut = 'annulee' WHERE id = ?1", bind: [priseId] });
 }
 
+/**
+ * Retire définitivement une prise (maquette 2e, « Retirer cette prise »).
+ *
+ * La maquette est explicite sur l'effet attendu : « Le retrait recalcule le
+ * total du jour et la plaquette. Rien n'est conservé en double. » D'où une
+ * suppression, et non un simple changement de statut : les lignes de
+ * `prise_substance` et `prise_exclusion` partent en cascade.
+ */
+export function supprimerPrise(priseId: string): void {
+  base().exec({ sql: 'DELETE FROM prise WHERE id = ?1', bind: [priseId] });
+}
+
+/**
+ * Corrige l'heure ou la dose d'une prise déjà enregistrée (maquette 2e).
+ *
+ * ⚠ R1 — la décomposition en substances n'est **pas** recalculée ici. La prise
+ * est supprimée puis réenregistrée par `enregistrerPrise`, seul chemin qui sait
+ * choisir la ligne comptée par liaison. Refaire ce calcul à la main ouvrirait
+ * la porte au double comptage que R1 interdit.
+ *
+ * `saisie_le` est conservé : une prise ajoutée après coup le reste, même
+ * corrigée. C'est ce que la feuille 2e affiche — « ajoutée le 12 août à 08:40 ».
+ */
+export function corrigerPrise(
+  priseId: string,
+  changements: { readonly horodatage?: Instant; readonly dose?: number },
+): ResultatEnregistrement {
+  const [existante] = lire(
+    `SELECT id, profil_id, produit_id, occurrence_id, horodatage, fuseau, dose,
+            saisie_le, source
+     FROM prise WHERE id = ?1`,
+    [priseId],
+  );
+  if (!existante) throw new Error('Prise introuvable.');
+
+  const reprise: NouvellePrise = {
+    id: texte(existante, 'id'),
+    profilId: texte(existante, 'profil_id'),
+    produitId: texte(existante, 'produit_id'),
+    occurrenceId: texteOuNull(existante, 'occurrence_id'),
+    horodatage: changements.horodatage ?? texte(existante, 'horodatage'),
+    fuseau: texte(existante, 'fuseau'),
+    dose: changements.dose ?? nombre(existante, 'dose'),
+    saisieLe: texte(existante, 'saisie_le'),
+    source: texte(existante, 'source') as NouvellePrise['source'],
+  };
+
+  supprimerPrise(priseId);
+  return enregistrerPrise(reprise);
+}
+
 /** Prises d'un profil sur une période, décomposées, prêtes pour le domaine. */
 export function prisesAvecSubstances(
   profilId: string,
@@ -317,7 +374,7 @@ export function prisesAvecSubstances(
   fin: Instant,
 ): PriseAvecSubstances[] {
   const prises = lire(
-    `SELECT id, profil_id, produit_id, horodatage, fuseau, dose, statut
+    `SELECT id, profil_id, produit_id, horodatage, fuseau, dose, statut, saisie_le
      FROM prise
      WHERE profil_id = ?1 AND horodatage >= ?2 AND horodatage < ?3
      ORDER BY horodatage`,
@@ -352,6 +409,7 @@ export function prisesAvecSubstances(
     fuseau: texte(p, 'fuseau'),
     dose: nombre(p, 'dose'),
     statut: texte(p, 'statut') as 'prise' | 'annulee',
+    saisieLe: texte(p, 'saisie_le'),
     substances: parPrise.get(texte(p, 'id')) ?? [],
   }));
 }

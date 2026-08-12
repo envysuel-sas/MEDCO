@@ -97,6 +97,7 @@ function priseDepuisCatalogue(
       mode: options.mode ?? 'libre',
       element: options.element ?? null,
       unite: lignes.find((l) => l.comptee)?.unite ?? null,
+      stock: null,
       classe: classeSpecialite(cis),
     },
   };

@@ -78,11 +78,27 @@ L'app enregistre l'oubli, affiche l'heure prévue et l'heure réelle, renvoie à
 
 ### 3.1 V1
 
-Catalogue BDPM complet embarqué · recherche et ajout par nom ou scan · prises ponctuelles et planifiées · multi-profils · cumul par substance · Plaquette 30/90 j · Pilulier (plans, vue jour et semaine, validation groupée) · rappels push + calendrier · relevé PDF · hors ligne intégral.
+Catalogue BDPM complet embarqué · recherche et ajout par nom ou scan · prises ponctuelles et planifiées · multi-profils · cumul par substance · Plaquette 30/90 j · Pilulier (plans, vue jour et semaine, validation groupée) · **historique ligne à ligne, correction et retrait d'une prise passée** · **écran de l'aidant « Préparer la semaine » avec suivi de stock (§9.4)** · **renvoi à la notice et au RCP officiels (§10.3)** · rappels push + calendrier · relevé PDF · hors ligne intégral.
+
+> **Élargissement du 12/08/2026.** Trois entrées ont rejoint la V1 après coup,
+> sur décision du commanditaire : l'historique (maquettes 2a–2e), « Préparer la
+> semaine » (1h) et la notice (1j). Les deux dernières étaient dessinées dans la
+> maquette mais absentes de cette liste — la divergence est levée ici plutôt que
+> laissée à l'arbitrage de l'implémentation.
+>
+> Le **suivi de stock** entre en V1 par la même porte : « Préparer la semaine »
+> affiche « Stock : 12 cp » et signale un stock insuffisant, ce qui est
+> impossible sans le stocker. §3.2 le listait comme reporté ; il en sort, borné
+> à ce seul usage — ni péremption, ni réapprovisionnement.
+>
+> Le **texte** des notices reste hors périmètre : il n'est pas dans les fichiers
+> BDPM ingérés, et §3.2 disait déjà qu'« un lien vers la page officielle
+> suffit ». L'écran 1j affiche l'identité de la spécialité, le sommaire des
+> rubriques officielles, et ouvre la source. Il ne résume rien.
 
 ### 3.2 Reporté
 
-Notices RCP (lien vers la page officielle suffit) · parapharmacie et compléments · stock et péremption · photos · ordonnances · journal de symptômes · fiches d'hygiène de vie · synchronisation multi-appareils.
+**Texte** des notices et RCP — le lien vers la page officielle suffit, cf. §3.1 · parapharmacie et compléments · **péremption** et réapprovisionnement, le stock seul étant passé en V1 · photos · ordonnances · journal de symptômes · fiches d'hygiène de vie · synchronisation multi-appareils.
 
 ### 3.3 Hors périmètre définitif
 
