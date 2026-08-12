@@ -117,6 +117,7 @@ Le détail, lot par lot, avec les chiffres et la façon de les reproduire :
 ## Licence
 
 **Propriétaire, tous droits réservés** — [`LICENSE`](LICENSE).
+© 2026 Envysuel SAS, 78125 Saint-Hilarion, France.
 
 Le code est consultable ; ça ne vaut aucune concession de droits. Ni
 utilisation, ni copie, ni modification, ni distribution, ni hébergement d'une
