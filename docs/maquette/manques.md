@@ -174,7 +174,17 @@ Certains sachets sont dosés « pour 100 g de poudre » : la conversion est exac
 enregistrable, la mention « valeur dérivée » s'affiche. À arbitrer : faut-il
 plutôt les traiter comme non exploitables ?
 
-### 5.3 Fragmentation des sels sans fraction thérapeutique
+### 5.3 ZBar ne décode pas le Datamatrix
+
+La spec §4.1 et §13 proposent `zbar-wasm` comme repli sur Safari, où
+`BarcodeDetector` est absent. ZBar couvre les codes-barres linéaires et le QR,
+**pas** l'ECC 200 du Datamatrix GS1 des boîtes françaises.
+
+**Fait en attendant :** le repli est `@zxing/library`, qui embarque un
+`DataMatrixReader`, chargé à la demande pour rester hors du bundle initial.
+À confirmer.
+
+### 5.4 Fragmentation des sels sans fraction thérapeutique
 
 Quand la BDPM ne publie pas de ligne `FT`, deux sels d'une même molécule
 gardent deux codes distincts (naproxène / naproxène sodique, codéine /
