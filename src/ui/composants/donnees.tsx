@@ -479,3 +479,81 @@ export function LegendeAtc({ groupes }: { readonly groupes: readonly GroupeAtc[]
     </div>
   );
 }
+
+// --- Journal par jour (maquette 2a) ---------------------------------------------
+
+export interface LigneJournalAffichee {
+  readonly id: string;
+  readonly heure: string;
+  /** Couleur ATC de la substance dominante, déjà résolue par l'appelant. */
+  readonly couleur: string;
+  readonly titre: string;
+  readonly detail: string;
+  readonly ajouteeApresCoup: boolean;
+}
+
+/**
+ * Un jour porteur de prises : **une carte**, en-tête dedans.
+ *
+ * 2a pose la date à gauche et le total à droite, sur une bande, à l'intérieur
+ * de la carte. Sortir l'en-tête de la carte rompait le lien visuel entre le
+ * jour et ses lignes.
+ */
+export function JourJournal({
+  date,
+  total,
+  lignes,
+  onChoisir,
+}: {
+  readonly date: string;
+  readonly total: string;
+  readonly lignes: readonly LigneJournalAffichee[];
+  readonly onChoisir?: ((id: string) => void) | undefined;
+}): ReactNode {
+  return (
+    <section className={styles['jourJournal']}>
+      <header className={styles['enTeteJour']}>
+        <span className={styles['dateJour']}>{date}</span>
+        <span className={styles['totalJour']}>{total}</span>
+      </header>
+      {lignes.map((ligne) => (
+        <button
+          key={ligne.id}
+          type="button"
+          className={styles['ligneJournal']}
+          onClick={() => onChoisir?.(ligne.id)}
+        >
+          <span className={styles['heureJournal']}>{ligne.heure}</span>
+          <span className={styles['pastilleJournal']} style={{ background: ligne.couleur }} />
+          <span className={styles['corpsJournal']}>
+            <span className={styles['ligneTitre']}>{ligne.titre}</span>
+            <span className={styles['ligneDetail']}>{ligne.detail}</span>
+            {/* La maquette l'exige : une prise ajoutée après coup est marquée —
+                par un marqueur encadré, non par du texte accolé au dosage, où
+                il se noyait. */}
+            {ligne.ajouteeApresCoup ? (
+              <span className={styles['marqueurApresCoup']}>ajoutée après coup</span>
+            ) : null}
+          </span>
+        </button>
+      ))}
+    </section>
+  );
+}
+
+/**
+ * Un jour sans prise : **une ligne**, pas une section.
+ *
+ * « Les jours sans prise sont écrits » — mais trente en-têtes de section
+ * suivis d'un paragraphe transformaient un mois calme en mur de « Aucune
+ * prise. », où plus rien ne se lisait. L'information devenait le vide qu'elle
+ * devait empêcher.
+ */
+export function JourSansPrise({ date }: { readonly date: string }): ReactNode {
+  return (
+    <div className={styles['jourVide']}>
+      <span className={styles['dateJourVide']}>{date}</span>
+      <span className={styles['mentionJourVide']}>Aucune prise</span>
+    </div>
+  );
+}

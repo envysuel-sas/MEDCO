@@ -85,7 +85,7 @@ c'est le sixième contrôle bloquant.
 
 | Fichier | Tests |
 |---|---|
-| `domain/__tests__/domaine.test.ts` | 74 |
+| `domain/__tests__/domaine.test.ts` | 78 |
 | `db/__tests__/verrou.test.ts` | 12 |
 | `domain/__tests__/golden.test.ts` | 45 |
 | `services/__tests__/ics.test.ts` | 15 |
@@ -361,9 +361,16 @@ Trois parcours sont rejouables à la demande, tous **calés sur `Europe/Paris`**
 
 | Commande | Ce qu'elle prouve |
 |---|---|
-| `pnpm verifier:ui` | aucun débordement horizontal ni erreur JS, à 320, 390, 768 et 1280 px |
+| `pnpm verifier:ui` | aucun débordement horizontal ni erreur JS, à 320, 390, 768 et 1280 px, **carnet peuplé** |
 | `pnpm verifier:prise` | une prise enregistrée apparaît sans rechargement, et survit à un rechargement |
 | `pnpm verifier:sauvegarde` | l'archive sort du téléphone, l'appareil s'efface, le carnet revient intact |
+
+⚠ `verifier:ui` parcourait les écrans sur un carnet **vide** : chacun ne
+rendait que son état vide, et un défaut de rendu dans une liste de prises
+passait inaperçu. C'est ainsi qu'un historique qui levait dès qu'un jour
+portait une prise a pu être livré — `totauxDuJour` neutralisait la fenêtre du
+cumul en la vidant, `epoch('')` levait, et l'écran entier tombait. Le parcours
+ajoute désormais un produit et deux prises avant de commencer.
 
 Le fuseau n'est pas décoratif. Deux défauts de restitution — une borne de fenêtre
 écrite en UTC face à des horodatages à offset local, et une prise tombant sur la

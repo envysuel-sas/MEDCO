@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 
 import { classeSpecialite, compositionDe, nomSpecialite, substance } from './catalogue-reel.js';
 import {
+  cumulDePrises,
   cumulParSubstance,
   elementsDe,
   joursDePrise,
@@ -758,5 +759,49 @@ describe('fenetreVivante', () => {
     const maintenant = '2026-08-12T19:48:32+02:00';
     const veille = { ...PRISE, horodatage: '2026-08-11T19:48:32+02:00' };
     expect(cumulParSubstance([veille], fenetreVivante(maintenant, 'PT24H', PARIS)).size).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Régression : un total sans fenêtre ne doit pas emprunter une fenêtre factice
+// ---------------------------------------------------------------------------
+
+describe('cumulDePrises', () => {
+  const base: PriseAvecSubstances = {
+    id: 'p1',
+    profilId: 'a',
+    produitId: 'x',
+    horodatage: '2026-08-12T08:00:00+02:00',
+    fuseau: PARIS,
+    dose: 1,
+    statut: 'prise',
+    substances: [{ code: 'PARA', quantiteMg: 1000, fiabilite: 2, classe: 'ANTALGIQUE_SIMPLE' }],
+  };
+
+  it('additionne l’ensemble qu’on lui donne, sans le filtrer par le temps', () => {
+    // Deux prises à trois mois d'écart : aucune fenêtre ne les réunirait.
+    const ancienne = { ...base, id: 'p0', horodatage: '2026-05-12T08:00:00+02:00' };
+    const cumul = cumulDePrises([ancienne, base]);
+    expect(cumul.get('PARA')).toEqual({ mg: 2000, fiabiliteMin: 2, nbPrises: 2 });
+  });
+
+  it('ne compte pas une prise annulée', () => {
+    expect(cumulDePrises([{ ...base, statut: 'annulee' }]).size).toBe(0);
+  });
+
+  it('retient la fiabilité la plus basse de l’ensemble', () => {
+    const douteuse: PriseAvecSubstances = {
+      ...base,
+      id: 'p2',
+      substances: [{ code: 'PARA', quantiteMg: 500, fiabilite: 1, classe: 'ANTALGIQUE_SIMPLE' }],
+    };
+    expect(cumulDePrises([base, douteuse]).get('PARA')?.fiabiliteMin).toBe(1);
+  });
+
+  it('rend un cumul vide sans lever, là où une fenêtre factice levait', () => {
+    expect(cumulDePrises([]).size).toBe(0);
+    // Ce que faisait l’historique : neutraliser la fenêtre en la vidant.
+    // `epoch('')` lève, et l’écran entier tombait avec.
+    expect(() => cumulParSubstance([base], { debut: '', fin: '' })).toThrow(/Instant illisible/);
   });
 });

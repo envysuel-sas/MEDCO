@@ -34,6 +34,8 @@ import {
   JaugeLineaire,
   LegendeAtc,
   LigneResultat,
+  JourJournal,
+  JourSansPrise,
   ListePrises,
   PastilleAtc,
   Plaquette,
@@ -347,6 +349,56 @@ export function KitchenSink(): ReactNode {
         <Carte>
           <ListePrises prises={[]} />
         </Carte>
+      </Bloc>
+
+      <Bloc titre="Journal par jour (2a)">
+        <JourJournal
+          date="Aujourd'hui · mer. 12 août"
+          total="2 000 mg"
+          lignes={[
+            {
+              id: 'j1',
+              heure: '14:30',
+              couleur: couleurSubstance('N', '02202'),
+              titre: 'Doliprane 1000 mg',
+              detail: 'paracétamol 1 000 mg · 1 cp',
+              ajouteeApresCoup: false,
+            },
+            {
+              id: 'j2',
+              heure: '08:12',
+              couleur: couleurSubstance('N', '02202'),
+              titre: 'Doliprane 1000 mg',
+              detail: 'paracétamol 1 000 mg · 1 cp',
+              ajouteeApresCoup: false,
+            },
+          ]}
+        />
+        {/* Deux substances dans la même journée, et une prise marquée. */}
+        <JourJournal
+          date="Hier · mar. 11 août"
+          total="1 000 mg · 400 mg"
+          lignes={[
+            {
+              id: 'j3',
+              heure: '21:30',
+              couleur: couleurSubstance('N', '02202'),
+              titre: 'Doliprane 1000 mg',
+              detail: 'paracétamol 1 000 mg · 1 cp',
+              ajouteeApresCoup: true,
+            },
+            {
+              id: 'j4',
+              heure: '09:05',
+              couleur: couleurSubstance('M', '02092'),
+              titre: 'Advil 400 mg',
+              detail: 'ibuprofène 400 mg · 1 cp',
+              ajouteeApresCoup: false,
+            },
+          ]}
+        />
+        <JourSansPrise date="Lun. 10 août" />
+        <JourSansPrise date="Dim. 9 août" />
       </Bloc>
 
       <Bloc titre="Produits">
