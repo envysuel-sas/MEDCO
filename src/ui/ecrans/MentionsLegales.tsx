@@ -8,9 +8,8 @@
  * (`TitreEcran`, `Carte`, `Etiquette`), sans motif visuel nouveau. Consigné
  * dans `docs/maquette/manques.md` §2.9.
  *
- * ⚠ Aucune valeur n'est inventée ici. Les champs vérifiés viennent du registre
- * national des entreprises ; **un champ vide n'est pas affiché** plutôt que de
- * porter une valeur plausible. Voir `IDENTITE` ci-dessous.
+ * ⚠ Aucune valeur n'est inventée ici : voir les sources en tête d'`IDENTITE`.
+ * Un champ non vérifié reste vide, et un champ vide n'est pas rendu.
  */
 
 import type { ReactNode } from 'react';
@@ -21,34 +20,39 @@ import styles from '../composants/composants.module.css';
 /**
  * Identité de l'éditeur.
  *
- * Source des valeurs renseignées : registre national des entreprises,
- * `recherche-entreprises.api.gouv.fr`, consulté le 12/08/2026.
+ * Double source, concordante, au 12/08/2026 :
+ *  · registre national des entreprises (`recherche-entreprises.api.gouv.fr`)
+ *    — raison sociale, forme, SIREN, SIRET, siège, APE, président ;
+ *  · mentions légales publiées sur envysuel.fr — capital social et TVA.
  *
- * ⚠ `capitalSocial` et `tvaIntracommunautaire` sont **vides et le restent**
- * tant qu'ils n'ont pas été confirmés :
+ * Le numéro de TVA publié coïncide avec celui que produit l'algorithme
+ * officiel appliqué au SIREN (clé 75), ce qui le corrobore.
  *
- *  · le capital social ne figure pas au registre consulté. Il est exigé par
- *    la LCEN : à relever sur le Kbis ;
- *  · le numéro de TVA se calcule depuis le SIREN, mais n'est dû que si la
- *    société est assujettie — ce qui n'a pas été vérifié.
+ * Ville du greffe confirmée par le Titulaire.
  *
- * Une ligne vide n'est pas rendue. Mieux vaut une mention incomplète qu'une
- * mention fausse.
+ * ⚠ Aucune valeur n'est inventée ici, et `Ligne` ne rend rien quand la valeur
+ * est vide : une mention incomplète vaut mieux qu'une mention fausse.
  */
 const IDENTITE = {
   raisonSociale: 'ENVYSUEL',
   formeJuridique: 'Société par actions simplifiée (SAS)',
-  capitalSocial: '',
+  capitalSocial: '100,00 €',
   siren: '977 452 531',
   siret: '977 452 531 00022',
   rcs: 'R.C.S. Versailles 977 452 531',
-  tvaIntracommunautaire: '',
+  tvaIntracommunautaire: 'FR75 977 452 531',
   ape: '62.01Z — programmation informatique',
   adresse: '184 route de Rambouillet, 78125 Saint-Hilarion, France',
   directeurPublication: 'Robin Deboves, président',
+  contact: 'info@envysuel.fr',
 } as const;
 
-/** GitHub Pages sert l'application. L'hébergeur doit être nommé (LCEN 6-III). */
+/**
+ * GitHub Pages sert l'application. L'hébergeur doit être nommé (LCEN 6-III).
+ *
+ * ⚠ Ce n'est **pas** l'hébergeur d'envysuel.fr, qui est Hostinger : ce sont
+ * deux services distincts, et c'est celui qui sert Medco qui doit figurer ici.
+ */
 const HEBERGEUR = {
   nom: 'GitHub, Inc.',
   adresse: '88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis',
@@ -85,6 +89,7 @@ export function MentionsLegales(): ReactNode {
         <Ligne intitule="TVA intracommunautaire" valeur={IDENTITE.tvaIntracommunautaire} />
         <Ligne intitule="Code APE" valeur={IDENTITE.ape} />
         <Ligne intitule="Directeur de la publication" valeur={IDENTITE.directeurPublication} />
+        <Ligne intitule="Contact" valeur={IDENTITE.contact} />
       </Carte>
 
       <Carte>

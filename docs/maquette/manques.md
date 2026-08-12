@@ -158,16 +158,17 @@ l'éditeur et de l'hébergeur.
 **Fait en attendant :** recomposé avec `TitreEcran`, `Carte` et `Etiquette`,
 aucun composant ni motif visuel nouveau.
 
-Deux champs restent **vides et non affichés**, faute d'avoir été vérifiés :
+L'identité est complète et corroborée par deux sources concordantes : le
+registre national des entreprises et les mentions légales publiées sur
+envysuel.fr. Le numéro de TVA publié coïncide avec celui que produit
+l'algorithme officiel appliqué au SIREN — les deux sources se confirment.
 
-| Champ | Pourquoi |
-|---|---|
-| Capital social | absent du registre national des entreprises ; exigé par la LCEN, à relever sur le Kbis |
-| TVA intracommunautaire | se calcule depuis le SIREN, mais n'est dû que si la société est assujettie — non vérifié |
+Le mécanisme reste en place pour la suite : `Ligne` ne rend rien quand la
+valeur est vide, de sorte qu'un champ futur non vérifié ne pourra pas être
+comblé par une valeur plausible.
 
-Une ligne vide n'est pas rendue : mieux vaut une mention incomplète qu'une
-mention fausse. La ville du greffe (`R.C.S. Versailles`) découle de la
-compétence territoriale des Yvelines et demande confirmation sur le Kbis.
+⚠ L'hébergeur déclaré ici est **GitHub**, pas celui d'envysuel.fr (Hostinger) :
+deux services distincts, et c'est celui qui sert Medco qui doit figurer.
 
 ### 2.10 [KitchenSink] — Écran non dessiné, par nature
 
