@@ -908,30 +908,93 @@
   flex-wrap: wrap;
 }
 
-.jourHistorique {
-  display: grid;
-  gap: var(--espace-5);
+/* --- Journal par jour (maquette 2a) ---------------------------------------- */
+/* Un jour est **une carte**. L'en-tête — date à gauche, total à droite — vit
+   dedans, sur une bande. Le sortir de la carte, comme c'était le cas, cassait
+   le lien visuel entre le jour et ses lignes. */
+
+.jourJournal {
+  background: var(--surface-1);
+  border: var(--filet) solid var(--trait);
+  border-radius: var(--rayon-carte);
+  overflow: hidden;
+}
+
+.enTeteJour {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-4);
+  padding: var(--espace-ligne-journal) var(--espace-8);
+  background: var(--surface-active);
+}
+
+.dateJour {
+  font-size: var(--taille-chip);
+  line-height: var(--interligne-chip);
+  font-weight: var(--graisse-forte);
+  color: var(--encre-1);
 }
 
 .totalJour {
-  font-size: var(--taille-liste);
-  line-height: var(--interligne-liste);
+  font-size: var(--taille-chip);
+  line-height: var(--interligne-chip);
   font-weight: var(--graisse-moyenne);
   font-variant-numeric: tabular-nums;
   color: var(--encre-2);
+}
+
+/* Un jour sans prise tient sur **une ligne**, dans la même carte compacte :
+   « aucune prise » est une information, pas un vide — mais trente sections à
+   pleine hauteur transforment l'information en mur. */
+
+.jourVide {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-4);
+  padding: var(--espace-ligne-journal) var(--espace-8);
+  background: var(--surface-1);
+  border: var(--filet) solid var(--trait);
+  border-radius: var(--rayon-carte);
+}
+
+.dateJourVide {
+  font-size: var(--taille-chip);
+  line-height: var(--interligne-chip);
+  font-weight: var(--graisse-forte);
+  color: var(--encre-3);
+}
+
+.mentionJourVide {
+  font-size: var(--taille-chip);
+  line-height: var(--interligne-chip);
+  color: var(--encre-3);
+}
+
+/* Pastille portée par une puce de filtre (2a) : plus petite que celle des
+   lignes, et alignée sur le texte plutôt que sur son sommet. */
+.pastilleChip {
+  width: var(--cote-pastille-chip);
+  height: var(--cote-pastille-chip);
+  border-radius: var(--rayon-pastille);
+  flex: none;
 }
 
 .ligneJournal {
   display: flex;
   align-items: flex-start;
   gap: var(--espace-6);
-  padding: var(--espace-6) 0;
-  border-top: var(--filet) solid var(--trait);
-}
-
-.ligneJournal:first-child {
-  border-top: 0;
-  padding-top: 0;
+  padding: var(--espace-ligne-journal) var(--espace-8);
+  border-top: var(--filet) solid var(--surface-creux);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border-inline: 0;
+  border-bottom: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 }
 
 .heureJournal {
@@ -940,6 +1003,34 @@
   color: var(--encre-3);
   font-variant-numeric: tabular-nums;
   flex: none;
+  width: var(--largeur-heure-journal);
+  padding-top: var(--espace-1);
+}
+
+.pastilleJournal {
+  width: var(--cote-pastille-journal);
+  height: var(--cote-pastille-journal);
+  border-radius: var(--rayon-pastille);
+  flex: none;
+  margin-top: var(--espace-3);
+}
+
+.corpsJournal {
+  flex: 1;
+  min-width: 0;
+}
+
+/* La maquette l'exige : une prise ajoutée après coup est marquée — et par un
+   marqueur encadré, pas par du texte accolé au dosage, qui s'y noyait. */
+.marqueurApresCoup {
+  display: inline-block;
+  margin-top: var(--espace-3);
+  padding: var(--espace-1) var(--espace-3);
+  border: var(--filet) solid var(--trait-marque);
+  border-radius: var(--rayon-marqueur);
+  font-size: var(--taille-mono-mini);
+  font-weight: var(--graisse-moyenne);
+  color: var(--encre-3);
 }
 
 .actionsPrisePassee {
@@ -948,15 +1039,6 @@
   margin-top: var(--espace-9);
 }
 
-.ligneJournalCliquable {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
 
 /* --- Onboarding, 5 écrans (maquette 1o) ----------------------------------- */
 
@@ -981,45 +1063,6 @@
   display: grid;
   gap: var(--espace-5);
   margin-top: var(--espace-8);
-}
-
-/* --- Historique, mise en page « ruban » (maquette 2b) ---------------------
-   Même contenu que le journal, la date dans un rail de gauche : plus de jours
-   tiennent à l'écran. */
-
-.rubanJour {
-  display: grid;
-  grid-template-columns: var(--espace-14) 1fr;
-  gap: var(--espace-6);
-  align-items: start;
-  padding-top: var(--espace-5);
-  border-top: var(--filet) solid var(--trait);
-}
-
-.rubanDate {
-  display: grid;
-  justify-items: center;
-  gap: var(--espace-1);
-}
-
-.rubanNumero {
-  font-size: var(--taille-dose);
-  font-weight: var(--graisse-moyenne);
-  font-variant-numeric: tabular-nums;
-  color: var(--encre-1);
-}
-
-.rubanJourSemaine {
-  font-size: var(--taille-jour);
-  text-transform: uppercase;
-  letter-spacing: var(--interlettrage-etiquette);
-  color: var(--encre-3);
-}
-
-.rubanEntrees {
-  display: grid;
-  gap: var(--espace-2);
-  min-width: 0;
 }
 
 /* --- Notice / RCP (maquette 1j) — intégralement en sérif ------------------- */

@@ -7,20 +7,22 @@
  *     été pris. L'historique est la lecture ligne à ligne : jour, heure,
  *     produit, dose. »
  *
- * ⚠ Règle explicite, et facile à trahir par omission :
+ * ⚠ Règle explicite, et facile à trahir dans les deux sens :
  *
  *   « Les jours sans prise sont écrits. Un trou dans une liste se lit comme un
  *     oubli de saisie ; "aucune prise" est une information, pas un vide. »
  *
- * Un jour sans prise n'est donc **jamais** sauté.
+ * Un jour sans prise n'est donc jamais sauté — mais il tient sur **une ligne**,
+ * comme 2a le dessine. Lui donner un en-tête de section et un paragraphe
+ * transformait vingt-neuf jours calmes en mur de « Aucune prise. », où plus
+ * rien ne se lisait : l'information devenait le vide qu'elle devait empêcher.
  *
- * ⚠ La maquette ne tranche pas entre journal (2a) et ruban (2b) : « Deux mises
- * en page à trancher », et elle livre les deux — exactement comme pour le rayon
- * d'alvéole. Les deux sont donc implémentées et permutables, plutôt que d'en
- * choisir une à sa place. Consigné dans `docs/maquette/manques.md` §1.6.
- *
- * Le ruban porte « le même contenu, plus de jours à l'écran » : la date passe
- * dans un rail de gauche au lieu d'un en-tête de section.
+ * ⚠ La maquette pose la question « journal (2a) ou ruban (2b) » et ne la
+ * tranche pas. 2a est retenu : c'est celle qu'elle dessine en entier, et la
+ * seule dont chaque valeur soit lisible. Le sélecteur qui permettait de
+ * basculer entre les deux n'existait dans aucune des deux — c'était un motif
+ * ajouté, et il empilait deux rangées de puces en tête d'écran. Consigné dans
+ * `docs/maquette/manques.md` §1.6.
  *
  * ⚠ §12.1 — aucun rouge, aucun pourcentage, aucune conclusion. Le total du
  * jour est un fait posé à droite, rien de plus.
@@ -29,27 +31,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { cumulParSubstance } from '../../domain/cumul.js';
+import { cumulDePrises } from '../../domain/cumul.js';
 import { baseDeDonnees } from '../../db/client.js';
 import { jourLocal } from '../../domain/temps.js';
 import type { CodeSubstance, PriseAvecSubstances, Produit, Substance } from '../../domain/types.js';
 import { maintenant } from '../App.js';
 import { useMedco } from '../etat.js';
 import { couleurSubstance } from '../tokens.js';
-import { Carte, Chip, Etiquette, TitreEcran } from '../composants/primitives.js';
+import { Bouton, Chip, TitreEcran } from '../composants/primitives.js';
+import { JourJournal, JourSansPrise } from '../composants/donnees.js';
+import type { LigneJournalAffichee } from '../composants/donnees.js';
 import { PrisePassee } from '../composants/PrisePassee.js';
 import styles from '../composants/composants.module.css';
 
-/** Fenêtre lue par le journal. La Plaquette en couvre 30 ; le journal va plus loin. */
+/** Fenêtre lue par le journal. La Plaquette en couvre 30 ; le journal l'égale. */
 const JOURS_AFFICHES = 30;
 
 export function Historique(): ReactNode {
-  const { prises, produits, profilNom, rafraichir } = useMedco();
+  const { prises, produits, profilNom, rafraichir, ouvrirSaisie } = useMedco();
   const [filtre, setFiltre] = useState<CodeSubstance | null>(null);
   const [substances, setSubstances] = useState<ReadonlyMap<CodeSubstance, Substance>>(new Map());
   // Maquette 2e — toute prise du journal est corrigeable ou retirable.
   const [ouverte, setOuverte] = useState<string | null>(null);
-  const [miseEnPage, setMiseEnPage] = useState<'journal' | 'ruban'>('journal');
   const instant = maintenant();
 
   const codes = useMemo(
@@ -107,18 +110,11 @@ export function Historique(): ReactNode {
 
   return (
     <main className={styles['pileEcran']} style={{ paddingTop: 'var(--espace-10)' }}>
-      <TitreEcran>Historique</TitreEcran>
-      <p className={styles['meta']}>
-        {profilNom || 'Profil'} · {moisEnCours(instant)}
-      </p>
-
-      <div className={styles['filtresHistorique']}>
-        <Chip actif={miseEnPage === 'journal'} onClick={() => setMiseEnPage('journal')}>
-          Journal
-        </Chip>
-        <Chip actif={miseEnPage === 'ruban'} onClick={() => setMiseEnPage('ruban')}>
-          Ruban
-        </Chip>
+      <div>
+        <TitreEcran>Historique</TitreEcran>
+        <p className={styles['meta']}>
+          {profilNom || 'Profil'} · {moisEnCours(instant)}
+        </p>
       </div>
 
       {presentes.length > 0 ? (
@@ -128,6 +124,14 @@ export function Historique(): ReactNode {
           </Chip>
           {presentes.map(([code, nom]) => (
             <Chip key={code} actif={filtre === code} onClick={() => setFiltre(code)}>
+              {/* 2a — la puce porte la couleur ATC de sa substance : sans elle,
+                  le filtre ne se relie pas aux pastilles des lignes. */}
+              <span
+                className={styles['pastilleChip']}
+                style={{
+                  background: couleurSubstance(substances.get(code)?.groupeAtc ?? '_', code),
+                }}
+              />
               {nom.toLowerCase()}
             </Chip>
           ))}
@@ -136,74 +140,32 @@ export function Historique(): ReactNode {
 
       {jours.map((jour) => {
         const duJour = parJour.get(jour) ?? [];
-        const lignes = [...duJour].sort((a, b) => b.horodatage.localeCompare(a.horodatage));
+        const date = libelleJour(jour, instant);
 
-        // 2b — même contenu, la date dans un rail de gauche.
-        if (miseEnPage === 'ruban') {
-          return (
-            <section key={jour} className={styles['rubanJour']}>
-              <div className={styles['rubanDate']}>
-                <span className={styles['rubanNumero']}>{jour.slice(8, 10)}</span>
-                <span className={styles['rubanJourSemaine']}>{jourSemaine(jour)}</span>
-              </div>
-              <div className={styles['rubanEntrees']}>
-                {lignes.length === 0 ? (
-                  <p className={styles['meta']}>Aucune prise</p>
-                ) : (
-                  lignes.map((prise) => (
-                    <button
-                      key={prise.id}
-                      type="button"
-                      className={styles['ligneJournalCliquable']}
-                      onClick={() => setOuverte(prise.id)}
-                    >
-                      <LigneJournal
-                        prise={prise}
-                        produit={produitsParId.get(prise.produitId)}
-                        substances={substances}
-                      />
-                    </button>
-                  ))
-                )}
-              </div>
-            </section>
-          );
-        }
-
-        return (
-          <section key={jour} className={styles['jourHistorique']}>
-            <header className={styles['entreDeux']}>
-              <Etiquette>{libelleJour(jour, instant)}</Etiquette>
-              <span className={styles['totalJour']}>{totauxDuJour(duJour)}</span>
-            </header>
-
-            {duJour.length === 0 ? (
-              // « Les jours sans prise sont écrits » — un vide se lirait comme
-              // un oubli de saisie.
-              <p className={styles['meta']}>Aucune prise.</p>
-            ) : (
-              <Carte>
-                {[...duJour]
-                  .sort((a, b) => b.horodatage.localeCompare(a.horodatage))
-                  .map((prise) => (
-                    <button
-                      key={prise.id}
-                      type="button"
-                      className={styles['ligneJournalCliquable']}
-                      onClick={() => setOuverte(prise.id)}
-                    >
-                      <LigneJournal
-                        prise={prise}
-                        produit={produitsParId.get(prise.produitId)}
-                        substances={substances}
-                      />
-                    </button>
-                  ))}
-              </Carte>
-            )}
-          </section>
+        return duJour.length === 0 ? (
+          <JourSansPrise key={jour} date={date} />
+        ) : (
+          <JourJournal
+            key={jour}
+            date={date}
+            total={totauxDuJour(duJour)}
+            lignes={[...duJour]
+              .sort((a, b) => b.horodatage.localeCompare(a.horodatage))
+              .map((prise) => ligneAffichee(prise, produitsParId.get(prise.produitId), substances))}
+            onChoisir={setOuverte}
+          />
         );
       })}
+
+      <Bouton variante="secondaire" pleineLargeur onClick={ouvrirSaisie}>
+        + Ajouter une prise antérieure
+      </Bouton>
+
+      {/* Mot pour mot dans 2a : la méthode est dite, aucune conclusion ne l'est. */}
+      <p className={styles['meta']}>
+        Le total du jour additionne les doses d&apos;une même substance. Aucune moyenne, aucune
+        série, aucun classement des journées entre elles.
+      </p>
 
       <PrisePassee
         prise={prises.find((p) => p.id === ouverte) ?? null}
@@ -217,40 +179,30 @@ export function Historique(): ReactNode {
   );
 }
 
-function LigneJournal({
-  prise,
-  produit,
-  substances,
-}: {
-  readonly prise: PriseAvecSubstances;
-  readonly produit: Produit | undefined;
-  readonly substances: ReadonlyMap<CodeSubstance, Substance>;
-}): ReactNode {
+/** Projette une prise vers ce que le journal en affiche (maquette 2a). */
+function ligneAffichee(
+  prise: PriseAvecSubstances,
+  produit: Produit | undefined,
+  substances: ReadonlyMap<CodeSubstance, Substance>,
+): LigneJournalAffichee {
   const dominante = [...prise.substances].sort((a, b) => b.quantiteMg - a.quantiteMg)[0];
   const substance = dominante ? substances.get(dominante.code) : undefined;
-  const groupe = substance?.groupeAtc ?? '_';
 
-  return (
-    <div className={styles['ligneJournal']}>
-      <span className={styles['heureJournal']}>{heure(prise.horodatage)}</span>
-      <span
-        className={styles['pastille']}
-        style={{ background: couleurSubstance(groupe, dominante?.code ?? '') }}
-      />
-      <span>
-        <span className={styles['ligneTitre']}>{produit?.nomAffiche ?? 'Produit retiré'}</span>
-        <span className={styles['ligneDetail']}>
-          {dominante && substance
-            ? `${substance.nom.toLowerCase()} ${formaterMg(dominante.quantiteMg)}`
-            : 'dosage non exploitable'}
-          {` · ${prise.dose} ${produit?.unite ?? 'dose'}`}
-          {/* La maquette l'exige : une prise ajoutée après coup est marquée. */}
-          {ajouteeApresCoup(prise) ? ' · ajoutée après coup' : ''}
-          {prise.statut === 'annulee' ? ' · annulée' : ''}
-        </span>
-      </span>
-    </div>
-  );
+  const dosage =
+    dominante && substance
+      ? `${substance.nom.toLowerCase()} ${formaterMg(dominante.quantiteMg)}`
+      : 'dosage non exploitable';
+
+  return {
+    id: prise.id,
+    heure: heure(prise.horodatage),
+    couleur: couleurSubstance(substance?.groupeAtc ?? '_', dominante?.code ?? ''),
+    titre: produit?.nomAffiche ?? 'Produit retiré',
+    detail: `${dosage} · ${prise.dose} ${produit?.unite ?? 'dose'}${
+      prise.statut === 'annulee' ? ' · annulée' : ''
+    }`,
+    ajouteeApresCoup: ajouteeApresCoup(prise),
+  };
 }
 
 /**
@@ -269,40 +221,45 @@ function ajouteeApresCoup(prise: PriseAvecSubstances): boolean {
 
 /** Total du jour, par substance, posé à droite de l'en-tête (maquette 2a). */
 function totauxDuJour(duJour: readonly PriseAvecSubstances[]): string {
-  if (duJour.length === 0) return '';
-  const cumul = cumulParSubstance(duJour, { debut: '', fin: '' });
-  const totaux = [...cumul.values()]
+  return [...cumulDePrises(duJour).values()]
     .filter((entree) => entree.mg > 0)
     .sort((a, b) => b.mg - a.mg)
-    .map((entree) => formaterMg(entree.mg));
-  return totaux.join(' · ');
+    .map((entree) => formaterMg(entree.mg))
+    .join(' · ');
 }
 
+/**
+ * ⚠ En milligrammes, toujours. 2a écrit « 2 000 mg », « 3 000 mg »,
+ * « 1 000 mg · 400 mg » — jamais de conversion en grammes. Un total qui change
+ * d'unité selon sa valeur ne se compare plus d'un jour à l'autre d'un coup
+ * d'œil, ce qui est précisément l'usage de cette colonne.
+ */
 function formaterMg(mg: number): string {
-  return mg >= 1000
-    ? `${(mg / 1000).toLocaleString('fr-FR')} g`
-    : `${Math.round(mg).toLocaleString('fr-FR')} mg`;
+  return `${Math.round(mg).toLocaleString('fr-FR')} mg`;
 }
 
 function heure(horodatage: string): string {
   return horodatage.slice(11, 16);
 }
 
-/** Les `JOURS_AFFICHES` derniers jours, du plus récent au plus ancien. */
+/**
+ * Les `JOURS_AFFICHES` derniers jours, du plus récent au plus ancien.
+ *
+ * ⚠ Ancré à midi UTC, jamais à minuit : minuit est à un cheveu de la veille
+ * pour tout fuseau négatif, et la liste sautait un jour.
+ */
 function joursDescendants(instant: string, combien: number): string[] {
-  const jours: string[] = [];
-  const depart = new Date(instant.slice(0, 10));
-  for (let recul = 0; recul < combien; recul += 1) {
-    const jour = new Date(depart);
-    jour.setDate(depart.getDate() - recul);
-    jours.push(jour.toISOString().slice(0, 10));
-  }
-  return jours;
+  const depart = Date.parse(`${instant.slice(0, 10)}T12:00:00Z`);
+  return Array.from({ length: combien }, (_, recul) =>
+    new Date(depart - recul * 86_400_000).toISOString().slice(0, 10),
+  );
 }
 
 function libelleJour(jour: string, instant: string): string {
   const aujourdhui = instant.slice(0, 10);
-  const hier = new Date(new Date(aujourdhui).getTime() - 86_400_000).toISOString().slice(0, 10);
+  const hier = new Date(Date.parse(`${aujourdhui}T12:00:00Z`) - 86_400_000)
+    .toISOString()
+    .slice(0, 10);
   const date = new Date(`${jour}T12:00:00Z`).toLocaleDateString('fr-FR', {
     weekday: 'short',
     day: 'numeric',
@@ -311,14 +268,7 @@ function libelleJour(jour: string, instant: string): string {
   });
   if (jour === aujourdhui) return `Aujourd'hui · ${date}`;
   if (jour === hier) return `Hier · ${date}`;
-  return date;
-}
-
-/** Abréviation du jour de la semaine, pour le rail du ruban (2b). */
-function jourSemaine(jour: string): string {
-  return new Date(`${jour}T12:00:00Z`)
-    .toLocaleDateString('fr-FR', { weekday: 'short', timeZone: 'UTC' })
-    .replace('.', '');
+  return date.charAt(0).toUpperCase() + date.slice(1);
 }
 
 function moisEnCours(instant: string): string {

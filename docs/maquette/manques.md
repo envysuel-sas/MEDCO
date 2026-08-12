@@ -115,11 +115,23 @@ La maquette pose la question elle-même (« À trancher, 3 · Rayon de l'alvéol
 Elle l'écrit : « Deux mises en page à trancher — journal (2a) ou ruban (2b) »,
 et livre les deux, exactement comme pour le rayon d'alvéole.
 
-**Fait en attendant :** les **deux** sont implémentées et permutables par un
-sélecteur en tête d'écran — journal (2a) par défaut, ruban (2b) au choix. La
-maquette livre les deux options sans trancher, exactement comme pour le rayon
-d'alvéole : choisir à sa place aurait été un arbitrage de plus. À trancher, et
-le perdant se retire en supprimant un bloc.
+**Tranché : journal (2a).** Le sélecteur qui permettait de basculer entre les
+deux a été retiré, et le ruban avec.
+
+Trois raisons, dans cet ordre :
+
+1. **2a est la seule des deux que la maquette dessine en entier**, valeur par
+   valeur — bande d'en-tête, largeur de la colonne d'heure, taille de pastille,
+   marqueur encadré. 2b n'est qu'esquissée. Construire 2b, c'était l'inventer.
+2. **Le sélecteur lui-même n'existait dans aucune des deux maquettes.** C'était
+   un motif ajouté en tête d'écran — précisément ce que `/CLAUDE.md` interdit.
+3. Il empilait **deux rangées de puces** au-dessus du journal : le sélecteur,
+   puis le filtre par substance. C'était une part du « problème d'affichage »
+   signalé à l'usage.
+
+Le ruban reste dans l'historique Git si l'arbitrage doit être renversé. Le
+renverser demande alors de relever les valeurs de 2b dans la maquette, pas de
+restaurer un commit tel quel : elles n'y étaient pas toutes.
 
 Deux valeurs y sont dérivées, absentes de la maquette :
 
@@ -131,6 +143,14 @@ Deux valeurs y sont dérivées, absentes de la maquette :
 ⚠ À noter : `saisie_le` était écrit en base depuis le début mais **jamais
 relu**. Le marqueur « ajoutée après coup », que la maquette exige, n'existait
 donc nulle part — ni dans l'historique, ni dans les prises du jour.
+
+⚠ Second point relevé en confrontant l'écran à 2a : « les jours sans prise sont
+écrits » avait été appliqué à la lettre et manqué dans l'esprit. Chaque jour
+vide portait un en-tête de section et un paragraphe, soit vingt-neuf blocs
+« Aucune prise. » à pleine hauteur sur un mois calme. 2a en fait **une ligne**,
+dans une carte compacte. La règle existe pour qu'un trou ne se lise pas comme
+un oubli de saisie ; à ce format, c'est l'information elle-même qui devenait le
+mur qu'elle devait éviter.
 
 ### 1.7 [Onboarding] — La maquette annonce un chiffrement qui n'existe pas
 

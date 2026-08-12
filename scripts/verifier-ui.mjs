@@ -60,7 +60,11 @@ for (const taille of LARGEURS) {
 
   async function capturer(nom) {
     await page.waitForTimeout(700);
-    await page.screenshot({ path: `${SORTIE}/${nom}-${taille.nom}.png`, fullPage: true });
+    // Une capture qui échoue ne doit pas emporter le parcours : le contrôle
+    // qui suit — le débordement horizontal — est plus important que l'image.
+    await page
+      .screenshot({ path: `${SORTIE}/${nom}-${taille.nom}.png`, fullPage: true, animations: 'disabled', timeout: 20000 })
+      .catch((cause) => probleme.push(`capture ${nom} @${taille.nom}px : ${String(cause).slice(0, 90)}`));
     const debord = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -84,6 +88,28 @@ for (const taille of LARGEURS) {
       for (const c of ['4', '9', '1', '3']) await chiffre(c).click();
     }
     await page.waitForTimeout(2500);
+  }
+
+  /** Un produit réel du catalogue et deux prises : de quoi remplir les listes. */
+  async function peupler() {
+    await page.getByRole('link', { name: 'Produits' }).first().click();
+    await page.getByPlaceholder('Nom du médicament ou substance').fill('doliprane 1000');
+    const resultat = page.locator('button, [role="button"]').filter({ hasText: /doliprane/i }).first();
+    if (!(await resultat.waitFor({ timeout: 30000 }).then(() => true).catch(() => false))) {
+      probleme.push(`catalogue introuvable, parcours joué à vide @${taille.nom}px`);
+      return;
+    }
+    await resultat.click();
+    await page.getByRole('button', { name: /ajouter à mes produits/i }).click();
+    await page.waitForTimeout(1500);
+
+    await page.getByRole('link', { name: "Aujourd'hui" }).first().click();
+    for (let i = 0; i < 2; i += 1) {
+      await page.getByRole('button', { name: /enregistrer une prise/i }).first().click();
+      await page.locator('button').filter({ hasText: /doliprane/i }).first().click();
+      await page.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+      await page.waitForTimeout(1500);
+    }
   }
 
   await page.goto(BASE, { waitUntil: 'networkidle' });
@@ -112,6 +138,12 @@ for (const taille of LARGEURS) {
     .first()
     .waitFor({ state: 'visible', timeout: 60000 })
     .catch(() => probleme.push(`l'application n'a jamais démarré @${taille.nom}px`));
+
+  // ⚠ Le parcours se faisait jusqu'ici sur un carnet **vide** : chaque écran
+  // ne rendait que son état vide, et un défaut de rendu dans une liste de
+  // prises passait inaperçu. C'est ainsi qu'un historique qui plantait dès
+  // qu'un jour portait une prise a pu être livré. On peuple d'abord.
+  await peupler();
 
   // 3. Écrans de l'application — navigation **interne**, sans rechargement.
   await capturer('03-aujourdhui');

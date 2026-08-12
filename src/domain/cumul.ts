@@ -119,11 +119,28 @@ export function cumulParSubstance(
   prises: readonly PriseAvecSubstances[],
   fenetre: Fenetre,
 ): Map<CodeSubstance, CumulSubstance> {
-  const debut = epoch(fenetre.debut);
-  const fin = epoch(fenetre.fin);
+  return cumulDePrises(dansLaFenetre(prises, epoch(fenetre.debut), epoch(fenetre.fin)));
+}
+
+/**
+ * Cumul d'un ensemble de prises **déjà choisi** — un jour du journal, une
+ * sélection à l'écran. Aucune fenêtre n'est appliquée : le tri a eu lieu avant.
+ *
+ * ⚠ Existe parce qu'appeler `cumulParSubstance` avec une fenêtre factice pour
+ * la neutraliser ne marche pas : `epoch('')` lève, et l'écran entier tombait
+ * avec. Un total sans fenêtre est un besoin légitime — il a sa fonction, il
+ * n'emprunte pas celle d'à côté en la trompant.
+ *
+ * Comme partout, seules les prises effectives comptent : une prise annulée ne
+ * verse rien.
+ */
+export function cumulDePrises(
+  prises: readonly PriseAvecSubstances[],
+): Map<CodeSubstance, CumulSubstance> {
   const cumul = new Map<CodeSubstance, CumulSubstance>();
 
-  for (const prise of dansLaFenetre(prises, debut, fin)) {
+  for (const prise of prises) {
+    if (prise.statut !== 'prise') continue;
     for (const substance of prise.substances) {
       const existant = cumul.get(substance.code);
       cumul.set(substance.code, {

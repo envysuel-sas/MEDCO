@@ -146,10 +146,20 @@
 
   --marge-ecran: var(--espace-8);
 
+  /* --- Journal (maquette 2a) -------------------------------------------- */
+  /* Valeurs lues dans 2a et absentes de l'échelle générale. Elles y sont
+     nommées plutôt qu'écrites dans le composant : `padding:13px 16px`,
+     `width:42px` pour l'heure, pastilles de 9 px en ligne et 7 px en filtre. */
+  --espace-ligne-journal: 13px;
+  --largeur-heure-journal: 42px;
+  --cote-pastille-journal: 9px;
+  --cote-pastille-chip: 7px;
+
   /* --- Rayons ---------------------------------------------------------- */
   --rayon-alveole: 4px; /* alvéole carrée (CDC §8.3) — voir manques.md */
   --rayon-jauge: 4px;
   --rayon-badge: 6px;
+  --rayon-marqueur: 7px; /* badge « ajoutée après coup » (2a) */
   --rayon-champ: 10px;
   --rayon-chip: 12px;
   --rayon-carte: 14px;
