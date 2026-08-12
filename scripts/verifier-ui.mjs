@@ -107,6 +107,18 @@ for (const taille of LARGEURS) {
 
   // 3. Écrans de l'application — navigation **interne**, sans rechargement.
   await capturer('03-aujourdhui');
+  // L'historique (maquette 2a) est un écran de détail, atteint depuis
+  // « Aujourd'hui » : c'est ce chemin-là qu'on emprunte.
+  const versHistorique = page.getByRole('link', { name: /historique/i }).first();
+  if (await versHistorique.count()) {
+    await versHistorique.click();
+    await capturer('03b-historique');
+    const retour = page.getByRole('button', { name: 'Retour' }).first();
+    if (await retour.count()) await retour.click();
+    else probleme.push(`pas de retour depuis l'historique @${taille.nom}px`);
+  } else {
+    probleme.push(`lien vers l'historique introuvable @${taille.nom}px`);
+  }
   for (const [nom, onglet] of [
     ['04-pilulier', 'Pilulier'],
     ['05-produits', 'Produits'],

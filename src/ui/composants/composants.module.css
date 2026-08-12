@@ -887,3 +887,45 @@
     border-radius: var(--rayon-carte) var(--rayon-carte) 0 0;
   }
 }
+
+/* --- Historique (maquette 2a) --------------------------------------------- */
+
+.filtresHistorique {
+  display: flex;
+  gap: var(--espace-4);
+  flex-wrap: wrap;
+}
+
+.jourHistorique {
+  display: grid;
+  gap: var(--espace-5);
+}
+
+.totalJour {
+  font-size: var(--taille-liste);
+  line-height: var(--interligne-liste);
+  font-weight: var(--graisse-moyenne);
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-2);
+}
+
+.ligneJournal {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-6);
+  padding: var(--espace-6) 0;
+  border-top: var(--filet) solid var(--trait);
+}
+
+.ligneJournal:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.heureJournal {
+  font-family: var(--famille-mono);
+  font-size: var(--taille-mono);
+  color: var(--encre-3);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}

@@ -62,6 +62,25 @@ La maquette pose la question elle-même (« À trancher, 3 · Rayon de l'alvéol
 **Fait en attendant :** `--rayon-alveole: 4px`, valeur par défaut du composant
 `MedcoPlaquette` et option CDC. Un seul jeton à changer pour basculer.
 
+### 1.6 [Historique] — Journal ou ruban, la maquette pose la question
+
+Elle l'écrit : « Deux mises en page à trancher — journal (2a) ou ruban (2b) »,
+et livre les deux, exactement comme pour le rayon d'alvéole.
+
+**Fait en attendant :** le **journal** (2a) est implémenté — groupes par jour,
+total à droite, filtres par substance. Le ruban (2b) ne l'est pas.
+
+Deux valeurs y sont dérivées, absentes de la maquette :
+
+| Valeur | Choix | Raison |
+|---|---|---|
+| Fenêtre du journal | 30 jours | aligne le journal sur la Plaquette |
+| Seuil « ajoutée après coup » | 1 heure d'écart entre `saisie_le` et l'horodatage | absorbe la saisie immédiate, qui décale toujours de quelques secondes |
+
+⚠ À noter : `saisie_le` était écrit en base depuis le début mais **jamais
+relu**. Le marqueur « ajoutée après coup », que la maquette exige, n'existait
+donc nulle part — ni dans l'historique, ni dans les prises du jour.
+
 ---
 
 ## 2. Valeurs absentes de l'export

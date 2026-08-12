@@ -95,6 +95,12 @@ export interface PriseAvecSubstances {
   readonly fuseau: string;
   readonly dose: number;
   readonly statut: 'prise' | 'annulee';
+  /**
+   * Instant de la saisie, distinct de l'horodatage de la prise. Leur écart est
+   * ce qui permet d'écrire « ajoutée après coup » dans l'historique, comme la
+   * maquette le demande. Facultatif : le cumul n'en a que faire.
+   */
+  readonly saisieLe?: Instant;
   readonly substances: readonly SubstancePrise[];
 }
 

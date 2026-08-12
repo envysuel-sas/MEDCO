@@ -317,7 +317,7 @@ export function prisesAvecSubstances(
   fin: Instant,
 ): PriseAvecSubstances[] {
   const prises = lire(
-    `SELECT id, profil_id, produit_id, horodatage, fuseau, dose, statut
+    `SELECT id, profil_id, produit_id, horodatage, fuseau, dose, statut, saisie_le
      FROM prise
      WHERE profil_id = ?1 AND horodatage >= ?2 AND horodatage < ?3
      ORDER BY horodatage`,
@@ -352,6 +352,7 @@ export function prisesAvecSubstances(
     fuseau: texte(p, 'fuseau'),
     dose: nombre(p, 'dose'),
     statut: texte(p, 'statut') as 'prise' | 'annulee',
+    saisieLe: texte(p, 'saisie_le'),
     substances: parPrise.get(texte(p, 'id')) ?? [],
   }));
 }

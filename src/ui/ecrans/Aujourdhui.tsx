@@ -21,6 +21,7 @@ import { Carte, Etiquette, EtatVide } from '../composants/primitives.js';
 import { CarteSignal, CumulJour, ListePrises, Plaquette } from '../composants/donnees.js';
 import type { Alveole, LignePriseAffichee } from '../composants/donnees.js';
 import styles from '../composants/composants.module.css';
+import { Link } from 'react-router';
 
 const JOURS_PLAQUETTE = 30;
 
@@ -112,7 +113,14 @@ export function Aujourdhui(): ReactNode {
         ))}
 
         <section>
-          <Etiquette>Prises du jour</Etiquette>
+          <div className={styles['entreDeux']}>
+            <Etiquette>Prises du jour</Etiquette>
+            {/* La maquette 2a pose l'historique en écran de détail, refermé par
+                un retour vers « Aujourd'hui » — pas en onglet. */}
+            <Link className={styles['source']} to="/historique">
+              Historique →
+            </Link>
+          </div>
           <ListePrises prises={lignes} />
         </section>
       </main>
@@ -203,6 +211,11 @@ function lignesDuJour(
           : 'dosage non exploitable',
         appoint: `${prise.dose} ${produit?.unite ?? ''}`.trim(),
         groupe: substance?.groupeAtc ?? ('_' as GroupeAtc),
+      // La maquette 2a l'exige : une prise saisie longtemps après son heure
+      // est marquée comme telle. Le champ existait, rien ne le remplissait.
+      ...(prise.saisieLe && Date.parse(prise.saisieLe) - Date.parse(prise.horodatage) > 3_600_000
+        ? { ajouteeApresCoup: true }
+        : {}),
         codeSubstance: premiere?.code ?? prise.produitId,
         ...(prise.statut === 'annulee' ? { annulee: true } : {}),
         ...(prise.substances.length === 0 ? { exclueDuCumul: true } : {}),
