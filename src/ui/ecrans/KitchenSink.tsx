@@ -32,6 +32,7 @@ import {
   Citation,
   CumulJour,
   JaugeLineaire,
+  LegendeAtc,
   LigneResultat,
   ListePrises,
   PastilleAtc,
@@ -282,6 +283,13 @@ export function KitchenSink(): ReactNode {
         <Carte>
           <JaugeLineaire valeur={400} repere={1200} couleur={COULEUR_ATC.M} legendeGauche="1 prise" legendeDroite="repère 1 200 mg" />
         </Carte>
+      </Bloc>
+
+      <Bloc titre="Légende ATC — la clé de lecture de la Plaquette">
+        <p className={styles['meta']}>
+          Maquette 1b et 1c. Ne liste que les groupes réellement présents sur la période.
+        </p>
+        <LegendeAtc groupes={['N', 'M', 'A', 'R']} />
       </Bloc>
 
       <Bloc titre="Plaquette">

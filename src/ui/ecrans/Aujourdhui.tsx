@@ -18,7 +18,7 @@ import type { EtatMedco } from '../etat.js';
 import { couleurSubstance } from '../tokens.js';
 import { faitDuSignal, formaterQuantite } from '../textes.js';
 import { Bouton, Carte, Etiquette, EtatVide } from '../composants/primitives.js';
-import { CarteSignal, CumulJour, ListePrises, Plaquette } from '../composants/donnees.js';
+import { CarteSignal, CumulJour, LegendeAtc, ListePrises, Plaquette } from '../composants/donnees.js';
 import type { Alveole, LignePriseAffichee } from '../composants/donnees.js';
 import styles from '../composants/composants.module.css';
 import { Link } from 'react-router';
@@ -68,6 +68,14 @@ export function Aujourdhui(): ReactNode {
     () => plaquetteDesJours(prises, instant, substances),
     [prises, instant, substances],
   );
+  const groupesPresents = useMemo<GroupeAtc[]>(
+    () =>
+      prises.flatMap((prise) =>
+        prise.substances.map((s) => substances.get(s.code)?.groupeAtc ?? ('_' as GroupeAtc)),
+      ),
+    [prises, substances],
+  );
+
   const lignes = useMemo(
     () => lignesDuJour(prises, produits, instant, substances),
     [prises, produits, instant, substances],
@@ -102,6 +110,9 @@ export function Aujourdhui(): ReactNode {
             </span>
           </div>
           <Plaquette alveoles={alveoles} />
+          {/* Maquette 1b/1c — la clé de lecture de la grille. Sans elle, la
+              couleur ne dit rien de la molécule. */}
+          <LegendeAtc groupes={groupesPresents} />
         </Carte>
 
         {signaux.map((signal) => (

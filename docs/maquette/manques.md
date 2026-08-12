@@ -8,9 +8,57 @@ plausible.
 
 ---
 
+## 0. Le cahier des charges de design manquait
+
+`docs/maquette/cdc-design.md` — 872 lignes — n'était pas dans le dépôt. Les
+jetons ont donc été extraits du seul export HTML, sans la source qui l'explique.
+Les composants `MedcoTabBar` et `MedcoPlaquette` manquaient aussi ; ils y sont
+désormais.
+
+Trois écarts constatés en comparant, pour la première fois, la maquette rendue
+et l'application rendue côte à côte :
+
+| # | Écart | État |
+|---|---|---|
+| 0.1 | **Légende ATC absente sous la Plaquette** — la maquette pose `● nerveux ● musculo ● digestif ● respiratoire` sous la grille, dans les écrans 1b et 1c. | **corrigé** — `LegendeAtc` |
+| 0.2 | ~~L'icône d'en-tête serait un soleil~~ | **constat erroné de ma part** — le glyphe de l'application est déjà un cercle à huit rayons, identique à celui de la maquette. Rien à corriger. |
+| 0.3 | **Lien « Historique → » sous « PRISES DU JOUR »** — invention de l'implémentation ; la maquette 2a referme l'historique sur « Aujourd'hui » sans dire par où on y entre. | à confirmer |
+
+### 0.4 Le thème sombre n'est plus introuvable
+
+Le CDC §4.2 pose le registre : « **Sombre, chaud, dense.** Fond noir tirant sur
+le brun […] Le mode clair existe et doit être excellent, mais le produit est
+**conçu en sombre d'abord**. » §7.1 en donne toutes les valeurs, y compris le
+laiton `--sable` `#C9B79A`.
+
+Mais l'export de la maquette **abandonne explicitement cette direction** : « La
+direction sombre et chaude du CDC §4.2 est abandonnée : fond clair bleu-gris,
+chrome pétrole tiré du bleu du mot-symbole, laiton remplacé par ce même
+pétrole. »
+
+`CLAUDE.md` tranche — sur un point visuel, la maquette gagne. L'application suit
+donc la maquette, et c'est cohérent. Reste que §1.1 affirmait que les valeurs du
+thème sombre manquaient : **c'est faux, elles sont au CDC §7.1**. Le thème
+sombre est désormais constructible. À décider : le construire d'après le CDC, ou
+acter que la direction claire de la maquette le remplace.
+
+---
+
 ## 1. Contradictions à arbitrer
 
-### 1.1 [Système] — Thème sombre absent de l'export
+### 1.1 [Système] — Thème sombre : la maquette tranche pour le clair
+
+⚠ Cette entrée disait que les valeurs du thème sombre étaient introuvables.
+**C'était faux** : elles sont au CDC §7.1, laiton `--sable` compris. Voir §0.4.
+
+Décision du commanditaire : **conforme à la maquette**. L'export abandonne
+explicitement la direction sombre du CDC §4.2 au profit du clair bleu-gris, et
+`CLAUDE.md` donne la maquette gagnante sur un point visuel. L'application reste
+donc en thème clair, et ce n'est plus une réserve mais un choix.
+
+Le texte d'origine, conservé pour mémoire :
+
+### 1.1 bis [Système] — Thème sombre absent de l'export
 
 L'export ne contient que la direction claire. La maquette y fait pourtant
 référence à une palette sombre antérieure (« le sérif sur fond clair pèse plus

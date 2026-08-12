@@ -451,3 +451,31 @@ export function SelecteurDose({
     </div>
   );
 }
+
+
+/**
+ * Légende des groupes ATC sous la Plaquette (maquette 1b et 1c).
+ *
+ * ⚠ Elle manquait. Les classes `.legende`, `.legendeEntree` et
+ * `.legendePastille` avaient été extraites de la maquette et n'étaient
+ * utilisées par aucun composant : la grille s'affichait sans sa clé de
+ * lecture, sur une application dont le principe est « la couleur porte la
+ * molécule » (§5.1).
+ *
+ * Ne liste que les groupes **réellement présents** dans la période affichée :
+ * une légende exhaustive de onze teintes serait du bruit.
+ */
+export function LegendeAtc({ groupes }: { readonly groupes: readonly GroupeAtc[] }): ReactNode {
+  const presents = [...new Set(groupes)].filter((groupe) => groupe !== '_');
+  if (presents.length === 0) return null;
+  return (
+    <div className={styles['legende']}>
+      {presents.map((groupe) => (
+        <span key={groupe} className={styles['legendeEntree']}>
+          <span className={styles['legendePastille']} style={{ background: COULEUR_ATC[groupe] }} />
+          {LIBELLE_GROUPE_ATC[groupe]}
+        </span>
+      ))}
+    </div>
+  );
+}
