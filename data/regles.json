@@ -1,0 +1,159 @@
+{
+  "version": "2026.08.12",
+  "note": "Seuils du §8.3 de la spec, chacun revérifié à la source et daté avant intégration (§8.1). Les codes de substance sont ceux de la BDPM du 03/08/2026. Le champ `citation` porte le texte exact de la source : c'est lui que l'UI affiche en deuxième bloc (§8.6), jamais une reformulation.",
+  "regles": [
+    {
+      "id": "PARA-24H",
+      "type": "cumul_fenetre",
+      "cible": { "substances": ["02202"], "libelle": "paracétamol" },
+      "mode": ["prescrit", "libre"],
+      "fenetre": "PT24H",
+      "seuil": 3000,
+      "unite": "mg",
+      "niveau": "vigilance",
+      "message": "MSG_PARA_24H",
+      "citation": "La dose maximale journalière est de 60 mg/kg/jour (avec un maximum de 3 g/j sans ordonnance).",
+      "source": {
+        "libelle": "ANSM — Dossier thématique : le paracétamol",
+        "url": "https://ansm.sante.fr/dossiers-thematiques/medicaments-de-la-douleur/le-paracetamol",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "PARA-PRISE",
+      "type": "dose_unitaire",
+      "cible": { "substances": ["02202"], "libelle": "paracétamol" },
+      "mode": ["prescrit", "libre"],
+      "seuil": 1000,
+      "unite": "mg",
+      "niveau": "information",
+      "message": "MSG_PARA_PRISE",
+      "citation": "La dose maximale par prise (1 gramme).",
+      "source": {
+        "libelle": "ANSM — Dossier thématique : le paracétamol",
+        "url": "https://ansm.sante.fr/dossiers-thematiques/medicaments-de-la-douleur/le-paracetamol",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "PARA-INTERVALLE",
+      "type": "intervalle_min",
+      "cible": { "substances": ["02202"], "libelle": "paracétamol" },
+      "mode": ["prescrit", "libre"],
+      "seuil": 4,
+      "unite": "h",
+      "niveau": "information",
+      "message": "MSG_PARA_INTERVALLE",
+      "citation": "L'intervalle minimum entre les prises (4 heures).",
+      "source": {
+        "libelle": "ANSM — Dossier thématique : le paracétamol",
+        "url": "https://ansm.sante.fr/dossiers-thematiques/medicaments-de-la-douleur/le-paracetamol",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "IBU-24H",
+      "type": "cumul_fenetre",
+      "cible": { "substances": ["02092"], "libelle": "ibuprofène" },
+      "mode": ["libre"],
+      "fenetre": "PT24H",
+      "seuil": 1200,
+      "unite": "mg",
+      "niveau": "vigilance",
+      "message": "MSG_IBU_24H",
+      "citation": "1 comprimé à 400 mg par prise à renouveler si nécessaire toutes les 6 à 8 heures sans dépasser 3 comprimés à 400 mg par jour (soit 1200 mg par jour).",
+      "source": {
+        "libelle": "RCP IBUPROFENE ALMUS 400 mg, comprimé pelliculé — BDPM (ANSM)",
+        "url": "https://base-donnees-publique.medicaments.gouv.fr/medicament/62611169/extrait",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "IBU-DUREE",
+      "type": "duree_consecutive",
+      "cible": { "substances": ["02092"], "libelle": "ibuprofène" },
+      "mode": ["libre"],
+      "seuil": 5,
+      "unite": "jours",
+      "niveau": "information",
+      "message": "MSG_IBU_DUREE",
+      "citation": "Chez l'adulte, si la douleur persiste plus de 5 jours ou la fièvre plus de 3 jours, ou si elles s'aggravent, en informer votre médecin.",
+      "source": {
+        "libelle": "RCP IBUPROFENE ALMUS 400 mg, comprimé pelliculé — BDPM (ANSM)",
+        "url": "https://base-donnees-publique.medicaments.gouv.fr/medicament/62611169/extrait",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "ASPI-24H",
+      "type": "cumul_fenetre",
+      "cible": { "substances": ["00005"], "libelle": "acide acétylsalicylique" },
+      "mode": ["libre"],
+      "fenetre": "PT24H",
+      "seuil": 3000,
+      "unite": "mg",
+      "niveau": "vigilance",
+      "message": "MSG_ASPI_24H",
+      "citation": "Chez l'adulte et l'enfant de plus de 50 kg (à partir d'environ 15 ans) : la posologie maximale recommandée est de 3 g d'aspirine par jour, soit 6 comprimés effervescents par jour.",
+      "remarque": "Le seuil dépend de la forme : le RCP d'ASPIRINE DU RHONE 500 mg comprimé retient 2 g/j. 3 g/j est la valeur du §8.3 de la spec ; le seuil le plus bas du marché est plus prudent. À trancher (voir docs/maquette/manques.md).",
+      "source": {
+        "libelle": "RCP ASPIRINE UPSA 500 mg, comprimé effervescent — BDPM (ANSM)",
+        "url": "https://base-donnees-publique.medicaments.gouv.fr/medicament/65265765/extrait",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "ANTALG-30J",
+      "type": "jours_de_prise",
+      "cible": { "classes": ["ANTALGIQUE_SIMPLE"], "libelle": "antalgique" },
+      "mode": ["libre"],
+      "fenetre": "P30D",
+      "seuil": 15,
+      "unite": "jours",
+      "niveau": "information",
+      "message": "MSG_ANTALG_30J",
+      "citation": "L'abus médicamenteux est défini par la prise régulière depuis plus de trois mois, plus de 15 jours par mois, d'antalgiques non opioïdes (paracétamol, aspirine, anti-inflammatoires non stéroïdiens).",
+      "source": {
+        "libelle": "HAS — Céphalées chroniques quotidiennes : diagnostic, rôle de l'abus médicamenteux, prise en charge. Recommandations pour la pratique clinique",
+        "url": "https://www.has-sante.fr/upload/docs/application/pdf/ccq_recos.pdf",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "ASSOC-30J",
+      "type": "jours_de_prise",
+      "cible": {
+        "classes": ["ANTALGIQUE_ASSOCIATION", "OPIOIDE", "TRIPTAN", "ERGOTAMINE"],
+        "libelle": "antalgique en association, opioïde, triptan ou dérivé ergoté"
+      },
+      "mode": ["libre"],
+      "fenetre": "P30D",
+      "seuil": 10,
+      "unite": "jours",
+      "niveau": "information",
+      "message": "MSG_ASSOC_30J",
+      "citation": "L'abus médicamenteux est défini par la prise régulière depuis plus de trois mois, plus de 10 jours par mois, des autres traitements de crise (opioïdes, dérivés ergotés, triptans et antalgiques en association).",
+      "source": {
+        "libelle": "HAS — Céphalées chroniques quotidiennes : diagnostic, rôle de l'abus médicamenteux, prise en charge. Recommandations pour la pratique clinique",
+        "url": "https://www.has-sante.fr/upload/docs/application/pdf/ccq_recos.pdf",
+        "consulte_le": "2026-08-12"
+      }
+    },
+    {
+      "id": "DECONG-DUREE",
+      "type": "duree_consecutive",
+      "cible": { "classes": ["DECONGESTIONNANT_NASAL"], "libelle": "décongestionnant nasal" },
+      "mode": ["libre"],
+      "seuil": 5,
+      "unite": "jours",
+      "niveau": "information",
+      "message": "MSG_DECONG_DUREE",
+      "citation": "La durée du traitement ne doit pas dépasser 5 jours.",
+      "source": {
+        "libelle": "RCP ATURGYL 0,05 POUR CENT, solution pour pulvérisation nasale — BDPM (ANSM)",
+        "url": "https://base-donnees-publique.medicaments.gouv.fr/medicament/63581266/extrait",
+        "consulte_le": "2026-08-12"
+      }
+    }
+  ]
+}

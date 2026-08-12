@@ -1,0 +1,1026 @@
+{
+  "couleurs": [
+    {
+      "valeur": "#56737f",
+      "occurrences": 245
+    },
+    {
+      "valeur": "#12566e",
+      "occurrences": 94
+    },
+    {
+      "valeur": "#ffffff",
+      "occurrences": 82
+    },
+    {
+      "valeur": "#d8e4eb",
+      "occurrences": 75
+    },
+    {
+      "valeur": "#e4edf2",
+      "occurrences": 74
+    },
+    {
+      "valeur": "#0f2e3d",
+      "occurrences": 57
+    },
+    {
+      "valeur": "#31505e",
+      "occurrences": 47
+    },
+    {
+      "valeur": "#bcceda",
+      "occurrences": 45
+    },
+    {
+      "valeur": "#8aa0ab",
+      "occurrences": 40
+    },
+    {
+      "valeur": "#c4551f",
+      "occurrences": 37
+    },
+    {
+      "valeur": "#f1f6f9",
+      "occurrences": 32
+    },
+    {
+      "valeur": "#2a6aac",
+      "occurrences": 10
+    },
+    {
+      "valeur": "#2f7a4b",
+      "occurrences": 10
+    },
+    {
+      "valeur": "#6b6258",
+      "occurrences": 9
+    },
+    {
+      "valeur": "#9a553a",
+      "occurrences": 7
+    },
+    {
+      "valeur": "#eaf2f6",
+      "occurrences": 7
+    },
+    {
+      "valeur": "#c07a12",
+      "occurrences": 6
+    },
+    {
+      "valeur": "rgba(15,46,61,.1)",
+      "occurrences": 6
+    },
+    {
+      "valeur": "#ac5478",
+      "occurrences": 5
+    },
+    {
+      "valeur": "#6552ae",
+      "occurrences": 4
+    },
+    {
+      "valeur": "#e8eef2",
+      "occurrences": 4
+    },
+    {
+      "valeur": "#2f9fa8",
+      "occurrences": 3
+    },
+    {
+      "valeur": "rgba(15,46,61,.18)",
+      "occurrences": 3
+    },
+    {
+      "valeur": "rgba(15,46,61,.45)",
+      "occurrences": 3
+    },
+    {
+      "valeur": "rgba(196,85,31,.7)",
+      "occurrences": 3
+    },
+    {
+      "valeur": "#1f8880",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#4f8770",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#84518c",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#8a8178",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#93763a",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#999999",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#a8bbc7",
+      "occurrences": 2
+    },
+    {
+      "valeur": "rgba(196,85,31,.4)",
+      "occurrences": 2
+    },
+    {
+      "valeur": "#2a1215",
+      "occurrences": 1
+    },
+    {
+      "valeur": "#5c2b2e",
+      "occurrences": 1
+    },
+    {
+      "valeur": "#666666",
+      "occurrences": 1
+    },
+    {
+      "valeur": "#8c5f86",
+      "occurrences": 1
+    },
+    {
+      "valeur": "#ff8a80",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(0,0,0,0.08)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(0,0,0,0.12)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(15,46,61,.09)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(15,46,61,.2)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(15,46,61,.55)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(15,46,61,.6)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(18,86,110,0.06)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(255,255,255,.94)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(255,255,255,0.9)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "rgba(42,106,172,.4)",
+      "occurrences": 1
+    }
+  ],
+  "taillesPolice": [
+    {
+      "valeur": "12px",
+      "occurrences": 82
+    },
+    {
+      "valeur": "15px",
+      "occurrences": 60
+    },
+    {
+      "valeur": "11px",
+      "occurrences": 58
+    },
+    {
+      "valeur": "13px",
+      "occurrences": 45
+    },
+    {
+      "valeur": "16px",
+      "occurrences": 32
+    },
+    {
+      "valeur": "14px",
+      "occurrences": 25
+    },
+    {
+      "valeur": "20px",
+      "occurrences": 17
+    },
+    {
+      "valeur": "15px\\",
+      "occurrences": 16
+    },
+    {
+      "valeur": "16px\\",
+      "occurrences": 12
+    },
+    {
+      "valeur": "10px",
+      "occurrences": 10
+    },
+    {
+      "valeur": "22px",
+      "occurrences": 6
+    },
+    {
+      "valeur": "28px",
+      "occurrences": 5
+    },
+    {
+      "valeur": "56px",
+      "occurrences": 5
+    },
+    {
+      "valeur": "26px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "34px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "18px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "24px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "30px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "64px",
+      "occurrences": 1
+    }
+  ],
+  "graisses": [
+    {
+      "valeur": "500",
+      "occurrences": 173
+    },
+    {
+      "valeur": "500\\",
+      "occurrences": 38
+    },
+    {
+      "valeur": "600",
+      "occurrences": 18
+    },
+    {
+      "valeur": "400",
+      "occurrences": 11
+    },
+    {
+      "valeur": "600\\",
+      "occurrences": 8
+    }
+  ],
+  "interlignes": [
+    {
+      "valeur": "18px",
+      "occurrences": 22
+    },
+    {
+      "valeur": "25px",
+      "occurrences": 14
+    },
+    {
+      "valeur": "17px",
+      "occurrences": 9
+    },
+    {
+      "valeur": "36px",
+      "occurrences": 7
+    },
+    {
+      "valeur": "27px",
+      "occurrences": 5
+    },
+    {
+      "valeur": "58px",
+      "occurrences": 4
+    },
+    {
+      "valeur": "28px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "23px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "24px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "38px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "40px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "14px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "20px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "21px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "22px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "22px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "30px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "30px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "54px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "66px",
+      "occurrences": 1
+    }
+  ],
+  "interlettrages": [
+    {
+      "valeur": ".07em",
+      "occurrences": 39
+    },
+    {
+      "valeur": "-.01em\\",
+      "occurrences": 10
+    },
+    {
+      "valeur": "-.02em\\",
+      "occurrences": 5
+    },
+    {
+      "valeur": ".08em",
+      "occurrences": 5
+    },
+    {
+      "valeur": "-.03em",
+      "occurrences": 4
+    },
+    {
+      "valeur": ".09em",
+      "occurrences": 4
+    },
+    {
+      "valeur": "-.01em",
+      "occurrences": 3
+    },
+    {
+      "valeur": "-.02em",
+      "occurrences": 3
+    },
+    {
+      "valeur": "-.03em\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": ".05em",
+      "occurrences": 2
+    },
+    {
+      "valeur": ".06em",
+      "occurrences": 2
+    }
+  ],
+  "familles": [
+    {
+      "valeur": "Poppins,sans-serif",
+      "occurrences": 28
+    },
+    {
+      "valeur": "",
+      "occurrences": 19
+    },
+    {
+      "valeur": "Newsreader,serif",
+      "occurrences": 17
+    },
+    {
+      "valeur": "-apple-system, BlinkMacSystemFont, sans-serif",
+      "occurrences": 1
+    },
+    {
+      "valeur": "Poppins,system-ui,sans-serif",
+      "occurrences": 1
+    }
+  ],
+  "rayons": [
+    {
+      "valeur": "50%",
+      "occurrences": 65
+    },
+    {
+      "valeur": "14px",
+      "occurrences": 42
+    },
+    {
+      "valeur": "8px",
+      "occurrences": 29
+    },
+    {
+      "valeur": "10px",
+      "occurrences": 27
+    },
+    {
+      "valeur": "4px",
+      "occurrences": 27
+    },
+    {
+      "valeur": "2px",
+      "occurrences": 25
+    },
+    {
+      "valeur": "12px",
+      "occurrences": 23
+    },
+    {
+      "valeur": "6px",
+      "occurrences": 13
+    },
+    {
+      "valeur": "9px",
+      "occurrences": 7
+    },
+    {
+      "valeur": "22px 22px 0 0",
+      "occurrences": 3
+    },
+    {
+      "valeur": "3px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "7px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "4px\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "11px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "1px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "5px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "7px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "8px\\",
+      "occurrences": 1
+    }
+  ],
+  "espacements": [
+    {
+      "valeur": "8px\\",
+      "occurrences": 55
+    },
+    {
+      "valeur": "6px\\",
+      "occurrences": 38
+    },
+    {
+      "valeur": "12px\\",
+      "occurrences": 32
+    },
+    {
+      "valeur": "12px",
+      "occurrences": 25
+    },
+    {
+      "valeur": "10px",
+      "occurrences": 23
+    },
+    {
+      "valeur": "16px\\",
+      "occurrences": 23
+    },
+    {
+      "valeur": "14px\\",
+      "occurrences": 22
+    },
+    {
+      "valeur": "54px",
+      "occurrences": 22
+    },
+    {
+      "valeur": "13px 0",
+      "occurrences": 21
+    },
+    {
+      "valeur": "10px\\",
+      "occurrences": 20
+    },
+    {
+      "valeur": "5px\\",
+      "occurrences": 20
+    },
+    {
+      "valeur": "2px\\",
+      "occurrences": 19
+    },
+    {
+      "valeur": "auto\\",
+      "occurrences": 17
+    },
+    {
+      "valeur": "0 16px 14px",
+      "occurrences": 16
+    },
+    {
+      "valeur": "8px",
+      "occurrences": 14
+    },
+    {
+      "valeur": "18px\\",
+      "occurrences": 13
+    },
+    {
+      "valeur": "13px 16px",
+      "occurrences": 12
+    },
+    {
+      "valeur": "6px",
+      "occurrences": 12
+    },
+    {
+      "valeur": "8px 4px",
+      "occurrences": 12
+    },
+    {
+      "valeur": "16px",
+      "occurrences": 9
+    },
+    {
+      "valeur": "10px 16px 8px\\",
+      "occurrences": 8
+    },
+    {
+      "valeur": "10px 8px 12px",
+      "occurrences": 8
+    },
+    {
+      "valeur": "14px",
+      "occurrences": 8
+    },
+    {
+      "valeur": "13px 0\\",
+      "occurrences": 7
+    },
+    {
+      "valeur": "3px\\",
+      "occurrences": 7
+    },
+    {
+      "valeur": "4px\\",
+      "occurrences": 7
+    },
+    {
+      "valeur": "7px 12px",
+      "occurrences": 7
+    },
+    {
+      "valeur": "14px 0",
+      "occurrences": 6
+    },
+    {
+      "valeur": "20px\\",
+      "occurrences": 6
+    },
+    {
+      "valeur": "3px 7px",
+      "occurrences": 6
+    },
+    {
+      "valeur": "4px 16px\\",
+      "occurrences": 6
+    },
+    {
+      "valeur": "9px 13px",
+      "occurrences": 6
+    },
+    {
+      "valeur": "9px\\",
+      "occurrences": 6
+    },
+    {
+      "valeur": "11px 0\\",
+      "occurrences": 5
+    },
+    {
+      "valeur": "14px 16px\\",
+      "occurrences": 5
+    },
+    {
+      "valeur": "4px",
+      "occurrences": 5
+    },
+    {
+      "valeur": "54px 24px 40px",
+      "occurrences": 5
+    },
+    {
+      "valeur": "8px 16px 6px\\",
+      "occurrences": 5
+    },
+    {
+      "valeur": "7px",
+      "occurrences": 4
+    },
+    {
+      "valeur": "7px 4px",
+      "occurrences": 4
+    },
+    {
+      "valeur": "8px 0",
+      "occurrences": 4
+    },
+    {
+      "valeur": "0",
+      "occurrences": 3
+    },
+    {
+      "valeur": "0 18px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "18px 16px\\",
+      "occurrences": 3
+    },
+    {
+      "valeur": "20px 16px 30px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "6px 10px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "7px\\",
+      "occurrences": 3
+    },
+    {
+      "valeur": "9px",
+      "occurrences": 3
+    },
+    {
+      "valeur": "0 14px\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "0 16px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "10px 14px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "10px 16px 12px\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "11px 0",
+      "occurrences": 2
+    },
+    {
+      "valeur": "12px 0\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "14px 0 0\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "14px 0\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "14px 16px 10px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "14px 16px 6px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "18px 16px 16px\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "20px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "22px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "22px 0",
+      "occurrences": 2
+    },
+    {
+      "valeur": "22px 24px\\",
+      "occurrences": 2
+    },
+    {
+      "valeur": "24px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "8px 16px 6px",
+      "occurrences": 2
+    },
+    {
+      "valeur": "-6px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 0 6px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 16px 14px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 2px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 auto\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "10px 0\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "10px 16px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "10px 8px 26px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "12px 0",
+      "occurrences": 1
+    },
+    {
+      "valeur": "12px 10px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "14px 12px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "18px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "22px 24px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "22px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "26px 0 0",
+      "occurrences": 1
+    },
+    {
+      "valeur": "26px 28px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "2px 0\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "2px 14px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "2px 16px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "30px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "34px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "34px 0 16px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "3px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "40px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "44px 48px 36px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "4px 0\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "5px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "6px 12px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "6px 16px 14px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "7px 8px\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "8px 14px",
+      "occurrences": 1
+    },
+    {
+      "valeur": "auto",
+      "occurrences": 1
+    }
+  ],
+  "durees": [],
+  "ombres": [
+    {
+      "valeur": "0 -8px 40px rgba(15,46,61,.18)\\",
+      "occurrences": 3
+    },
+    {
+      "valeur": "{{ c.ring",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 1px 2px rgba(15,46,61,.2)\\",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 1px 4px rgba(0,0,0,0.08)",
+      "occurrences": 1
+    },
+    {
+      "valeur": "0 1px 4px rgba(0,0,0,0.12)",
+      "occurrences": 1
+    }
+  ],
+  "_aVerifier": {
+    "couleurs": [
+      "#2a1215",
+      "#5c2b2e",
+      "#666666",
+      "#8c5f86",
+      "#ff8a80",
+      "rgba(0,0,0,0.08)",
+      "rgba(0,0,0,0.12)",
+      "rgba(15,46,61,.09)",
+      "rgba(15,46,61,.2)",
+      "rgba(15,46,61,.55)",
+      "rgba(15,46,61,.6)",
+      "rgba(18,86,110,0.06)",
+      "rgba(255,255,255,.94)",
+      "rgba(255,255,255,0.9)",
+      "rgba(42,106,172,.4)"
+    ],
+    "taillesPolice": [
+      "18px",
+      "24px",
+      "30px",
+      "64px"
+    ],
+    "interlignes": [
+      "14px",
+      "20px",
+      "21px",
+      "22px",
+      "22px\\",
+      "30px",
+      "30px\\",
+      "54px",
+      "66px"
+    ],
+    "familles": [
+      "-apple-system, BlinkMacSystemFont, sans-serif",
+      "Poppins,system-ui,sans-serif"
+    ],
+    "rayons": [
+      "11px",
+      "1px\\",
+      "5px",
+      "7px\\",
+      "8px\\"
+    ],
+    "espacements": [
+      "-6px\\",
+      "0 0 6px",
+      "0 16px 14px\\",
+      "0 2px\\",
+      "0 auto\\",
+      "10px 0\\",
+      "10px 16px",
+      "10px 8px 26px",
+      "12px 0",
+      "12px 10px\\",
+      "14px 12px\\",
+      "18px",
+      "22px 24px",
+      "22px\\",
+      "26px 0 0",
+      "26px 28px",
+      "2px 0\\",
+      "2px 14px\\",
+      "2px 16px\\",
+      "30px",
+      "34px",
+      "34px 0 16px",
+      "3px",
+      "40px",
+      "44px 48px 36px",
+      "4px 0\\",
+      "5px",
+      "6px 12px",
+      "6px 16px 14px\\",
+      "7px 8px\\",
+      "8px 14px",
+      "auto"
+    ],
+    "ombres": [
+      "{{ c.ring",
+      "0 1px 2px rgba(15,46,61,.2)\\",
+      "0 1px 4px rgba(0,0,0,0.08)",
+      "0 1px 4px rgba(0,0,0,0.12)"
+    ]
+  },
+  "_meta": {
+    "source": "docs/maquette/export",
+    "fichiers": 1,
+    "genere_le": "2026-08-12T08:43:00.641Z",
+    "note": "Inventaire brut. Regrouper les quasi-doublons, nommer par rôle, consigner les regroupements dans manques.md."
+  }
+}
