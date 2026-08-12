@@ -46,7 +46,15 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src/pwa',
       filename: 'sw.ts',
-      registerType: 'prompt',
+      // `autoUpdate` et non `prompt` : `prompt` suppose que l'application
+      // affiche une invite « nouvelle version, recharger ? ». Aucune n'existait,
+      // si bien que le nouveau service worker s'installait, passait en attente
+      // et n'était **jamais** activé. L'application restait figée sur sa version
+      // d'installation — définitivement, et sans le dire.
+      //
+      // Corollaire côté `sw.ts` : `skipWaiting` et `clients.claim()`, sans quoi
+      // `autoUpdate` attendrait lui aussi la fermeture de tous les clients.
+      registerType: 'autoUpdate',
       injectRegister: 'auto',
       includeAssets: ['apple-touch-icon.png', 'favicon.png'],
       injectManifest: {
