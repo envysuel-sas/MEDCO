@@ -29,6 +29,7 @@ import { Substance } from './ecrans/Substance.js';
 import { Plan } from './ecrans/Plan.js';
 import { Scan } from './ecrans/Scan.js';
 import { KitchenSink } from './ecrans/KitchenSink.js';
+import { MentionsLegales } from './ecrans/MentionsLegales.js';
 import styles from './composants/composants.module.css';
 
 /** L'instant est injecté partout : le domaine ne lit jamais l'horloge. */
@@ -154,6 +155,7 @@ export function App(): ReactNode {
         <Route path="/scan" element={<Scan />} />
         <Route path="/reperes" element={<Reperes />} />
         <Route path="/reglages" element={<Reglages />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
         <Route path="/kitchen-sink" element={<KitchenSink />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

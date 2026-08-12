@@ -150,7 +150,27 @@ Deux points à trancher :
 - **Délai de reverrouillage en arrière-plan.** Deux minutes, choisi pour ne pas
   rendre l'application pénible. Aucune valeur dans la maquette ni dans la spec.
 
-### 2.9 [KitchenSink] — Écran non dessiné, par nature
+### 2.9 [MentionsLegales] — Écran non dessiné
+
+Obligation légale (LCEN art. 6-III) absente de la maquette : identification de
+l'éditeur et de l'hébergeur.
+
+**Fait en attendant :** recomposé avec `TitreEcran`, `Carte` et `Etiquette`,
+aucun composant ni motif visuel nouveau.
+
+L'identité est complète et corroborée par deux sources concordantes : le
+registre national des entreprises et les mentions légales publiées sur
+envysuel.fr. Le numéro de TVA publié coïncide avec celui que produit
+l'algorithme officiel appliqué au SIREN — les deux sources se confirment.
+
+Le mécanisme reste en place pour la suite : `Ligne` ne rend rien quand la
+valeur est vide, de sorte qu'un champ futur non vérifié ne pourra pas être
+comblé par une valeur plausible.
+
+⚠ L'hébergeur déclaré ici est **GitHub**, pas celui d'envysuel.fr (Hostinger) :
+deux services distincts, et c'est celui qui sert Medco qui doit figurer.
+
+### 2.10 [KitchenSink] — Écran non dessiné, par nature
 
 Recomposé à partir des composants existants.
 

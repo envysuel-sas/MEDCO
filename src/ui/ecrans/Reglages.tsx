@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { Link } from 'react-router';
 
 import { fenetreGlissante } from '../../domain/temps.js';
 import type { Substance } from '../../domain/types.js';
@@ -250,6 +251,16 @@ export function Reglages(): ReactNode {
         >
           base-donnees-publique.medicaments.gouv.fr ↗
         </a>
+      </Carte>
+
+      <Carte>
+        <Etiquette>Mentions légales</Etiquette>
+        <p className={styles['meta']}>
+          Éditeur, hébergeur, nature de l&apos;application et traitement des données.
+        </p>
+        <Link className={styles['source']} to="/mentions-legales">
+          Consulter les mentions légales →
+        </Link>
       </Carte>
 
       <Carte>
