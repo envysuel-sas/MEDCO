@@ -48,6 +48,35 @@ export function fenetreGlissante(fin: Instant, duree: string): { debut: Instant;
   return { debut: new Date(epoch(fin) - dureeMs(duree)).toISOString(), fin };
 }
 
+/**
+ * Fenêtre courant jusqu'à **la seconde en cours incluse**.
+ *
+ * `fenetreGlissante` exclut sa borne de fin (§7.3), et c'est ce qui garantit
+ * que deux fenêtres consécutives ne comptent jamais deux fois la même prise.
+ * Mais un instant s'écrit à la seconde, et une prise enregistrée « maintenant »
+ * porte exactement la seconde en cours : elle tombe *sur* la borne, donc
+ * s'exclut d'elle-même. L'utilisateur enregistrait sa prise et ne la voyait pas
+ * entrer dans son cumul.
+ *
+ * Toute fenêtre qui doit contenir ce que l'utilisateur vient de faire passe
+ * donc par ici : la seconde en cours est comptée entière.
+ *
+ * ⚠ Les deux bornes sont rendues dans l'offset local, comme `prise.horodatage`.
+ * Les requêtes comparent des chaînes : une borne en UTC suffixée `Z` serait
+ * textuellement inférieure à une prise du même instant portant `+02:00`.
+ */
+export function fenetreVivante(
+  maintenant: Instant,
+  duree: string,
+  fuseau: string,
+): { debut: Instant; fin: Instant } {
+  const fin = epoch(maintenant) + 1000;
+  return {
+    debut: instantDepuisEpoch(fin - dureeMs(duree), fuseau),
+    fin: instantDepuisEpoch(fin, fuseau),
+  };
+}
+
 export function ajouterJours(jour: JourLocal, nombre: number): JourLocal {
   const date = new Date(`${jour}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + nombre);

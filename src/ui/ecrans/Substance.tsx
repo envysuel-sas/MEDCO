@@ -10,12 +10,12 @@ import type { ReactNode } from 'react';
 import { useParams } from 'react-router';
 
 import { cumulParSubstance, jourLocal } from '../../domain/cumul.js';
-import { ajouterJours, fenetreGlissante } from '../../domain/temps.js';
+import { ajouterJours, fenetreVivante } from '../../domain/temps.js';
 import type { Substance as SubstanceDomaine } from '../../domain/types.js';
 import type { ResultatRecherche } from '../../db/depots.js';
 import { baseDeDonnees } from '../../db/client.js';
 import { maintenant } from '../App.js';
-import { useMedco } from '../etat.js';
+import { FUSEAU, useMedco } from '../etat.js';
 import { LIBELLE_GROUPE_ATC, couleurSubstance } from '../tokens.js';
 import { Carte, Etiquette, TitreEcran } from '../composants/primitives.js';
 import { CumulJour, LigneResultat, Plaquette } from '../composants/donnees.js';
@@ -38,7 +38,7 @@ export function Substance(): ReactNode {
   }, [code]);
 
   const cumul = useMemo(
-    () => cumulParSubstance(prises, fenetreGlissante(instant, 'PT24H')).get(code ?? ''),
+    () => cumulParSubstance(prises, fenetreVivante(instant, 'PT24H', FUSEAU())).get(code ?? ''),
     [prises, instant, code],
   );
 
